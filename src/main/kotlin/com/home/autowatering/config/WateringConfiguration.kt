@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration
 @EnableAutoConfiguration
 open class WateringConfiguration : SpringBootServletInitializer() {
 
-    override fun configure(builder: SpringApplicationBuilder): SpringApplicationBuilder {
-        return builder.sources(WateringConfiguration::class.java)
-    }
+    override fun configure(builder: SpringApplicationBuilder): SpringApplicationBuilder =
+        builder.sources(WateringConfiguration::class.java)
 }

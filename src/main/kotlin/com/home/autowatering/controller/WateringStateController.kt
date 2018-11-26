@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 class WateringStateController(val stateService: WateringStateServiceImpl) {
     companion object {
         fun response(): SendStateResult = SendStateResult()
+        fun response(error: Exception) = SendStateResult("ERROR", error.message)
     }
 
     @GetMapping("/send-state")
@@ -19,7 +20,11 @@ class WateringStateController(val stateService: WateringStateServiceImpl) {
         @RequestParam(value = "humidity") humidity: Double,
         @RequestParam(value = "tankVolume") tankVolume: Double
     ): SendStateResult {
-        stateService.load(WateringState(potName, humidity, tankVolume))
+        try {
+            stateService.load(WateringState(potName, humidity, tankVolume))
+        } catch (exc: Exception) {
+            return response(exc)
+        }
         return response()
     }
 }
