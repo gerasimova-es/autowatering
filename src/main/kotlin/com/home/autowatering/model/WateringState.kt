@@ -1,7 +1,7 @@
 package com.home.autowatering.model
 
-data class WateringState(var humidity: Double, var tankVolume: Double) {
+data class WateringState(var potName: String, var humidity: Double, var tankVolume: Double) {
     override fun toString(): String {
-        return "WateringState(humidity=$humidity, tankVolume=$tankVolume)"
+        return "WateringState(potName=$potName, humidity=$humidity, tankVolume=$tankVolume)"
     }
 }

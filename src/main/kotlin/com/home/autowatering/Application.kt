@@ -1,8 +1,11 @@
 package com.home.autowatering
 
-import com.home.autowatering.config.WateringConfiguration
 import org.springframework.boot.SpringApplication
+import org.springframework.boot.autoconfigure.SpringBootApplication
+
+@SpringBootApplication
+class Application
 
 fun main(args: Array<String>) {
-    SpringApplication.run(WateringConfiguration::class.java, *args)
+    SpringApplication.run(Application::class.java, *args)
 }

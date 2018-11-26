@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 class WateringStateServiceImpl(val potDao: PotDao, val tankDao: TankDao) : WateringStateService {
 
     override fun load(state: WateringState): WateringState {
-        potDao.save(state.humidity)
+        potDao.save(state.potName, state.humidity)
         tankDao.save(state.tankVolume)
 
         return state //todo

@@ -15,10 +15,11 @@ class WateringStateController(val stateService: WateringStateServiceImpl) {
 
     @GetMapping("/send-state")
     fun sendState(
+        @RequestParam(value = "potName", defaultValue = "1") potName: String,
         @RequestParam(value = "humidity") humidity: Double,
         @RequestParam(value = "tankVolume") tankVolume: Double
     ): SendStateResult {
-        stateService.load(WateringState(humidity, tankVolume))
+        stateService.load(WateringState(potName, humidity, tankVolume))
         return response()
     }
 }
