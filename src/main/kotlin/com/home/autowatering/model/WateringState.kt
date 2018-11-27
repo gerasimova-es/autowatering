@@ -4,7 +4,6 @@ class WateringState(
     var potName: String, var humidity: Double,
     var tankName: String, var tankVolume: Double
 ) {
-    override fun toString(): String {
-        return "WateringState(potName=$potName, humidity=$humidity, tankVolume=$tankVolume)"
-    }
+    override fun toString(): String =
+        "WateringState(potName=$potName, humidity=$humidity, tankVolume=$tankVolume)"
 }

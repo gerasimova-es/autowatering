@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class PotStateServiceImpl(val stateDao: PotStateDao) : PotStateService {
-    override fun find(filter: PotStateFilter): List<PotState> {
-        return stateDao.find(filter)
-    }
+    override fun find(filter: PotStateFilter): List<PotState> =
+        stateDao.find(filter)
 }
