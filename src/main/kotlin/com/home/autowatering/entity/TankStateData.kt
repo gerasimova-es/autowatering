@@ -1,5 +1,6 @@
 package com.home.autowatering.entity
 
+import java.sql.Date
 import javax.persistence.*
 
 @Entity
@@ -13,6 +14,9 @@ class TankStateData {
     @Column(name = "NAME", precision = 2, nullable = false)
     var name: String? = null
 
+    @Column(name = "DATE", nullable = false)
+    var date: Date? = null
+
     @Column(name = "VOLUME", precision = 2, nullable = false)
     var volume: Double = 0.0
 
@@ -21,8 +25,9 @@ class TankStateData {
 
     constructor()
 
-    constructor(name: String, volume: Double, filled: Double) {
+    constructor(name: String, date: Date, volume: Double, filled: Double) {
         this.name = name
+        this.date = date
         this.volume = volume
         this.filled = filled
     }

@@ -10,6 +10,7 @@ import com.home.autowatering.service.interfaces.WateringStateService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class WateringStateServiceImpl(val potDao: PotDao, val potStateDao: PotStateDao, val tankStateDao: TankStateDao) :
@@ -22,7 +23,7 @@ class WateringStateServiceImpl(val potDao: PotDao, val potStateDao: PotStateDao,
         try {
             val pot = potDao.findByName(state.potName) ?: potDao.save(Pot(state.potName))
             potStateDao.save(pot, state.humidity)
-            tankStateDao.save(TankState(state.tankName, state.tankVolume, state.tankVolume)) //todo set filled
+            tankStateDao.save(TankState(state.tankName, Date(), state.tankVolume, state.tankVolume)) //todo set filled
         } catch (exc: Exception) {
             logger.error("watering state saving error:", exc)
             throw exc

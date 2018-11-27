@@ -20,14 +20,11 @@ class WateringStateController(val stateService: WateringStateService) {
         @RequestParam(value = "humidity") humidity: Double,
         @RequestParam(value = "tankName", defaultValue = "1") tankName: String,
         @RequestParam(value = "tankVolume") tankVolume: Double
-    ): SendStateResult {
+    ): SendStateResult =
         try {
             stateService.load(WateringState(potName, humidity, tankName, tankVolume))
-            return response()
+            response()
         } catch (exc: Exception) {
-            return response(exc)
+            response(exc)
         }
-    }
-
-
 }
