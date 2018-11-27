@@ -28,11 +28,4 @@ class PotStateData {
         this.date = date
         this.humidity = humidity
     }
-
-    constructor(id: Long, pot: PotData, date: Date, humidity: Double?) {
-        this.id = id
-        this.pot = pot
-        this.date = date
-        this.humidity = humidity
-    }
 }

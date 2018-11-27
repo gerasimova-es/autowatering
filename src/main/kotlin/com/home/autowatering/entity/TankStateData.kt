@@ -26,11 +26,4 @@ class TankStateData {
         this.volume = volume
         this.filled = filled
     }
-
-    constructor(id: Long?, name: String, volume: Double, filled: Double) {
-        this.id = id
-        this.name = name
-        this.volume = volume
-        this.filled = filled
-    }
 }

@@ -4,9 +4,9 @@ import com.home.autowatering.dao.interfaces.TankStateDao
 import com.home.autowatering.entity.TankStateData
 import com.home.autowatering.model.TankState
 import com.home.autowatering.repository.TankStateRepository
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Repository
 
-@Component
+@Repository
 class TankStateStateDaoJpa(val stateRepository: TankStateRepository) : TankStateDao {
     override fun save(tankState: TankState): TankState {
         val tankStateData: TankStateData =

@@ -18,12 +18,8 @@ class PotData {
     val states: List<PotStateData> = ArrayList<PotStateData>()
 
     constructor()
-    constructor(name: String) {
-        this.name = name
-    }
 
-    constructor(id: Long, name: String) {
-        this.id = id
+    constructor(name: String) {
         this.name = name
     }
 

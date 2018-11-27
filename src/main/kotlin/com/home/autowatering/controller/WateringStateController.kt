@@ -23,9 +23,11 @@ class WateringStateController(val stateService: WateringStateService) {
     ): SendStateResult {
         try {
             stateService.load(WateringState(potName, humidity, tankName, tankVolume))
+            return response()
         } catch (exc: Exception) {
             return response(exc)
         }
-        return response()
     }
+
+
 }
