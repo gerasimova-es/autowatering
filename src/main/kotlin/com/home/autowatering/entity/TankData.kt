@@ -17,6 +17,13 @@ class TankData {
     var filled: Double = 0.0
 
     constructor()
-    constructor(volume: Double)
-    constructor(id: Long, volume: Double, filled: Double)
+    constructor(volume: Double) {
+        this.volume = volume
+    }
+
+    constructor(id: Long, volume: Double, filled: Double) {
+        this.id = id
+        this.volume = volume
+        this.filled = filled
+    }
 }

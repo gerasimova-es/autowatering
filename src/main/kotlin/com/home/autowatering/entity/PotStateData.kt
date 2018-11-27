@@ -18,6 +18,14 @@ class PotStateData {
     var humidity: Double? = null
 
     constructor()
-    constructor(pot: PotData, humidity: Double)
-    constructor(id: Long, pot: PotData, humidity: Double?)
+    constructor(pot: PotData, humidity: Double) {
+        this.pot = pot
+        this.humidity = humidity
+    }
+
+    constructor(id: Long, pot: PotData, humidity: Double?) {
+        this.id = id
+        this.pot = pot
+        this.humidity = humidity
+    }
 }
