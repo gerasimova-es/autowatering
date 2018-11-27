@@ -11,7 +11,7 @@ class PotData {
     @GeneratedValue
     var id: Long? = null
 
-    @Column(name = "NAME")
+    @Column(name = "NAME", nullable = false)
     var name: String? = null
 
     @OneToMany(mappedBy = "pot", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
