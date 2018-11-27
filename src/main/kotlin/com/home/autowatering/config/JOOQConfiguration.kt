@@ -25,8 +25,8 @@ class JOOQConfiguration {
     fun dataSource(): DataSource {
         val source = JdbcDataSource()
         source.setUrl(url)
-        source.setUser(user)
-        source.setPassword(password)
+        source.user = user
+        source.password = password
         return source
     }
 }
