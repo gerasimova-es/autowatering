@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Configuration
 
 
 @Configuration
-class JooqConfiguration2 {
+class WateringJooqConfiguration {
 
 //    @Autowired
 //    lateinit var dataSource: DataSource
