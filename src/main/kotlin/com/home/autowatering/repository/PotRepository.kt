@@ -1,6 +1,6 @@
 package com.home.autowatering.repository
 
-import com.home.autowatering.entity.PotData
+import com.home.autowatering.entity.hibernate.PotData
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

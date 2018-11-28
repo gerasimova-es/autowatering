@@ -1,4 +1,4 @@
-package com.home.autowatering.entity
+package com.home.autowatering.entity.hibernate
 
 import javax.persistence.*
 
@@ -9,13 +9,13 @@ class PotData {
     @Id
     @Column(name = "ID")
     @GeneratedValue
-    var id: Long? = null
+    private var id: Long? = null
 
     @Column(name = "NAME", nullable = false)
-    var name: String? = null
+    private var name: String? = null
 
     @OneToMany(mappedBy = "pot", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-    val states: List<PotStateData> = ArrayList<PotStateData>()
+    private val states: List<PotStateData> = ArrayList<PotStateData>()
 
     constructor()
 

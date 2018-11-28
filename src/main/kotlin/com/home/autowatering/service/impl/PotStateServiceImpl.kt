@@ -7,7 +7,7 @@ import com.home.autowatering.service.interfaces.PotStateService
 import org.springframework.stereotype.Service
 
 @Service
-class PotStateServiceImpl(val stateDao: PotStateDao) : PotStateService {
+class PotStateServiceImpl(private val stateDao: PotStateDao) : PotStateService {
     override fun find(filter: PotStateFilter): List<PotState> =
         stateDao.find(filter)
 }

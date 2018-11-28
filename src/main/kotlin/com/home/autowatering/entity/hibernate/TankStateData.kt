@@ -1,4 +1,4 @@
-package com.home.autowatering.entity
+package com.home.autowatering.entity.hibernate
 
 import java.sql.Date
 import javax.persistence.*
@@ -9,19 +9,19 @@ class TankStateData {
     @Id
     @Column(name = "ID")
     @GeneratedValue
-    var id: Long? = null
+    private var id: Long? = null
 
     @Column(name = "NAME", precision = 2, nullable = false)
-    var name: String? = null
+    private var name: String? = null
 
     @Column(name = "DATE", nullable = false)
-    var date: Date? = null
+    private var date: Date? = null
 
     @Column(name = "VOLUME", precision = 2, nullable = false)
-    var volume: Double = 0.0
+    private var volume: Double = 0.0
 
     @Column(name = "FILLED", precision = 2, nullable = false)
-    var filled: Double = 0.0
+    private var filled: Double = 0.0
 
     constructor()
 

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class WateringStateController(val stateService: WateringStateService) {
+class WateringStateController(private val stateService: WateringStateService) {
     companion object {
         fun response(): SendStateResult = SendStateResult()
         fun response(error: Exception) = SendStateResult("ERROR", error.message)

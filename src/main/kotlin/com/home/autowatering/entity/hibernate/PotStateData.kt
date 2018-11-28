@@ -1,4 +1,4 @@
-package com.home.autowatering.entity
+package com.home.autowatering.entity.hibernate
 
 import java.sql.Date
 import javax.persistence.*
@@ -9,17 +9,17 @@ class PotStateData {
     @Id
     @GeneratedValue
     @Column(name = "ID", nullable = false)
-    var id: Long? = null
+    private var id: Long? = null
 
     @Column(name = "DATE", nullable = false)
-    var date: Date? = null
+    private var date: Date? = null
 
     @ManyToOne
     @JoinColumn(name = "POT_ID", nullable = false)
-    var pot: PotData? = null
+    private var pot: PotData? = null
 
     @Column(name = "HUMIDITY", precision = 2, nullable = false)
-    var humidity: Double? = null
+    private var humidity: Double? = null
 
     constructor()
 

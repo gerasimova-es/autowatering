@@ -13,7 +13,11 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class WateringStateServiceImpl(val potDao: PotDao, val potStateDao: PotStateDao, val tankStateDao: TankStateDao) :
+class WateringStateServiceImpl(
+    private val potDao: PotDao,
+    private val potStateDao: PotStateDao,
+    private val tankStateDao: TankStateDao
+) :
     WateringStateService {
     companion object {
         val logger: Logger = LoggerFactory.getLogger(WateringStateServiceImpl::class.java)

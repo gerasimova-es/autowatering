@@ -1,6 +1,6 @@
 package com.home.autowatering.model
 
-class WateringState(
+data class WateringState(
     var potName: String, var humidity: Double,
     var tankName: String, var tankVolume: Double
 ) {
