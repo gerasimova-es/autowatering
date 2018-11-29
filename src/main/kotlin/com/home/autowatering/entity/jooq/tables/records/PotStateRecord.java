@@ -4,7 +4,7 @@
 package com.home.autowatering.entity.jooq.tables.records;
 
 
-import com.home.autowatering.entity.tables.PotState;
+import com.home.autowatering.entity.jooq.tables.PotState;
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record4;

@@ -16,7 +16,6 @@ import org.jooq.impl.DSL.trueCondition
 import org.springframework.stereotype.Repository
 import java.sql.Date
 import java.time.LocalDate
-import java.util.function.Function
 import javax.persistence.PersistenceException
 import javax.sql.DataSource
 
@@ -33,23 +32,30 @@ class PotStateDaoJpa(
         val state = POT_STATE
 
         val condition = trueCondition()
-            .and(filter.pot.id == null).or(pot.ID.eq(filter.pot.id))
+            .and(filter.pot?.id != null).and(
+                pot.ID.eq(filter.pot!!.id)
+                    .or(filter.pot?.name != null).and(pot.NAME.eq(filter.pot!!.name))
+            )
             .and(filter.from == null).or(state.DATE.greaterOrEqual(java.sql.Date(filter.from!!.time)))
             .and(filter.to == null).or(state.DATE.lessOrEqual(java.sql.Date(filter.to!!.time)))
 
-        val fetch = DSL.using(dataSource, SQLDialect.SQLITE)
-            .select(state.ID, pot.ID, pot.NAME, state.DATE, state.HUMIDITY)
-            .from(state)
-            .join(pot).on(state.POT_ID.eq(pot.ID))
-            .where(condition)
-            .orderBy(state.DATE)
-            .fetch()
+        val fetch =
+            DSL.using(dataSource, SQLDialect.SQLITE) //todo use entity manager
+                .select(state.ID, pot.ID, pot.NAME, state.DATE, state.HUMIDITY)
+                .from(state)
+                .join(pot).on(state.POT_ID.eq(pot.ID))
+                .where(condition)
+                .orderBy(state.DATE)
+                .fetch()
 
-        fetch.stream()
-            .map(Function() {
-
-            })
-
+        return fetch.map { record ->
+            PotState(
+                record[0] as Long,
+                Pot(record[1] as Long, record[2] as String),
+                record[3] as Date,
+                record[4] as Double
+            )
+        }
 
     }
 
