@@ -45,9 +45,9 @@ public class PotState extends TableImpl<PotStateRecord> {
      */
     public final TableField<PotStateRecord, Date> DATE = createField("date", org.jooq.impl.SQLDataType.DATE.nullable(false), this, "");
     /**
-     * The column <code>pot_state.humidity</code>.
+     * The column <code>pot_state.potHumidity</code>.
      */
-    public final TableField<PotStateRecord, Double> HUMIDITY = createField("humidity", org.jooq.impl.SQLDataType.DOUBLE.nullable(false), this, "");
+    public final TableField<PotStateRecord, Double> HUMIDITY = createField("potHumidity", org.jooq.impl.SQLDataType.DOUBLE.nullable(false), this, "");
     /**
      * The column <code>pot_state.pot_id</code>.
      */

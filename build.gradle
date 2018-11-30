@@ -58,15 +58,20 @@ dependencies {
     compile('org.xerial:sqlite-jdbc:3.25.2')
     compile('com.zsoltfabok:sqlite-dialect:1.0')
 //    compile('org.hibernate.dialect:sqlite-dialect:0.1.0')
-    jooqRuntime "org.xerial:sqlite-jdbc:3.25.2"
+    jooqRuntime("org.xerial:sqlite-jdbc:3.25.2")
 
     //tests
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile(group: 'junit', name: 'junit', version: '4.12')
+//    testCompile(group: 'org.mockito', name: 'mockito-all', version: '2.0.2-beta')
+    testCompile(group: 'com.nhaarman.mockitokotlin2', name: 'mockito-kotlin', version: '2.0.0')
 
-    //Для java11
+    //Для java 11
     compile('javax.xml.bind:jaxb-api:2.3.0')
     compile('javax.activation:activation:1.1')
     compile('org.glassfish.jaxb:jaxb-runtime:2.3.0')
+
+    //other
+    compile('commons-lang:commons-lang:2.6')
 }
 
 compileKotlin {

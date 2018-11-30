@@ -28,8 +28,8 @@ class PotStateDaoJpa(
 ) : PotStateDao {
 
     override fun find(filter: PotStateFilter): List<PotState> {
-        val pot = POT
-        val state = POT_STATE
+        val pot: com.home.autowatering.entity.jooq.tables.Pot = POT
+        val state: com.home.autowatering.entity.jooq.tables.PotState = POT_STATE
 
         val condition = trueCondition()
             .and(filter.pot?.id != null).and(

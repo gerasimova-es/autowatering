@@ -9,17 +9,17 @@ class PotStateData {
     @Id
     @GeneratedValue
     @Column(name = "ID", nullable = false)
-    private var id: Long? = null
+    var id: Long? = null
 
     @Column(name = "DATE", nullable = false)
-    private var date: Date? = null
+    var date: Date? = null
 
     @ManyToOne
     @JoinColumn(name = "POT_ID", nullable = false)
-    private var pot: PotData? = null
+    var pot: PotData? = null
 
     @Column(name = "HUMIDITY", precision = 2, nullable = false)
-    private var humidity: Double? = null
+    var humidity: Double? = null
 
     constructor()
 

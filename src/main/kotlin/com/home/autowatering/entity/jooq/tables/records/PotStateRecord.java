@@ -80,14 +80,14 @@ public class PotStateRecord extends UpdatableRecordImpl<PotStateRecord> implemen
     }
 
     /**
-     * Getter for <code>pot_state.humidity</code>.
+     * Getter for <code>pot_state.potHumidity</code>.
      */
     public Double getHumidity() {
         return (Double) get(2);
     }
 
     /**
-     * Setter for <code>pot_state.humidity</code>.
+     * Setter for <code>pot_state.potHumidity</code>.
      */
     public PotStateRecord setHumidity(Double value) {
         set(2, value);

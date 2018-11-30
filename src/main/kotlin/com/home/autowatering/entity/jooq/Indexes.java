@@ -4,9 +4,9 @@
 package com.home.autowatering.entity.jooq;
 
 
-import com.home.autowatering.entity.tables.Pot;
-import com.home.autowatering.entity.tables.PotState;
-import com.home.autowatering.entity.tables.TankState;
+import com.home.autowatering.entity.jooq.tables.Pot;
+import com.home.autowatering.entity.jooq.tables.PotState;
+import com.home.autowatering.entity.jooq.tables.TankState;
 import org.jooq.Index;
 import org.jooq.OrderField;
 import org.jooq.impl.Internal;

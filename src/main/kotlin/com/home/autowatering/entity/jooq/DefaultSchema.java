@@ -4,10 +4,10 @@
 package com.home.autowatering.entity.jooq;
 
 
-import com.home.autowatering.entity.tables.HibernateSequence;
-import com.home.autowatering.entity.tables.Pot;
-import com.home.autowatering.entity.tables.PotState;
-import com.home.autowatering.entity.tables.TankState;
+import com.home.autowatering.entity.jooq.tables.HibernateSequence;
+import com.home.autowatering.entity.jooq.tables.Pot;
+import com.home.autowatering.entity.jooq.tables.PotState;
+import com.home.autowatering.entity.jooq.tables.TankState;
 import org.jooq.Catalog;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
