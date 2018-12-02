@@ -1,24 +1,19 @@
 package com.home.autowatering.controller
 
-import com.home.autowatering.dto.SendStateResult
-import com.home.autowatering.model.Pot
+import com.home.autowatering.dto.response.ResponseStatus
+import com.home.autowatering.dto.response.SendStateResponse
 import com.home.autowatering.model.WateringState
-import com.home.autowatering.model.filter.PotStateFilter
 import com.home.autowatering.service.impl.WateringStateServiceImpl
-import com.home.autowatering.service.interfaces.PotStateService
 import com.home.autowatering.service.interfaces.WateringStateService
-import org.apache.commons.lang.Validate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
 
 @RestController
 class WateringStateController(
-    private val stateService: WateringStateService,
-    private val potStateService: PotStateService
+    private val stateService: WateringStateService
 ) {
     companion object {
         val logger: Logger = LoggerFactory.getLogger(WateringStateServiceImpl::class.java)
@@ -30,26 +25,29 @@ class WateringStateController(
         @RequestParam(value = "potHumidity") potHumidity: Double,
         @RequestParam(value = "tankName") tankName: String,
         @RequestParam(value = "tankVolume") tankVolume: Double
-    ): Any {
+    ): SendStateResponse {
 
         try {
-            val wateringState =
-                WateringState(potName, potHumidity, tankName, tankVolume) //todo think about json input parameter type
-
-            validate(wateringState)
-
-            val from = Date()
-            stateService.load(wateringState)
+            //  val from = Date()
+            stateService.load(
+                WateringState(
+                    potName,
+                    potHumidity,
+                    tankName,
+                    tankVolume
+                )
+            )
             logger.info("watering state saving loaded successfully")
-            val to = Date()
+            //  val to = Date()
 
             //todo delete find and from/to
-            return potStateService.find(
-                PotStateFilter.withPot(Pot(potName))
-                    .from(from)
-                    .to(to)
-                    .build()
-            )
+//            return potStateService.find(
+//                PotStateFilter.withPot(Pot(potName))
+//                    .from(from)
+//                    .to(to)
+//                    .build()
+//            )
+            return response()
 
         } catch (exc: Exception) {
             logger.error("watering state saving error: ", exc)
@@ -57,19 +55,11 @@ class WateringStateController(
         }
     }
 
-    private fun response(): SendStateResult = SendStateResult() //todo use
-    private fun response(error: Exception) = SendStateResult("ERROR", error.message)
+    private fun response(): SendStateResponse =
+        SendStateResponse()
 
-    private fun validate(state: WateringState) {
-        Validate.notNull(state)
-        Validate.notEmpty(state.potName, "pot name cannot be empty")
-        if (state.potHumidity <= 0) {
-            throw IllegalArgumentException("pot humidity cannot be less or equals zero")
-        }
-        Validate.notEmpty(state.tankName, "tank name cannot be empty")
-        if (state.tankVolume < 0) {
-            throw IllegalArgumentException("tank volume cannot be less zero")
-        }
-    }
+    private fun response(error: Exception) =
+        SendStateResponse(ResponseStatus.ERROR, error.message)
+
 
 }
