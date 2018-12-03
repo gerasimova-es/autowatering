@@ -1,9 +1,8 @@
 package com.home.autowatering.dao.impl
 
 import com.home.autowatering.dao.interfaces.PotStateDao
+import com.home.autowatering.entiry.jooq.Tables
 import com.home.autowatering.entity.hibernate.PotStateData
-import com.home.autowatering.entity.jooq.Tables.POT
-import com.home.autowatering.entity.jooq.Tables.POT_STATE
 import com.home.autowatering.exception.SavingException
 import com.home.autowatering.model.Pot
 import com.home.autowatering.model.PotState
@@ -28,16 +27,17 @@ class PotStateDaoJpa(
 ) : PotStateDao {
 
     override fun find(filter: PotStateFilter): List<PotState> {
-        val pot: com.home.autowatering.entity.jooq.tables.Pot = POT
-        val state: com.home.autowatering.entity.jooq.tables.PotState = POT_STATE
+        val pot = Tables.POT
+        val state = Tables.POT_STATE
 
         val condition = trueCondition()
             .and(filter.pot?.id != null).and(
                 pot.ID.eq(filter.pot!!.id)
                     .or(filter.pot?.name != null).and(pot.NAME.eq(filter.pot!!.name))
             )
-            .and(filter.from == null).or(state.DATE.greaterOrEqual(java.sql.Date(filter.from!!.time)))
-            .and(filter.to == null).or(state.DATE.lessOrEqual(java.sql.Date(filter.to!!.time)))
+        //todo check and return
+//            .and(filter.from == null).or(state.DATE.greaterOrEqual(java.sql.Date(filter.from!!.time)))
+//            .and(filter.to == null).or(state.DATE.lessOrEqual(java.sql.Date(filter.to!!.time)))
 
         val fetch =
             DSL.using(dataSource, SQLDialect.SQLITE) //todo use entity manager

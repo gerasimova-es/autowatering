@@ -13,31 +13,30 @@ import org.junit.Test
 import org.mockito.Mockito.verify
 
 class WateringStateControllerTest {
-    private lateinit var wateringStateService: WateringStateService
-    private lateinit var wateringStateController: WateringStateController
+    private lateinit var service: WateringStateService
+    private lateinit var controller: WateringStateController
 
     @Before
     fun init() {
-        wateringStateService = mock()
-        wateringStateController = WateringStateController(wateringStateService)
+        service = mock()
+        controller = WateringStateController(service)
     }
-
 
     @Test
     fun loadWithError() {
-        whenever(wateringStateService.load(any())).thenThrow(RuntimeException())
-        val result = wateringStateController.sendState("test", 1.0, "test", 1.0)
+        whenever(service.load(any())).thenThrow(RuntimeException())
+        val result = controller.sendState("test", 1.0, "test", 1.0)
 
-        verify(wateringStateService, times(1)).load(any())
+        verify(service, times(1)).load(any())
         assertNotNull(result)
         assertEquals(ResponseStatus.ERROR, result.status)
     }
 
     @Test
     fun success() {
-        val result = wateringStateController.sendState("test", 1.0, "test", 1.0)
+        val result = controller.sendState("test", 1.0, "test", 1.0)
 
-        verify(wateringStateService, times(1)).load(any())
+        verify(service, times(1)).load(any())
         assertNotNull(result)
         assertEquals(ResponseStatus.SUCCESS, result.status)
     }

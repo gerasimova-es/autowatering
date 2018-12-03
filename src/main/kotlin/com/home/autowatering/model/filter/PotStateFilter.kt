@@ -24,12 +24,12 @@ class PotStateFilter(builder: Builder) {
             return this
         }
 
-        fun from(from: Date): Builder {
+        fun from(from: Date?): Builder {
             this.from = from
             return this
         }
 
-        fun to(to: Date): Builder {
+        fun to(to: Date?): Builder {
             this.to = to
             return this
         }

@@ -19,7 +19,7 @@ class WateringStateController(
         val logger: Logger = LoggerFactory.getLogger(WateringStateServiceImpl::class.java)
     }
 
-    @GetMapping("/send-state")
+    @GetMapping("/wateringstate/send")
     fun sendState(
         @RequestParam(value = "potName") potName: String,
         @RequestParam(value = "potHumidity") potHumidity: Double,
@@ -28,7 +28,6 @@ class WateringStateController(
     ): SendStateResponse {
 
         try {
-            //  val from = Date()
             stateService.load(
                 WateringState(
                     potName,
@@ -38,15 +37,7 @@ class WateringStateController(
                 )
             )
             logger.info("watering state saving loaded successfully")
-            //  val to = Date()
 
-            //todo delete find and from/to
-//            return potStateService.find(
-//                PotStateFilter.withPot(Pot(potName))
-//                    .from(from)
-//                    .to(to)
-//                    .build()
-//            )
             return response()
 
         } catch (exc: Exception) {
@@ -56,10 +47,8 @@ class WateringStateController(
     }
 
     private fun response(): SendStateResponse =
-        SendStateResponse()
+        SendStateResponse("OK")
 
     private fun response(error: Exception) =
-        SendStateResponse(ResponseStatus.ERROR, error.message)
-
-
+        SendStateResponse(ResponseStatus.ERROR, if (error.message == null) error.javaClass.name else error.message!!)
 }
