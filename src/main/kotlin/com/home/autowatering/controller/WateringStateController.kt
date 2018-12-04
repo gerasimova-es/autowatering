@@ -21,11 +21,13 @@ class WateringStateController(
 
     @GetMapping("/wateringstate/send")
     fun sendState(
+        //todo set request date
         @RequestParam(value = "potName") potName: String,
         @RequestParam(value = "potHumidity") potHumidity: Double,
         @RequestParam(value = "tankName") tankName: String,
         @RequestParam(value = "tankVolume") tankVolume: Double
     ): SendStateResponse {
+        logger.info("received send watering state request. Executing...")
 
         try {
             stateService.load(

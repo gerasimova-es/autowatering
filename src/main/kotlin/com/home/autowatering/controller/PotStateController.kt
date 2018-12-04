@@ -27,6 +27,7 @@ class PotStateController(var potStateService: PotStateService) {
         @RequestParam(value = "dateFrom", required = false) dateFrom: Date?,
         @RequestParam(value = "dateTo", required = false) dateTo: Date?
     ): SearchPotStateResponse {
+        logger.info("received search pot state request. Search executing...")
         try {
             val states: List<PotState> = potStateService.find(
                 PotStateFilter.withPot(Pot(potName))
@@ -34,9 +35,10 @@ class PotStateController(var potStateService: PotStateService) {
                     .to(dateTo)
                     .build()
             )
+            logger.info("found ${states.size} records with pot name = $potName, dateFrom = $dateFrom, dateTo = $dateTo")
             return response(states)
         } catch (exc: Exception) {
-            logger.error("Ошибка выполнения запроса", exc)
+            logger.error("request executing error", exc)
             return response(exc)
         }
     }

@@ -47,7 +47,7 @@ class PotStateDaoJpa(
             condition.and(state.DATE.lessOrEqual(java.sql.Date(filter.to!!.time)))
         }
 
-        val fetch =
+        val data =
             DSL.using(dataSource, SQLDialect.SQLITE) //todo use entity manager
                 .select(state.ID, pot.ID, pot.NAME, state.DATE, state.HUMIDITY)
                 .from(state)
@@ -56,7 +56,7 @@ class PotStateDaoJpa(
                 .orderBy(state.DATE)
                 .fetch()
 
-        return fetch.map { record ->
+        return data.map { record ->
             PotState(
                 record[0] as Long,
                 Pot(record[1] as Long, record[2] as String),
