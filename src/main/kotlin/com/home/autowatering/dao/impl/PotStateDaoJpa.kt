@@ -31,13 +31,21 @@ class PotStateDaoJpa(
         val state = Tables.POT_STATE
 
         val condition = trueCondition()
-            .and(filter.pot?.id != null).and(
-                pot.ID.eq(filter.pot!!.id)
-                    .or(filter.pot?.name != null).and(pot.NAME.eq(filter.pot!!.name))
-            )
-        //todo check and return
-//            .and(filter.from == null).or(state.DATE.greaterOrEqual(java.sql.Date(filter.from!!.time)))
-//            .and(filter.to == null).or(state.DATE.lessOrEqual(java.sql.Date(filter.to!!.time)))
+
+        //todo reactor query building
+        if (filter.pot?.id != null) {
+            condition.and(state.POT_ID.eq(filter.pot!!.id))
+        } else if (filter.pot?.name != null) {
+            condition.and(pot.NAME.eq(filter.pot!!.name))
+        }
+
+        if (filter.from != null) {
+            condition.and(state.DATE.greaterOrEqual(java.sql.Date(filter.from!!.time)))
+        }
+
+        if (filter.to != null) {
+            condition.and(state.DATE.lessOrEqual(java.sql.Date(filter.to!!.time)))
+        }
 
         val fetch =
             DSL.using(dataSource, SQLDialect.SQLITE) //todo use entity manager

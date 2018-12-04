@@ -26,10 +26,18 @@ class WateringStateServiceImpl(
 
     override fun load(state: WateringState) {
         validate(state)
+        logger.info("saving watering state $state...")
         try {
             val pot = potDao.findByName(state.potName) ?: potDao.save(Pot(state.potName))
+            logger.info("used pot [id=${pot.id}, name=${pot.name}")
+
             potStateDao.save(pot, state.potHumidity)
-            tankStateDao.save(TankState(state.tankName, Date(), state.tankVolume, state.tankVolume)) //todo set filled
+            logger.info("saved pot state [pot=$pot, humidity=${state.potHumidity}]")
+
+            val tankState = TankState(state.tankName, Date(), state.tankVolume, state.tankVolume)
+            tankStateDao.save(tankState)
+            logger.info("saved tank state info [state=$tankState]")
+
         } catch (exc: Exception) {
             logger.error("watering state saving error:", exc)
             throw exc
