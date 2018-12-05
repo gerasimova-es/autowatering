@@ -6,7 +6,6 @@ import com.home.autowatering.dto.response.SearchPotStateResponse
 import com.home.autowatering.model.Pot
 import com.home.autowatering.model.PotState
 import com.home.autowatering.model.filter.PotStateFilter
-import com.home.autowatering.service.impl.WateringStateServiceImpl
 import com.home.autowatering.service.interfaces.PotStateService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -18,7 +17,7 @@ import java.util.*
 @RestController
 class PotStateController(var potStateService: PotStateService) {
     companion object {
-        val logger: Logger = LoggerFactory.getLogger(WateringStateServiceImpl::class.java)
+        val logger: Logger = LoggerFactory.getLogger(PotStateController::class.java)
     }
 
     @GetMapping("/potstate/list")

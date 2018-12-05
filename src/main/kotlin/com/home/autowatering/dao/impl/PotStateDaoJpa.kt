@@ -67,17 +67,25 @@ class PotStateDaoJpa(
 
     }
 
-    override fun save(pot: Pot, humidity: Double): PotStateData =
+    override fun save(state: PotState): PotState {
         try {
-            stateRepository.save(
+            val pot = potRepository.getOne(state.pot.id!!)
+            val saved = stateRepository.save(
                 PotStateData(
-                    potRepository.getOne(pot.id!!),
+                    pot,
                     Date.valueOf(LocalDate.now()),
-                    humidity
+                    state.humidity
                 )
+            )
+            return PotState(
+                saved.id,
+                Pot(pot.id!!, pot.name!!),
+                saved.date!!,
+                saved.humidity!!
             )
         } catch (exc: PersistenceException) {
             throw SavingException(exc)
         }
+    }
 
 }
