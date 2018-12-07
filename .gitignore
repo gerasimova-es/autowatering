@@ -2,8 +2,6 @@
 *.iml
 target
 build
-gradle
 # Package Files #
-*.jar
 *.db
 *.log
