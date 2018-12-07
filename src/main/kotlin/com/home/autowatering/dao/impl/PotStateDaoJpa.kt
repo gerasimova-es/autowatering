@@ -48,7 +48,7 @@ class PotStateDaoJpa(
         }
 
         val data =
-            DSL.using(dataSource, SQLDialect.SQLITE) //todo use entity manager
+            DSL.using(dataSource, SQLDialect.POSTGRES) //todo use entity manager
                 .select(state.ID, pot.ID, pot.NAME, state.DATE, state.HUMIDITY)
                 .from(state)
                 .join(pot).on(state.POT_ID.eq(pot.ID))

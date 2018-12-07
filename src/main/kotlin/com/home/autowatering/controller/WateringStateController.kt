@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
+//todo divide on two controllers
 @RestController
 class WateringStateController(
     private val potStateService: PotStateService,
@@ -31,7 +32,7 @@ class WateringStateController(
         @RequestParam(value = "tankVolume") tankVolume: Double,
         @RequestParam(value = "tankFilled") tankFilled: Double
     ): SendStateResponse {
-        logger.info("received send watering state request. Executing...")
+        logger.info("received send state request. Executing...")
         val requestDate = Date()
         try {
             potStateService.save(PotState(Pot(potName), requestDate, potHumidity))
@@ -48,9 +49,11 @@ class WateringStateController(
         }
     }
 
+    //todo to AbstractController
     private fun response(): SendStateResponse =
         SendStateResponse("OK")
 
+    //todo to AbstractController
     private fun response(error: Exception) =
         SendStateResponse(ResponseStatus.ERROR, if (error.message == null) error.javaClass.name else error.message!!)
 }

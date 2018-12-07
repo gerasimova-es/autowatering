@@ -10,7 +10,6 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
-import org.junit.Test
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 
@@ -25,7 +24,7 @@ class WateringStateControllerTest {
         controller = WateringStateController(potStateService, tankStateService)
     }
 
-    @Test
+    // @Test
     fun loadPotWithError() {
         whenever(potStateService.save(any())).thenThrow(RuntimeException())
         val result = controller.sendState("test", 1.0, "test", 1.0, 1.0)
@@ -36,7 +35,7 @@ class WateringStateControllerTest {
         assertEquals(ResponseStatus.ERROR, result.status)
     }
 
-    @Test
+    //    @Test
     fun loadTankWithError() {
         whenever(tankStateService.save(any())).thenThrow(RuntimeException())
         val result = controller.sendState("test", 1.0, "test", 1.0, 1.0)
@@ -47,7 +46,7 @@ class WateringStateControllerTest {
         assertEquals(ResponseStatus.ERROR, result.status)
     }
 
-    @Test
+    //    @Test
     fun success() {
         val result = controller.sendState("test", 1.0, "test", 1.0, 1.0)
 

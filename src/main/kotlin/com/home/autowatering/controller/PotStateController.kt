@@ -20,6 +20,23 @@ class PotStateController(var potStateService: PotStateService) {
         val logger: Logger = LoggerFactory.getLogger(PotStateController::class.java)
     }
 
+    @GetMapping("/potstate/save")
+    fun save(
+        @RequestParam(value = "potName") potName: String,
+        @RequestParam(value = "humidity") humidity: Double
+    ): Any { //todo special DTO
+        logger.info("received saving state request. Executing...")
+        val requestDate = Date()
+        try {
+            val result = potStateService.save(PotState(Pot(potName), requestDate, humidity))
+            logger.info("pot state [$result] saved successfully")
+            return response(result)
+        } catch (exc: Exception) {
+            logger.error("request executing error")
+            return response(exc)
+        }
+    }
+
     @GetMapping("/potstate/list")
     fun find(
         @RequestParam(value = "potName") potName: String,
@@ -42,11 +59,12 @@ class PotStateController(var potStateService: PotStateService) {
         }
     }
 
-    fun response(exc: Exception) =
+    //todo to base controller
+    private fun response(exc: Exception) =
         SearchPotStateResponse(ResponseStatus.ERROR, if (exc.message == null) exc.javaClass.name else exc.message!!)
 
 
-    fun response(states: List<PotState>): SearchPotStateResponse =
+    private fun response(states: List<PotState>): SearchPotStateResponse =
         SearchPotStateResponse(states.map { state ->
             PotStateDto(
                 state.id!!,
@@ -55,5 +73,8 @@ class PotStateController(var potStateService: PotStateService) {
                 state.humidity
             )
         })
+
+    //todo to AbstractController
+    private fun response(result: Any): Any = Any()
 
 }
