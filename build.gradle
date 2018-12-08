@@ -13,12 +13,9 @@ buildscript {
     }
 }
 
-//newer method of applying plugins, and they must be available in the Gradle plugin repository
-//does not work in multi-project configurations (subprojects, allprojects), but will work on the build configuration for each child project.
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.3.0'
-//    id 'war'
     id 'nu.studer.jooq' version '3.0.2' //latest version
 }
 
@@ -30,7 +27,10 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 group 'com.home.growing'
-//version '1.0-SNAPSHOT'
+jar {
+    baseName = 'autowatering'
+    version = '0.0.1'
+}
 
 sourceCompatibility = 1.8
 
@@ -54,22 +54,20 @@ dependencies {
     testCompile('org.springframework.boot:spring-boot-starter-test')
 
     //db
-//    compile "com.h2database:h2"
     compile "org.jooq:jooq:$jooq_version"
     //sqlite
     compile('org.xerial:sqlite-jdbc:3.25.2')
     compile('com.zsoltfabok:sqlite-dialect:1.0')
     jooqRuntime("org.xerial:sqlite-jdbc:3.25.2")
-    //postgress
+    //postgres
     compile('org.postgresql:postgresql:42.2.2')
     jooqRuntime("org.postgresql:postgresql:42.2.2")
 
     //tests
     testCompile(group: 'junit', name: 'junit', version: '4.12')
-//    testCompile(group: 'org.mockito', name: 'mockito-all', version: '2.0.2-beta')
     testCompile(group: 'com.nhaarman.mockitokotlin2', name: 'mockito-kotlin', version: '2.0.0')
 
-    //Для java 11
+    //if it is running on java 11
     compile('javax.xml.bind:jaxb-api:2.3.0')
     compile('javax.activation:activation:1.1')
     compile('org.glassfish.jaxb:jaxb-runtime:2.3.0')
@@ -91,24 +89,6 @@ sourceSets {
     main.resources.srcDirs = ['src/main/resources']
 }
 
-//heroku
-jar {
-    baseName = 'autowatering'
-    version = '0.0.1'
-}
-
-//task stage(type: Copy, dependsOn: [clean, build]) {
-//    from jar.archivePath
-//    into project.rootDir
-//    rename {
-//        'autowatering.jar'
-//    }
-//}
-//stage.mustRunAfter(clean)
-//
-//clean << {
-//    project.file('autowatering.jar').delete()
-//}
 
 //----------------------JOOQ-------------------------
 //jooq {

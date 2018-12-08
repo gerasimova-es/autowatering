@@ -3,6 +3,7 @@ package com.home.autowatering.dao.impl
 import com.home.autowatering.dao.interfaces.PotStateDao
 import com.home.autowatering.entiry.jooq.Tables
 import com.home.autowatering.entity.hibernate.PotStateData
+import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.exception.SavingException
 import com.home.autowatering.model.Pot
 import com.home.autowatering.model.PotState
@@ -69,7 +70,10 @@ class PotStateDaoJpa(
 
     override fun save(state: PotState): PotState {
         try {
-            val pot = potRepository.getOne(state.pot.id!!)
+            val pot = potRepository.getOneByName(state.pot.name!!)
+            if (pot == null) {
+                throw PotNotFoundException("pot not found by name = [${state.pot.name}]")
+            }
             val saved = stateRepository.save(
                 PotStateData(
                     pot,
