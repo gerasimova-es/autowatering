@@ -18,7 +18,7 @@ buildscript {
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.3.0'
-    id 'war'
+//    id 'war'
     id 'nu.studer.jooq' version '3.0.2' //latest version
 }
 
@@ -30,7 +30,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 group 'com.home.growing'
-version '1.0-SNAPSHOT'
+//version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
@@ -92,18 +92,23 @@ sourceSets {
 }
 
 //heroku
-task stage(type: Copy, dependsOn: [clean, build]) {
-    from jar.archivePath
-    into project.rootDir
-    rename {
-        'autowatering.jar'
-    }
+jar {
+    baseName = 'autowatering'
+    version = '0.0.1'
 }
-stage.mustRunAfter(clean)
 
-clean << {
-    project.file('autowatering.jar').delete()
-}
+//task stage(type: Copy, dependsOn: [clean, build]) {
+//    from jar.archivePath
+//    into project.rootDir
+//    rename {
+//        'autowatering.jar'
+//    }
+//}
+//stage.mustRunAfter(clean)
+//
+//clean << {
+//    project.file('autowatering.jar').delete()
+//}
 
 //----------------------JOOQ-------------------------
 //jooq {
