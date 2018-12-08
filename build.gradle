@@ -91,6 +91,21 @@ sourceSets {
     main.resources.srcDirs = ['src/main/resources']
 }
 
+//heroku
+task stage(type: Copy, dependsOn: [clean, build]) {
+    from jar.archivePath
+    into project.rootDir
+    rename {
+        'autowatering.jar'
+    }
+}
+stage.mustRunAfter(clean)
+
+clean << {
+    project.file('autowatering.jar').delete()
+}
+
+//----------------------JOOQ-------------------------
 //jooq {
 //    version = '3.11.7' //replace with placeholer
 ////    edition = 'OSS'
