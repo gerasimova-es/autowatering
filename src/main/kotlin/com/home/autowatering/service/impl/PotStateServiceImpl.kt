@@ -12,6 +12,7 @@ class PotStateServiceImpl(private val stateDao: PotStateDao) : PotStateService {
     override fun save(state: PotState): PotState {
         Validate.notNull(state)
         Validate.noNullElements(arrayOf(state.date, state.pot, state.pot, state.humidity))
+        //todo save pot!!!!
         return stateDao.save(state)
 
     }
