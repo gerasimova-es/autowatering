@@ -1,8 +1,8 @@
 package com.home.autowatering.dto.response
 
-class BaseResponse<T> {
+open class Response<T> {
     var status: ResponseStatus = ResponseStatus.SUCCESS
-    var message: String = "сообщение обработано успешно"
+    var message: String = "message was handled successfully"
     var payload: T? = null
 
     constructor(payload: T) {

@@ -66,6 +66,7 @@ dependencies {
     //tests
     testCompile(group: 'junit', name: 'junit', version: '4.12')
     testCompile(group: 'com.nhaarman.mockitokotlin2', name: 'mockito-kotlin', version: '2.0.0')
+    testCompile("org.assertj:assertj-core:3.11.1")
 
     //if it is running on java 11
     compile('javax.xml.bind:jaxb-api:2.3.0')
