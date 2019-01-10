@@ -26,7 +26,11 @@ class TankStateController(val tankStateService: TankStateService) {
         logger.info("received saving state request. Executing...")
         val requestDate = Date()
         try {
-            val result = tankStateService.save(TankState(name, requestDate, volume, filled))
+            val result = tankStateService.save(
+                TankState(
+                    name = name, date = requestDate, volume = volume, filled = filled
+                )
+            )
             logger.info("state [$result] saved successfully")
             return response(result)
         } catch (exc: Exception) {

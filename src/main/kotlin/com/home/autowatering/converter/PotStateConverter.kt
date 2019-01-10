@@ -4,24 +4,9 @@ import com.home.autowatering.dto.PotStateDto
 import com.home.autowatering.dto.response.Response
 import com.home.autowatering.model.Pot
 import com.home.autowatering.model.PotState
-import com.home.autowatering.model.filter.PotStateFilter
 import org.apache.commons.lang.Validate
-import java.util.*
 
-class PotStateConverter() : RequestConverter {
-    var request: PotStateDto? = null
-    var dateFrom: Date? = null
-    var dateTo: Date? = null
-
-    constructor(request: PotStateDto) : this() {
-        this.request = request
-    }
-
-    constructor(potName: String, dateFrom: Date?, dateTo: Date?) : this() {
-        this.request = PotStateDto(potName)
-        this.dateFrom = dateFrom
-        this.dateTo = dateTo
-    }
+class PotStateConverter(var request: PotStateDto? = null) : RequestConverter {
 
     override fun validate() {
         if (request == null) {
@@ -38,18 +23,11 @@ class PotStateConverter() : RequestConverter {
             return null
         }
         return PotState(
-            Pot(request!!.potName),
-            request!!.date!!,
-            request!!.humidity!!
+            pot = Pot(name = request!!.potName),
+            date = request!!.date!!,
+            humidity = request!!.humidity!!
         )
     }
-
-    fun getFilter(): PotStateFilter =
-        PotStateFilter.withPot(Pot(request!!.potName))
-            .from(dateFrom)
-            .to(dateTo)
-            .build()
-
 
     fun response(state: PotState): Response<PotStateDto> {
         return Response(convert(state))

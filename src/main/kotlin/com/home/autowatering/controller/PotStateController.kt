@@ -1,6 +1,7 @@
 package com.home.autowatering.controller
 
 import com.home.autowatering.converter.PotStateConverter
+import com.home.autowatering.converter.PotStateFilterConverter
 import com.home.autowatering.dto.PotStateDto
 import com.home.autowatering.dto.response.Response
 import com.home.autowatering.model.PotState
@@ -39,8 +40,8 @@ class PotStateController(var potStateService: PotStateService) : AbstractControl
     ): Response<List<PotStateDto>> {
         logger.info("received search pot state request. Search executing...")
 
-        val converter = PotStateConverter(potName, dateFrom, dateTo)
-        converter.validate()
+        val converter = PotStateFilterConverter(potName, dateFrom, dateTo)
+
         val filter = converter.getFilter()
         val states: List<PotState> = potStateService.find(filter)
 

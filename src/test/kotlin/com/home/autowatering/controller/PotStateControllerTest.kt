@@ -11,6 +11,7 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import java.util.*
+import kotlin.collections.ArrayList
 
 class PotStateControllerTest {
     private lateinit var service: PotStateService
@@ -26,7 +27,7 @@ class PotStateControllerTest {
     fun saveError() {
         whenever(service.save(any())).thenThrow(IllegalArgumentException("test"))
         try {
-            val response = controller.save(PotStateDto("", Date(), 0.0))
+            val response = controller.save(PotStateDto(potName = "", date = Date(), humidity = 0.0))
             fail("expected IllegalArgumentException")
         } catch (ignored: IllegalArgumentException) {
             verify(service, times(1)).save(any())
@@ -35,10 +36,10 @@ class PotStateControllerTest {
 
     @Test
     fun saveSuccess() {
-        val state = PotState(0, Pot("pot"), Date(), 1.0)
+        val state = PotState(0, Pot(name = "pot"), Date(), 1.0)
         whenever(service.save(any())).thenReturn(state)
 
-        val response = controller.save(PotStateDto("pot", Date(), 1.0))
+        val response = controller.save(PotStateDto(potName = "pot", date = Date(), humidity = 1.0))
         assertThat(response).isNotNull
 
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
@@ -47,5 +48,73 @@ class PotStateControllerTest {
         assertThat(response.payload!!.date).isEqualTo(state.date)
         assertThat(response.payload!!.humidity).isEqualTo(state.humidity)
         assertThat(response.message).isEqualTo("message was handled successfully")
+    }
+
+    @Test
+    fun findWithError() {
+        whenever(service.find(any())).thenThrow(IllegalArgumentException("test"))
+        try {
+            controller.find("pot", Date(), Date())
+            fail("expected IllegalArgumentException")
+        } catch (ignored: IllegalArgumentException) {
+            verify(service, times(1)).find(any())
+        }
+    }
+
+    @Test
+    fun foundNothing() {
+        whenever(service.find(any())).thenReturn(arrayListOf())
+
+        val response = controller.find("pot", Date(), Date())
+
+        assertThat(response).isNotNull
+        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.payload).isEqualTo(ArrayList<PotStateDto>())
+        verify(service, times(1)).find(any())
+    }
+
+    @Test
+    fun foundOne() {
+        val state = PotState(1L, Pot(name = "pot"), Date(), 1.0)
+        whenever(service.find(any())).thenReturn(arrayListOf(state))
+
+        val response = controller.find("pot", Date(), Date())
+
+        assertThat(response).isNotNull
+        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.payload).isNotNull
+        assertThat(response.payload).hasSize(1)
+        assertThat(response.payload).hasOnlyElementsOfType(PotStateDto::class.java)
+        assertThat(response.payload).hasOnlyOneElementSatisfying { element ->
+            assertThat(element.id).isEqualTo(state.id)
+            assertThat(element.date).isEqualTo(state.date)
+            assertThat(element.humidity).isEqualTo(state.humidity)
+            assertThat(element.potName).isEqualTo(state.pot.name)
+        }
+
+        verify(service, times(1)).find(any())
+    }
+
+    @Test
+    fun foundAny() {
+        val state1 = PotState(1L, Pot(name = "pot1"), Date(), 1.0)
+        val state2 = PotState(2L, Pot(name = "pot2"), Date(), 2.0)
+        whenever(service.find(any())).thenReturn(arrayListOf(state1, state2))
+
+        val response = controller.find("pot", Date(), Date())
+
+        assertThat(response).isNotNull
+        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.payload).isNotNull
+        assertThat(response.payload).hasSize(2)
+        assertThat(response.payload).hasOnlyElementsOfType(PotStateDto::class.java)
+//        assertThat(response.payload).satisfies() { element ->
+//            assertThat(element.id).isEqualTo(state.id)
+//            assertThat(element.date).isEqualTo(state.date)
+//            assertThat(element.humidity).isEqualTo(state.humidity)
+//            assertThat(element.potName).isEqualTo(state.pot.name)
+//        }
+
+        verify(service, times(1)).find(any())
     }
 }
