@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class TankStateServiceImpl : TankStateService {
-    @Autowired
-    lateinit var tankStateDao: TankStateDao
+class TankStateServiceImpl(@Autowired val tankStateDao: TankStateDao) : TankStateService {
 
     override fun save(state: TankState): TankState {
         Validate.notNull(state)
