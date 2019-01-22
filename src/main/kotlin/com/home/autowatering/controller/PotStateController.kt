@@ -3,12 +3,12 @@ package com.home.autowatering.controller
 import com.home.autowatering.converter.PotStateConverter
 import com.home.autowatering.converter.PotStateFilterConverter
 import com.home.autowatering.dto.PotStateDto
+import com.home.autowatering.dto.PotStateFilterDto
 import com.home.autowatering.dto.response.Response
 import com.home.autowatering.model.PotState
 import com.home.autowatering.service.interfaces.PotStateService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -20,13 +20,11 @@ class PotStateController(var potStateService: PotStateService) : AbstractControl
     }
 
     @PostMapping("/save")
-    @ResponseStatus(HttpStatus.CREATED)
     fun save(@RequestBody request: PotStateDto): Response<PotStateDto> {
         logger.info("received saving state request. Executing...")
 
-        val converter = PotStateConverter(request)
-        converter.validate()
-        val state = potStateService.save(converter.getState()!!)
+        val converter = PotStateConverter()
+        val state = potStateService.save(converter.fromDto(request))
 
         logger.info("pot state [$state] saved successfully")
         return converter.response(state)
@@ -40,13 +38,11 @@ class PotStateController(var potStateService: PotStateService) : AbstractControl
     ): Response<List<PotStateDto>> {
         logger.info("received search pot state request. Search executing...")
 
-        val converter = PotStateFilterConverter(potName, dateFrom, dateTo)
-
-        val filter = converter.getFilter()
+        val filter = PotStateFilterConverter().fromDto(PotStateFilterDto(potName, dateFrom, dateTo))
         val states: List<PotState> = potStateService.find(filter)
 
-        logger.info("found ${states.size} records with filter [$filter]")
+        logger.info("found ${states.size} records with getFilter [$filter]")
 
-        return converter.response(states)
+        return PotStateConverter().response(states)
     }
 }

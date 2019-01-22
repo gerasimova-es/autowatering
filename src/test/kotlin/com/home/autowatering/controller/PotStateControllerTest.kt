@@ -108,6 +108,7 @@ class PotStateControllerTest {
         assertThat(response.payload).isNotNull
         assertThat(response.payload).hasSize(2)
         assertThat(response.payload).hasOnlyElementsOfType(PotStateDto::class.java)
+
 //        assertThat(response.payload).satisfies() { element ->
 //            assertThat(element.id).isEqualTo(state.id)
 //            assertThat(element.date).isEqualTo(state.date)
