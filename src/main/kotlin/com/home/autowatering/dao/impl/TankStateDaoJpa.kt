@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-class TankStateStateDaoJpa(private val stateRepository: TankStateRepository) : TankStateDao {
+class TankStateDaoJpa(private val stateRepository: TankStateRepository) : TankStateDao {
     override fun save(tankState: TankState): TankState {
 
         val tankStateData: TankStateData = stateRepository.save(

@@ -15,7 +15,6 @@ import org.jooq.impl.DSL
 import org.jooq.impl.DSL.trueCondition
 import org.springframework.stereotype.Repository
 import java.sql.Date
-import java.time.LocalDate
 import javax.persistence.PersistenceException
 import javax.sql.DataSource
 
@@ -70,15 +69,16 @@ class PotStateDaoJpa(
 
     override fun save(state: PotState): PotState {
         try {
-            val pot = potRepository.getOneByName(state.pot.name!!)
+            val pot = potRepository.getOneByName(state.pot.name)
                 ?: throw PotNotFoundException("pot not found by name = ${state.pot.name}")
             val saved = stateRepository.save(
                 PotStateData(
                     pot,
-                    Date.valueOf(LocalDate.now()),
+                    Date(state.date.time),
                     state.humidity
                 )
             )
+            //todo to converter
             return PotState(
                 saved.id,
                 Pot(pot.id!!, pot.name!!),
