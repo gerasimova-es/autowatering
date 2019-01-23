@@ -16,7 +16,6 @@ class PotStateConverter : RequestConverter<PotStateDto, PotState>(
     },
     Function {
         PotStateDto(
-            it.id!!,
             it.pot.name,
             it.date,
             it.humidity

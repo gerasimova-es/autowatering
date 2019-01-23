@@ -2,6 +2,7 @@ package com.home.autowatering.controller
 
 import com.home.autowatering.dto.PotStateDto
 import com.home.autowatering.dto.response.ResponseStatus
+import com.home.autowatering.exception.SavingException
 import com.home.autowatering.model.Pot
 import com.home.autowatering.model.PotState
 import com.home.autowatering.service.interfaces.PotStateService
@@ -24,30 +25,33 @@ class PotStateControllerTest {
     }
 
     @Test
-    fun saveError() {
-        whenever(service.save(any())).thenThrow(IllegalArgumentException("test"))
+    fun saveWithError() {
+        whenever(service.save(any())).thenThrow(SavingException(RuntimeException()))
         try {
             val response = controller.save(PotStateDto(potName = "", date = Date(), humidity = 0.0))
-            fail("expected IllegalArgumentException")
-        } catch (ignored: IllegalArgumentException) {
+            fail("expected SavingException")
+        } catch (ignored: SavingException) {
             verify(service, times(1)).save(any())
+            verifyNoMoreInteractions(service)
         }
     }
 
     @Test
-    fun saveSuccess() {
-        val state = PotState(0, Pot(name = "pot"), Date(), 1.0)
-        whenever(service.save(any())).thenReturn(state)
+    fun saveSuccessfully() {
+        val dto = PotStateDto(potName = "pot", date = Date(), humidity = 1.0)
+        whenever(service.save(any())).thenReturn(
+            PotState(1L, Pot(name = "pot"), dto.date!!, 1.0)
+        )
 
-        val response = controller.save(PotStateDto(potName = "pot", date = Date(), humidity = 1.0))
+        val response = controller.save(dto)
+
         assertThat(response).isNotNull
-
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
-        assertThat(response.payload!!.id).isEqualTo(state.id)
-        assertThat(response.payload!!.potName).isEqualTo(state.pot.name)
-        assertThat(response.payload!!.date).isEqualTo(state.date)
-        assertThat(response.payload!!.humidity).isEqualTo(state.humidity)
         assertThat(response.message).isEqualTo("message was handled successfully")
+        assertThat(response.payload).isEqualTo(dto)
+
+        verify(service, times(1)).save(any())
+        verifyNoMoreInteractions(service)
     }
 
     @Test
@@ -58,6 +62,7 @@ class PotStateControllerTest {
             fail("expected IllegalArgumentException")
         } catch (ignored: IllegalArgumentException) {
             verify(service, times(1)).find(any())
+            verifyNoMoreInteractions(service)
         }
     }
 
@@ -69,8 +74,11 @@ class PotStateControllerTest {
 
         assertThat(response).isNotNull
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
-        assertThat(response.payload).isEqualTo(ArrayList<PotStateDto>())
+        assertThat(response.message).isEqualTo("message was handled successfully")
+        assertThat(response.payload).isEqualTo(arrayListOf<PotStateDto>())
+
         verify(service, times(1)).find(any())
+        verifyNoMoreInteractions(service)
     }
 
     @Test
@@ -82,21 +90,21 @@ class PotStateControllerTest {
 
         assertThat(response).isNotNull
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.message).isEqualTo("message was handled successfully")
         assertThat(response.payload).isNotNull
-        assertThat(response.payload).hasSize(1)
-        assertThat(response.payload).hasOnlyElementsOfType(PotStateDto::class.java)
+        assertThat(response.payload).isInstanceOf(ArrayList::class.java)
         assertThat(response.payload).hasOnlyOneElementSatisfying { element ->
-            assertThat(element.id).isEqualTo(state.id)
             assertThat(element.date).isEqualTo(state.date)
             assertThat(element.humidity).isEqualTo(state.humidity)
             assertThat(element.potName).isEqualTo(state.pot.name)
         }
 
         verify(service, times(1)).find(any())
+        verifyNoMoreInteractions(service)
     }
 
     @Test
-    fun foundAny() {
+    fun foundSome() {
         val state1 = PotState(1L, Pot(name = "pot1"), Date(), 1.0)
         val state2 = PotState(2L, Pot(name = "pot2"), Date(), 2.0)
         whenever(service.find(any())).thenReturn(arrayListOf(state1, state2))
@@ -108,7 +116,8 @@ class PotStateControllerTest {
         assertThat(response.payload).isNotNull
         assertThat(response.payload).hasSize(2)
         assertThat(response.payload).hasOnlyElementsOfType(PotStateDto::class.java)
-
+        assertThat(response.payload).containsExactlyInAnyOrder()
+//todo check both
 //        assertThat(response.payload).satisfies() { element ->
 //            assertThat(element.id).isEqualTo(state.id)
 //            assertThat(element.date).isEqualTo(state.date)
@@ -117,5 +126,6 @@ class PotStateControllerTest {
 //        }
 
         verify(service, times(1)).find(any())
+        verifyNoMoreInteractions(service)
     }
 }
