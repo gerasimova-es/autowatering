@@ -22,7 +22,7 @@ class PotStateServiceImpl(
     override fun save(state: PotState): PotState {
         Validate.notNull(state)
         Validate.noNullElements(arrayOf(state.pot, state.date, state.humidity))
-        state.pot = potDao.findByName(state.pot.name) ?: potDao.save(state.pot)
+        state.pot = potDao.getByName(state.pot.name) ?: potDao.save(state.pot)
         return stateDao.save(state)
     }
 }

@@ -58,7 +58,7 @@ class PotStateServiceImplTest {
 
     @Test
     fun potSearchException() {
-        whenever(potDao.findByName(any())).thenThrow(SavingException(RuntimeException()))
+        whenever(potDao.getByName(any())).thenThrow(SavingException(RuntimeException()))
         try {
             service.save(
                 PotState(
@@ -69,7 +69,7 @@ class PotStateServiceImplTest {
             )
             fail("expected SavingException")
         } catch (ignored: SavingException) {
-            verify(potDao, times(1)).findByName(any())
+            verify(potDao, times(1)).getByName(any())
             verifyNoMoreInteractions(potDao)
             verifyNoMoreInteractions(potStateDao)
         }
@@ -77,7 +77,7 @@ class PotStateServiceImplTest {
 
     @Test
     fun potSaveException() {
-        whenever(potDao.findByName(any())).thenReturn(null)
+        whenever(potDao.getByName(any())).thenReturn(null)
         whenever(potDao.save(any())).thenThrow(SavingException(RuntimeException()))
         try {
             service.save(
@@ -89,7 +89,7 @@ class PotStateServiceImplTest {
             )
             fail("expected SavingException")
         } catch (ignored: SavingException) {
-            verify(potDao, times(1)).findByName(any())
+            verify(potDao, times(1)).getByName(any())
             verify(potDao, times(1)).save(any())
             verifyNoMoreInteractions(potDao)
             verifyNoMoreInteractions(potStateDao)
@@ -98,14 +98,14 @@ class PotStateServiceImplTest {
 
     @Test
     fun potFound() {
-        whenever(potDao.findByName(any())).thenReturn(Pot(name = "pot"))
+        whenever(potDao.getByName(any())).thenReturn(Pot(name = "pot"))
         val state = PotState(
             pot = Pot(name = "pot"),
             date = Date(),
             humidity = 1.0
         )
         service.save(state)
-        verify(potDao, times(1)).findByName(any())
+        verify(potDao, times(1)).getByName(any())
         verifyNoMoreInteractions(potDao)
         verify(potStateDao, times(1)).save(eq(state))
         verifyNoMoreInteractions(potStateDao)
@@ -114,7 +114,7 @@ class PotStateServiceImplTest {
 
     @Test
     fun stateSavingError() {
-        whenever(potDao.findByName(any())).thenReturn(Pot(name = "pot"))
+        whenever(potDao.getByName(any())).thenReturn(Pot(name = "pot"))
         whenever(potStateDao.save(any())).thenThrow(SavingException(RuntimeException()))
         try {
             service.save(
@@ -126,7 +126,7 @@ class PotStateServiceImplTest {
             )
             fail("expected SavingException")
         } catch (ignored: SavingException) {
-            verify(potDao, times(1)).findByName(any())
+            verify(potDao, times(1)).getByName(any())
             verifyNoMoreInteractions(potDao)
             verify(potStateDao, times(1)).save(any())
             verifyNoMoreInteractions(potStateDao)
