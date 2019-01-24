@@ -4,7 +4,10 @@ import java.sql.Date
 import javax.persistence.*
 
 @Entity
-@Table(name = "POT_STATE")
+@Table(
+    name = "POT_STATE",
+    indexes = [Index(columnList = "DATE, POT_ID", name = "POT_STATE_DATE")]
+)
 class PotStateData {
     @Id
     @GeneratedValue

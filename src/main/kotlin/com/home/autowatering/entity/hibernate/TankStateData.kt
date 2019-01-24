@@ -4,7 +4,7 @@ import java.sql.Date
 import javax.persistence.*
 
 @Entity
-@Table(name = "TANK_STATE")
+@Table(name = "TANK_STATE", indexes = [Index(columnList = "DATE", name = "TANK_STATE_DATE")])
 class TankStateData {
     @Id
     @Column(name = "ID")
