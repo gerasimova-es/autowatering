@@ -28,10 +28,10 @@ class PotDaoJpa(private val potRepository: PotRepository) : PotDao {
     override fun save(pot: Pot): Pot {
         val potData: PotData = potRepository.save(
             PotData(
-                pot.name
+                name = pot.name,
+                description = pot.description
             )
         )
-        return Pot(potData.id!!, potData.name!!)
+        return Pot(potData.id!!, potData.name!!, potData.description)
     }
-
 }

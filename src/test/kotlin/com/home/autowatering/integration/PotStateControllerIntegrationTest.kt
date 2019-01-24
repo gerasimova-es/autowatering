@@ -47,7 +47,7 @@ class PotStateControllerIntegrationTest {
         assertThat(result).isNotNull
         assertThat(result.statusCode).isSameAs(HttpStatus.OK)
         assertThat(result.body).isNotNull
-        assertThat(result.body!!.status).isSameAs(ResponseStatus.SUCCESS) //todo figure out about generic
+        assertThat(result.body!!.status).isSameAs(ResponseStatus.SUCCESS)
         assertThat(result.body!!.payload!!.potName).isEqualTo(dto.potName)
         assertThat(result.body!!.payload!!.date).isEqualTo(dto.date)
         assertThat(result.body!!.payload!!.humidity).isEqualTo(dto.humidity)
@@ -79,13 +79,13 @@ class PotStateControllerIntegrationTest {
         val saved2 = restTemplate.exchange(
             "/potstate/save",
             HttpMethod.POST,
-            HttpEntity(dto1),
+            HttpEntity(dto2),
             object : ParameterizedTypeReference<Response<PotStateDto>>() {})
 
         assertThat(saved2.statusCode).isSameAs(HttpStatus.OK)
 
         val builder = UriComponentsBuilder.fromPath("/potstate/list")
-            .queryParam("potName", dto1.potName)
+            .queryParam("potName", "pot")
             .queryParam("dateFrom", SimpleDateFormat(DATE_FORMAT).format(Date(dto1.date!!)))
             .queryParam("dateTo", SimpleDateFormat(DATE_FORMAT).format(Date(dto2.date!!)))
 
@@ -97,7 +97,7 @@ class PotStateControllerIntegrationTest {
         )
         assertThat(found.statusCode).isSameAs(HttpStatus.OK)
         assertThat(found.body).isNotNull
-        assertThat(found.body!!.status).isSameAs(ResponseStatus.SUCCESS) //todo figure out about generic
+        assertThat(found.body!!.status).isSameAs(ResponseStatus.SUCCESS)
         assertThat(found.body!!.message).isEqualTo("message was handled successfully")
         assertThat(found.body!!.payload).isInstanceOf(ArrayList::class.java)
         assertThat(found.body!!.payload).hasSize(2)

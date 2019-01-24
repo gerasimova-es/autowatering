@@ -39,4 +39,24 @@ class PotControllerTest {
         verifyNoMoreInteractions(service)
     }
 
+    @Test
+    fun saved() {
+        val pot = PotDto(name = "pot", description = "pot")
+        whenever(service.save(any())).thenReturn(Pot(id = 1, name = "pot", description = "desc"))
+
+        val response = controller.save(pot)
+
+        assertThat(response).isNotNull
+        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.message).isEqualTo("message was handled successfully")
+        assertThat(response.payload).isNotNull
+        assertThat(response.payload).isInstanceOf(PotDto::class.java)
+        assertThat(response.payload!!.id).isEqualTo(1)
+        assertThat(response.payload!!.name).isEqualTo("pot")
+        assertThat(response.payload!!.description).isEqualTo("desc")
+
+        verify(service, times(1)).save(any())
+        verifyNoMoreInteractions(service)
+    }
+
 }

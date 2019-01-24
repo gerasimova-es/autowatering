@@ -59,4 +59,20 @@ class PotServiceImplTest {
         verify(potDao, times(1)).getByName(eq("pot1"))
         verifyNoMoreInteractions(potDao)
     }
+
+    @Test
+    fun save() {
+        whenever(potDao.save(any()))
+            .thenReturn(Pot(id = 1, name = "pot1", description = "pot1"))
+
+        val result = service.save(Pot(name = "pot1", description = "pot1"))
+
+        assertThat(result).isNotNull
+        assertThat(result.id).isEqualTo(1)
+        assertThat(result.name).isEqualTo("pot1")
+        assertThat(result.description).isEqualTo("pot1")
+
+        verify(potDao, times(1)).save(any())
+        verifyNoMoreInteractions(potDao)
+    }
 }

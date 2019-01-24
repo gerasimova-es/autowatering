@@ -16,4 +16,7 @@ class PotServiceImpl(@Autowired val potDao: PotDao) : PotService {
 
     override fun getAll(): List<Pot> =
         potDao.getAll()
+
+    override fun save(pot: Pot): Pot =
+        potDao.save(pot)
 }
