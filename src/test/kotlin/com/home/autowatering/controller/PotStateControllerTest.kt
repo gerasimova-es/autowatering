@@ -40,7 +40,7 @@ class PotStateControllerTest {
     fun saveSuccessfully() {
         val dto = PotStateDto(potName = "pot", date = Date().time, humidity = 1.0)
         whenever(service.save(any())).thenReturn(
-            PotState(1L, Pot(name = "pot"), Date(dto.date!!), 1.0)
+            PotState(1, Pot(name = "pot"), Date(dto.date!!), 1.0)
         )
 
         val response = controller.save(dto)
@@ -48,7 +48,10 @@ class PotStateControllerTest {
         assertThat(response).isNotNull
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
         assertThat(response.message).isEqualTo("message was handled successfully")
-        assertThat(response.payload).isEqualTo(dto)
+        assertThat(response.payload!!.id).isEqualTo(1)
+        assertThat(response.payload!!.potName).isEqualTo(dto.potName)
+        assertThat(response.payload!!.date).isEqualTo(dto.date!!)
+        assertThat(response.payload!!.humidity).isEqualTo(dto.humidity)
 
         verify(service, times(1)).save(any())
         verifyNoMoreInteractions(service)
@@ -94,7 +97,7 @@ class PotStateControllerTest {
         assertThat(response.payload).isNotNull
         assertThat(response.payload).isInstanceOf(ArrayList::class.java)
         assertThat(response.payload).hasOnlyOneElementSatisfying { element ->
-            assertThat(element.date).isEqualTo(state.date)
+            assertThat(element.date).isEqualTo(state.date.time)
             assertThat(element.humidity).isEqualTo(state.humidity)
             assertThat(element.potName).isEqualTo(state.pot.name)
         }

@@ -42,7 +42,7 @@ class TankStateControllerTest {
 
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
         assertThat(response.payload!!.name).isEqualTo(state.name)
-        assertThat(response.payload!!.date).isEqualTo(state.date)
+        assertThat(response.payload!!.date).isEqualTo(state.date.time)
         assertThat(response.payload!!.volume).isEqualTo(state.volume)
         assertThat(response.payload!!.filled).isEqualTo(state.filled)
         assertThat(response.message).isEqualTo("message was handled successfully")
