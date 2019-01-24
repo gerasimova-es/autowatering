@@ -10,7 +10,6 @@ import java.util.*
 @Repository
 class TankStateDaoJpa(private val stateRepository: TankStateRepository) : TankStateDao {
     override fun save(tankState: TankState): TankState {
-
         val tankStateData: TankStateData = stateRepository.save(
             TankStateData(
                 tankState.name,

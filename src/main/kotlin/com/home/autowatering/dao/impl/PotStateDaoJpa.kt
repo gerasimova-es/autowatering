@@ -74,16 +74,16 @@ class PotStateDaoJpa(
             val saved = stateRepository.save(
                 PotStateData(
                     pot,
-                    Date(state.date.time),
+                    java.sql.Date(state.date.time),
                     state.humidity
                 )
             )
             //todo to converter
             return PotState(
-                saved.id,
-                Pot(pot.id!!, pot.name!!),
-                saved.date!!,
-                saved.humidity!!
+                id = saved.id,
+                pot = Pot(pot.id!!, pot.name!!),
+                date = Date(saved.date!!.time),
+                humidity = saved.humidity!!
             )
         } catch (exc: PersistenceException) {
             throw SavingException(exc)

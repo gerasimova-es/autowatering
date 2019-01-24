@@ -28,7 +28,7 @@ class PotStateControllerTest {
     fun saveWithError() {
         whenever(service.save(any())).thenThrow(SavingException(RuntimeException()))
         try {
-            val response = controller.save(PotStateDto(potName = "", date = Date(), humidity = 0.0))
+            val response = controller.save(PotStateDto(potName = "", date = Date().time, humidity = 0.0))
             fail("expected SavingException")
         } catch (ignored: SavingException) {
             verify(service, times(1)).save(any())
@@ -38,9 +38,9 @@ class PotStateControllerTest {
 
     @Test
     fun saveSuccessfully() {
-        val dto = PotStateDto(potName = "pot", date = Date(), humidity = 1.0)
+        val dto = PotStateDto(potName = "pot", date = Date().time, humidity = 1.0)
         whenever(service.save(any())).thenReturn(
-            PotState(1L, Pot(name = "pot"), dto.date!!, 1.0)
+            PotState(1L, Pot(name = "pot"), Date(dto.date!!), 1.0)
         )
 
         val response = controller.save(dto)

@@ -1,5 +1,4 @@
 package com.home.autowatering.dto
 
-import java.util.*
-
-data class PotStateDto(val potName: String, var date: Date? = null, var humidity: Double? = null)
+//todo date to Date
+data class PotStateDto(val id: Long? = null, val potName: String, var date: Long? = null, var humidity: Double? = null)
