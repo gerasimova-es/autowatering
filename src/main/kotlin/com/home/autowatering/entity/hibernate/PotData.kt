@@ -17,8 +17,11 @@ class PotData {
     @Column(name = "DESCRIPTION", nullable = false)
     var description: String? = null
 
-    @OneToMany(mappedBy = "pot", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-    val states: List<PotStateData> = ArrayList<PotStateData>()
+//    @OneToMany(
+//        mappedBy = "pot",
+//        cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true
+//    )
+//    val states: List<PotStateData> = arrayListOf()
 
     constructor()
 
