@@ -1,10 +1,10 @@
 package com.home.autowatering.repository
 
-import com.home.autowatering.entity.hibernate.PotData
+import com.home.autowatering.entity.hibernate.JpaPot
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface PotRepository : JpaRepository<PotData, Long> {
-    fun getOneByName(name: String): PotData
+interface PotRepository : JpaRepository<JpaPot, Long> {
+    fun findOneByName(name: String): JpaPot?
 }

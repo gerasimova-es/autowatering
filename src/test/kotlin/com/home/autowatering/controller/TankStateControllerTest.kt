@@ -25,7 +25,7 @@ class TankStateControllerTest {
     fun saveError() {
         whenever(service.save(any())).thenThrow(IllegalArgumentException("test"))
         try {
-            val response = controller.save(
+            controller.save(
                 TankStateDto(name = "", date = Date().time, volume = 0.0, filled = 0.0)
             )
             fail("expected IllegalArgumentException")
@@ -45,10 +45,10 @@ class TankStateControllerTest {
         assertThat(response).isNotNull
 
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
-        assertThat(response.payload!!.name).isEqualTo(state.name)
-        assertThat(response.payload!!.date).isEqualTo(state.date.time)
-        assertThat(response.payload!!.volume).isEqualTo(state.volume)
-        assertThat(response.payload!!.filled).isEqualTo(state.filled)
+        assertThat(response.payload?.name).isEqualTo(state.name)
+        assertThat(response.payload?.date).isEqualTo(state.date.time)
+        assertThat(response.payload?.volume).isEqualTo(state.volume)
+        assertThat(response.payload?.filled).isEqualTo(state.filled)
         assertThat(response.message).isEqualTo("message was handled successfully")
     }
 

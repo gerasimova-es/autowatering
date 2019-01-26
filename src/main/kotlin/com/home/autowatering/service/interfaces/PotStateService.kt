@@ -5,5 +5,4 @@ import com.home.autowatering.model.filter.PotStateFilter
 
 interface PotStateService {
     fun find(filter: PotStateFilter): List<PotState>
-    fun save(state: PotState): PotState
 }

@@ -8,7 +8,7 @@ import javax.persistence.*
     name = "POT_STATE",
     indexes = [Index(columnList = "DATE, POT_ID", name = "POT_STATE_DATE")]
 )
-class PotStateData {
+class JpaPotState {
     @Id
     @GeneratedValue
     @Column(name = "ID", nullable = false)
@@ -19,14 +19,15 @@ class PotStateData {
 
     @ManyToOne
     @JoinColumn(name = "POT_ID", nullable = false)
-    var pot: PotData? = null
+    var pot: JpaPot? = null
 
     @Column(name = "HUMIDITY", precision = 2, nullable = false)
     var humidity: Double? = null
 
     constructor()
 
-    constructor(pot: PotData, date: Date, humidity: Double) {
+    constructor(id: Long? = null, pot: JpaPot? = null, date: Date, humidity: Double) {
+        this.id = id
         this.pot = pot
         this.date = date
         this.humidity = humidity

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/tankstate")
 class TankStateController(val tankStateService: TankStateService) : AbstractController() {
     companion object {
-        val logger: Logger = LoggerFactory.getLogger(PotStateController::class.java)
+        val logger: Logger = LoggerFactory.getLogger(TankStateController::class.java)
     }
 
     @PostMapping("/save")

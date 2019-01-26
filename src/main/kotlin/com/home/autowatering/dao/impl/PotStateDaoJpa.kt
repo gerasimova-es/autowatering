@@ -2,20 +2,19 @@ package com.home.autowatering.dao.impl
 
 import com.home.autowatering.dao.interfaces.PotStateDao
 import com.home.autowatering.entiry.jooq.Tables
-import com.home.autowatering.entity.hibernate.PotStateData
-import com.home.autowatering.exception.PotNotFoundException
-import com.home.autowatering.exception.SavingException
+import com.home.autowatering.entity.hibernate.JpaPotState
+import com.home.autowatering.entity.hibernate.converter.JpaPotStateConverter
 import com.home.autowatering.model.Pot
 import com.home.autowatering.model.PotState
 import com.home.autowatering.model.filter.PotStateFilter
 import com.home.autowatering.repository.PotRepository
 import com.home.autowatering.repository.PotStateRepository
+import org.apache.commons.lang.Validate
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.trueCondition
 import org.springframework.stereotype.Repository
 import java.sql.Date
-import javax.persistence.PersistenceException
 import javax.sql.DataSource
 
 
@@ -25,6 +24,15 @@ class PotStateDaoJpa(
     private val potRepository: PotRepository,
     private val stateRepository: PotStateRepository
 ) : PotStateDao {
+
+    val converter = JpaPotStateConverter()
+
+    override fun findLastState(pot: Pot): PotState? {
+        val found = potRepository.findOneByName(pot.name)
+        Validate.notNull(found)//todo PotNotFoundException
+        val state = stateRepository.findFirstByPotOrderByDateDesc(found!!)
+        return if (state == null) null else converter.fromJpa(state)
+    }
 
     override fun find(filter: PotStateFilter): List<PotState> {
         val pot = Tables.POT
@@ -48,46 +56,41 @@ class PotStateDaoJpa(
         }
 
         val data =
-            DSL.using(dataSource, SQLDialect.POSTGRES) //todo use entity manager
-                .select(state.ID, pot.ID, pot.NAME, state.DATE, state.HUMIDITY)
+            DSL.using(dataSource, SQLDialect.SQLITE) //todo use entity manager
+                .select(state.ID, state.DATE, state.HUMIDITY)
                 .from(state)
                 .join(pot).on(state.POT_ID.eq(pot.ID))
                 .where(condition)
                 .orderBy(state.DATE)
                 .fetch()
 
-        return data.map { record ->
-            PotState(
-                record[0] as Long,
-                Pot(record[1] as Long, record[2] as String),
-                record[3] as Date,
-                record[4] as Double
-            )
+        return data.map { jpa ->
+            converter.fromJpa(JpaPotState(id = jpa[0] as Long, date = jpa[1] as Date, humidity = jpa[2] as Double))
         }
 
     }
 
-    override fun save(state: PotState): PotState {
-        try {
-            val pot = potRepository.getOneByName(state.pot.name)
-                ?: throw PotNotFoundException("pot not found by name = ${state.pot.name}")
-            val saved = stateRepository.save(
-                PotStateData(
-                    pot,
-                    java.sql.Date(state.date.time),
-                    state.humidity
-                )
-            )
-            //todo to converter
-            return PotState(
-                id = saved.id,
-                pot = Pot(pot.id!!, pot.name!!),
-                date = Date(saved.date!!.time),
-                humidity = saved.humidity!!
-            )
-        } catch (exc: PersistenceException) {
-            throw SavingException(exc)
-        }
-    }
+//    override fun save(state: PotState): PotState {
+//        try {
+//            val pot = potRepository.getOneByName(state.pot.name)
+//                ?: throw PotNotFoundException("pot not found by name = ${state.pot.name}")
+//            val saved = stateRepository.save(
+//                JpaPotState(
+//                    pot,
+//                    java.sql.Date(state.date.time),
+//                    state.humidity
+//                )
+//            )
+//            //todo to JpaConverter
+//            return PotState(
+//                id = saved.id,
+//                pot = Pot(pot.id!!, pot.name!!),
+//                date = Date(saved.date!!.time),
+//                humidity = saved.humidity!!
+//            )
+//        } catch (exc: PersistenceException) {
+//            throw SavingException(exc)
+//        }
+//    }
 
 }

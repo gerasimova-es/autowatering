@@ -1,37 +1,64 @@
 package com.home.autowatering.dao.impl
 
 import com.home.autowatering.dao.interfaces.PotDao
-import com.home.autowatering.entity.hibernate.PotData
+import com.home.autowatering.entity.hibernate.JpaPot
+import com.home.autowatering.entity.hibernate.converter.JpaPotConverter
+import com.home.autowatering.entity.hibernate.converter.JpaPotStateConverter
 import com.home.autowatering.model.Pot
 import com.home.autowatering.repository.PotRepository
+import com.home.autowatering.repository.PotStateRepository
 import org.springframework.stereotype.Repository
 import java.util.stream.Collectors
+import javax.transaction.Transactional
 
 @Repository
-class PotDaoJpa(private val potRepository: PotRepository) : PotDao {
+class PotDaoJpa(private val potRepository: PotRepository, private val potStateRepository: PotStateRepository) : PotDao {
+    val potConverter = JpaPotConverter()
+    val stateConverter = JpaPotStateConverter()
+
     override fun getAll(): List<Pot> {
         return potRepository.findAll().stream()
-            .map { pot -> Pot(pot.id!!, pot.name!!) }
+            .map { jpaPot ->
+                potConverter.fromJpa(
+                    jpaPot,
+                    potStateRepository.findFirstByPotOrderByDateDesc(jpaPot)
+                )
+            }
             .collect(Collectors.toList())
     }
 
     override fun getById(id: Long): Pot {
-        val pot = potRepository.getOne(id)
-        return Pot(pot.id!!, pot.name!!)
-    }
-
-    override fun getByName(name: String): Pot {
-        val pot: PotData = potRepository.getOneByName(name)
-        return Pot(pot.id!!, pot.name!!)
-    }
-
-    override fun save(pot: Pot): Pot {
-        val potData: PotData = potRepository.save(
-            PotData(
-                name = pot.name,
-                description = pot.description
-            )
+        val jpaPot = potRepository.getOne(id)
+        return potConverter.fromJpa(
+            jpaPot,
+            potStateRepository.findFirstByPotOrderByDateDesc(jpaPot)
         )
-        return Pot(potData.id!!, potData.name!!, potData.description)
+    }
+
+    override fun findByName(name: String): Pot? {
+        val jpaPot: JpaPot? = potRepository.findOneByName(name)
+        return if (jpaPot == null) null
+        else potConverter.fromJpa(
+            jpaPot,
+            potStateRepository.findFirstByPotOrderByDateDesc(jpaPot)
+        )
+    }
+
+    @Transactional
+    override fun save(pot: Pot): Pot {
+        var jpaPot: JpaPot
+        if (pot.id != null) {
+            jpaPot = potRepository.getOne(pot.id!!)
+            jpaPot = potRepository.save(potConverter.map(pot, jpaPot))
+        } else {
+            jpaPot = potRepository.save(potConverter.fromEntity(pot))
+        }
+        if (pot.state == null) {
+            return potConverter.fromJpa(jpaPot)
+        }
+
+        val jpaState = stateConverter.fromEntity(pot.state!!)
+        jpaState.pot = jpaPot //todo хм
+        return potConverter.fromJpa(jpaPot, potStateRepository.save(jpaState))
     }
 }

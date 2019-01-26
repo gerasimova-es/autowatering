@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "TANK_STATE", indexes = [Index(columnList = "DATE", name = "TANK_STATE_DATE")])
-class TankStateData {
+class JpaTankState {
     @Id
     @Column(name = "ID")
     @GeneratedValue

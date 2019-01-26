@@ -60,8 +60,11 @@ dependencies {
     compile('com.zsoltfabok:sqlite-dialect:1.0')
     jooqRuntime("org.xerial:sqlite-jdbc:3.25.2")
     //postgres
-    compile('org.postgresql:postgresql:42.2.2')
-    jooqRuntime("org.postgresql:postgresql:42.2.2")
+    runtime('org.postgresql:postgresql:42.2.2')
+    jooqRuntime("org.postgresql:postgresql:42.2.2")    
+    compile('ru.yandex.qatools.embed:postgresql-embedded:2.9')
+    //h2
+    compile('com.h2database:h2:1.0.60')
 
     //tests
     testCompile(group: 'junit', name: 'junit', version: '4.12')

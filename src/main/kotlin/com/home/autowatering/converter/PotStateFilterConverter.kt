@@ -7,7 +7,7 @@ import java.util.function.Function
 
 class PotStateFilterConverter : RequestConverter<PotStateFilterDto, PotStateFilter>(
     Function {
-        PotStateFilter.withPot(Pot(name = it.potName))
+        PotStateFilter.withPot(Pot(name = it.pot))
             .from(it.dateFrom)
             .to(it.dateTo)
             .build()

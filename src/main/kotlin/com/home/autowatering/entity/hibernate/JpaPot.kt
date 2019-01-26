@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "POT")
-class PotData {
+class JpaPot {
     @Id
     @Column(name = "ID")
     @GeneratedValue
@@ -17,17 +17,11 @@ class PotData {
     @Column(name = "DESCRIPTION", nullable = false)
     var description: String? = null
 
-//    @OneToMany(
-//        mappedBy = "pot",
-//        cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true
-//    )
-//    val states: List<PotStateData> = arrayListOf()
-
     constructor()
 
-    constructor(name: String, description: String?) {
+    constructor(id: Long? = null, name: String, description: String? = null) {
+        this.id = id
         this.name = name
         this.description = description
     }
-
 }
