@@ -12,7 +12,9 @@ class PotStateConverter : RequestConverter<PotStateDto, PotState>(
             id = it.id,
             pot = Pot(code = it.potCode),
             date = if (it.date == null) Date() else Date(it.date),
-            humidity = it.humidity
+            humidity = it.humidity,
+            watering = it.watering
+
         )
     },
     Function {
@@ -20,7 +22,8 @@ class PotStateConverter : RequestConverter<PotStateDto, PotState>(
             id = it.id,
             potCode = it.pot.code,
             date = it.date.time,
-            humidity = it.humidity
+            humidity = it.humidity,
+            watering = it.watering
         )
     })
 

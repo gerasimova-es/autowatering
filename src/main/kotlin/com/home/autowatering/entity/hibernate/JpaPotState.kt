@@ -24,12 +24,16 @@ class JpaPotState {
     @Column(name = "HUMIDITY", precision = 2, nullable = false)
     var humidity: Double? = null
 
+    @Column(name = "WATERING")
+    var watering: Boolean? = null
+
     constructor()
 
-    constructor(id: Long? = null, pot: JpaPot? = null, date: Date, humidity: Double) {
+    constructor(id: Long? = null, pot: JpaPot? = null, date: Date, humidity: Double, watering: Boolean?) {
         this.id = id
         this.pot = pot
         this.date = date
         this.humidity = humidity
+        this.watering = watering
     }
 }

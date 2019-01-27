@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/tankstate")
+@RequestMapping("/tank")
 class TankStateController(val tankStateService: TankStateService) : AbstractController() {
     val converter = TankStateConverter()
 
@@ -20,7 +20,7 @@ class TankStateController(val tankStateService: TankStateService) : AbstractCont
         val logger: Logger = LoggerFactory.getLogger(TankStateController::class.java)
     }
 
-    @PostMapping("/save")
+    @PostMapping("/state/save")
     fun save(@RequestBody request: TankStateDto): Response<TankStateDto> {
         logger.info("received saving state request [$request]. Executing...")
         val result = tankStateService.save(converter.fromDto(request))

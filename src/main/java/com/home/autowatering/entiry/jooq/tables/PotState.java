@@ -10,6 +10,7 @@ import com.home.autowatering.entiry.jooq.Keys;
 import com.home.autowatering.entiry.jooq.tables.records.PotStateRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 import javax.annotation.Generated;
@@ -48,6 +49,11 @@ public class PotState extends TableImpl<PotStateRecord> {
      * The column <code>pot_state.potHumidity</code>.
      */
     public final TableField<PotStateRecord, Double> HUMIDITY = createField("humidity", org.jooq.impl.SQLDataType.DOUBLE.nullable(false), this, "");
+    /**
+     * The column <code>pot_state.potHumidity</code>.
+     */
+    public final TableField<PotStateRecord, Boolean> WATERING = createField("watering", SQLDataType.BOOLEAN.nullable(false), this, "");
+
     /**
      * The column <code>pot_state.pot_id</code>.
      */

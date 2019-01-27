@@ -11,7 +11,8 @@ class JpaPotStateConverter : JpaConverter<JpaPotState, PotState>(
             id = it.id,
             pot = JpaPotConverter().fromJpa(it.pot!!),
             date = Date(it.date!!.time),
-            humidity = it.humidity!!
+            humidity = it.humidity!!,
+            watering = it.watering
         )
     },
     Function {
@@ -19,7 +20,8 @@ class JpaPotStateConverter : JpaConverter<JpaPotState, PotState>(
             id = it.id,
             pot = JpaPotConverter().fromEntity(it.pot),
             date = java.sql.Date(it.date.time),
-            humidity = it.humidity
+            humidity = it.humidity,
+            watering = it.watering
         )
     }
 )

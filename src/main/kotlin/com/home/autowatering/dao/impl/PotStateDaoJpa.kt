@@ -51,7 +51,7 @@ class PotStateDaoJpa(
 
         val data =
             DSL.using(dataSource, SQLDialect.SQLITE) //todo use entity manager
-                .select(state.ID, pot.ID, pot.CODE, pot.NAME, state.DATE, state.HUMIDITY)
+                .select(state.ID, pot.ID, pot.CODE, pot.NAME, state.DATE, state.HUMIDITY, state.WATERING)
                 .from(state)
                 .join(pot).on(state.POT_ID.eq(pot.ID))
                 .where(condition)
@@ -64,7 +64,8 @@ class PotStateDaoJpa(
                     id = jpa[0] as Long,
                     pot = JpaPot(jpa[1] as Long, jpa[2] as String, jpa[3] as String),
                     date = jpa[4] as Date,
-                    humidity = jpa[5] as Double
+                    humidity = jpa[5] as Double,
+                    watering = jpa[6] as Boolean
                 )
             )
         }

@@ -25,12 +25,12 @@ class TankStateControllerIntegrationTest {
     fun save() {
         val dto = TankStateDto(
             name = "tank",
-            volume = 100.0,
-            filled = 100.0
+            volume = 2.178,
+            filled = 0.0
         )
 
         val result = restTemplate.exchange(
-            "/tankstate/save",
+            "/tank/state/save",
             HttpMethod.POST,
             HttpEntity(dto),
             object : ParameterizedTypeReference<Response<TankStateDto>>() {})
@@ -40,7 +40,6 @@ class TankStateControllerIntegrationTest {
         Assertions.assertThat(result.body).isNotNull
         Assertions.assertThat(result.body!!.status).isSameAs(ResponseStatus.SUCCESS)
         Assertions.assertThat(result.body!!.payload!!.name).isEqualTo(dto.name)
-        Assertions.assertThat(result.body!!.payload!!.date).isEqualTo(dto.date)
         Assertions.assertThat(result.body!!.payload!!.volume).isEqualTo(dto.volume)
         Assertions.assertThat(result.body!!.payload!!.id).isGreaterThan(0)
     }

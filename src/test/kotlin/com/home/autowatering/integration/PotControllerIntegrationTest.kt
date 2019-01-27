@@ -28,8 +28,8 @@ class PotControllerIntegrationTest {
     @Test
     fun saveAndFind() {
         val dto = PotDto(
-            code = "pot1",
-            name = "pot"
+            code = "AUTHORIUM",
+            name = "Ауториум"
         )
 
         val result = restTemplate.exchange(
@@ -83,7 +83,8 @@ class PotControllerIntegrationTest {
 
         val stateDto = PotStateDto(
             potCode = "pot1",
-            humidity = 100.0
+            humidity = 100.0,
+            watering = true
         )
         val savedStateDto = restTemplate.exchange(
             "/pot/state/save",
@@ -95,6 +96,7 @@ class PotControllerIntegrationTest {
         assertThat(savedStateDto.body).isNotNull
         assertThat(savedStateDto.body?.status).isSameAs(ResponseStatus.SUCCESS)
         assertThat(savedStateDto.body?.payload?.id).isGreaterThan(0)
+        assertThat(savedStateDto.body?.payload?.watering).isTrue()
 
         val builder = UriComponentsBuilder.fromPath("/pot/${savedPotDto?.body?.payload?.id}/history")
 
