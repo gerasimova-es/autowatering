@@ -2,7 +2,7 @@ package com.home.autowatering.dto
 
 data class PotDto(
     val id: Long? = null,
-    val name: String,
-    val description: String? = null,
-    val state: PotStateDto? = null
+    val code: String,
+    val name: String? = null,
+    val humidity: Double? = null
 )

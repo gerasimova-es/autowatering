@@ -65,7 +65,7 @@ public class PotRecord extends UpdatableRecordImpl<PotRecord> implements Record2
     // -------------------------------------------------------------------------
 
     /**
-     * Getter for <code>pot.name</code>.
+     * Getter for <code>pot.code</code>.
      */
     public String getName() {
         return (String) get(1);
@@ -76,7 +76,7 @@ public class PotRecord extends UpdatableRecordImpl<PotRecord> implements Record2
     // -------------------------------------------------------------------------
 
     /**
-     * Setter for <code>pot.name</code>.
+     * Setter for <code>pot.code</code>.
      */
     public PotRecord setName(String value) {
         set(1, value);
@@ -120,7 +120,7 @@ public class PotRecord extends UpdatableRecordImpl<PotRecord> implements Record2
      */
     @Override
     public Field<String> field2() {
-        return Pot.POT.NAME;
+        return Pot.POT.CODE;
     }
 
     /**

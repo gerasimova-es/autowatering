@@ -40,7 +40,7 @@ class TankStateControllerTest {
         whenever(service.save(any())).thenReturn(state)
 
         val response = controller.save(
-            TankStateDto(name = "name", date = Date().time, volume = 0.0, filled = 0.0)
+            TankStateDto(name = "code", date = Date().time, volume = 0.0, filled = 0.0)
         )
         assertThat(response).isNotNull
 

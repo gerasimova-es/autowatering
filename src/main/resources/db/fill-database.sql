@@ -1,0 +1,1 @@
+insert into pot(id, code, name) values (1, 'ANTHURIUM', 'Ауториум')

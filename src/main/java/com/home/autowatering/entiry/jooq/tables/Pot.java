@@ -40,9 +40,14 @@ public class Pot extends TableImpl<PotRecord> {
      */
     public final TableField<PotRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
     /**
-     * The column <code>pot.name</code>.
+     * The column <code>pot.code</code>.
+     */
+    public final TableField<PotRecord, String> CODE = createField("code", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
+    /**
+     * The column <code>pot.code</code>.
      */
     public final TableField<PotRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
+
 
     /**
      * Create a <code>pot</code> table reference

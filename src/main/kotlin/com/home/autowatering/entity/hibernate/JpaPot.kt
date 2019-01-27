@@ -11,17 +11,21 @@ class JpaPot {
     @GeneratedValue
     var id: Long? = null
 
+    @Column(name = "CODE", nullable = false)
+    var code: String? = null
+
     @Column(name = "NAME", nullable = false)
     var name: String? = null
 
-    @Column(name = "DESCRIPTION", nullable = false)
-    var description: String? = null
+    @Column(name = "HUMIDITY")
+    var humidity: Double? = null
 
     constructor()
 
-    constructor(id: Long? = null, name: String, description: String? = null) {
+    constructor(id: Long? = null, name: String, description: String? = null, humidity: Double? = null) {
         this.id = id
-        this.name = name
-        this.description = description
+        this.code = name
+        this.name = description
+        this.humidity = humidity
     }
 }

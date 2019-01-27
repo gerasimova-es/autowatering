@@ -2,6 +2,7 @@ package com.home.autowatering.service.impl
 
 import com.home.autowatering.dao.interfaces.PotDao
 import com.home.autowatering.model.Pot
+import com.home.autowatering.model.PotState
 import com.home.autowatering.model.filter.PotFilter
 import com.home.autowatering.service.interfaces.PotService
 import org.apache.commons.lang.Validate
@@ -18,17 +19,23 @@ class PotServiceImpl(@Autowired val potDao: PotDao) : PotService {
         Validate.notNull(filter)
         if (filter.id != null) {
             return potDao.getById(filter.id!!)
-        } else if (filter.name != null) {
-            return potDao.findByName(filter.name!!)
+        } else if (filter.code != null) {
+            return potDao.findByCode(filter.code!!)
         }
         throw IllegalArgumentException("filter parameters are empty")
     }
 
+    override fun mergeState(source: PotState, target: Pot): Pot {
+        Validate.noNullElements(arrayOf(source, target))
+        target.humidity = source.humidity
+        return target
+    }
+
     override fun merge(source: Pot, target: Pot): Pot {
         Validate.noNullElements(arrayOf(source, target))
+        target.code = source.code
         target.name = source.name
-        target.description = source.description
-        target.state = source.state
+        target.humidity = source.humidity
         return target
     }
 

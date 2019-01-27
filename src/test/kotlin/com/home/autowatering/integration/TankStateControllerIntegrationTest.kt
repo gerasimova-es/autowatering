@@ -14,7 +14,6 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.junit4.SpringRunner
-import java.util.*
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,8 +24,7 @@ class TankStateControllerIntegrationTest {
     @Test
     fun save() {
         val dto = TankStateDto(
-            name = "tank1",
-            date = Date().time,
+            name = "tank",
             volume = 100.0,
             filled = 100.0
         )

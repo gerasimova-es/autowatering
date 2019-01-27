@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PotRepository : JpaRepository<JpaPot, Long> {
-    fun findOneByName(name: String): JpaPot?
+    fun findOneByCode(code: String): JpaPot?
 }

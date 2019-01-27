@@ -11,7 +11,7 @@ class JpaTankState {
     @GeneratedValue
     var id: Long? = null
 
-    @Column(name = "NAME", precision = 2, nullable = false)
+    @Column(name = "CODE", precision = 2, nullable = false)
     var name: String? = null
 
     @Column(name = "DATE", nullable = false)

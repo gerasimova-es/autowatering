@@ -3,45 +3,27 @@ package com.home.autowatering.dao.impl
 import com.home.autowatering.dao.interfaces.PotDao
 import com.home.autowatering.entity.hibernate.JpaPot
 import com.home.autowatering.entity.hibernate.converter.JpaPotConverter
-import com.home.autowatering.entity.hibernate.converter.JpaPotStateConverter
 import com.home.autowatering.model.Pot
 import com.home.autowatering.repository.PotRepository
-import com.home.autowatering.repository.PotStateRepository
 import org.springframework.stereotype.Repository
-import java.util.stream.Collectors
 import javax.transaction.Transactional
 
 @Repository
-class PotDaoJpa(private val potRepository: PotRepository, private val potStateRepository: PotStateRepository) : PotDao {
+class PotDaoJpa(private val potRepository: PotRepository) : PotDao {
     val potConverter = JpaPotConverter()
-    val stateConverter = JpaPotStateConverter()
 
     override fun getAll(): List<Pot> {
-        return potRepository.findAll().stream()
-            .map { jpaPot ->
-                potConverter.fromJpa(
-                    jpaPot,
-                    potStateRepository.findFirstByPotOrderByDateDesc(jpaPot)
-                )
-            }
-            .collect(Collectors.toList())
+        return potRepository.findAll()
+            .map { potConverter.fromJpa(it) }
     }
 
-    override fun getById(id: Long): Pot {
-        val jpaPot = potRepository.getOne(id)
-        return potConverter.fromJpa(
-            jpaPot,
-            potStateRepository.findFirstByPotOrderByDateDesc(jpaPot)
-        )
-    }
+    override fun getById(id: Long): Pot =
+        potConverter.fromJpa(potRepository.getOne(id))
 
-    override fun findByName(name: String): Pot? {
-        val jpaPot: JpaPot? = potRepository.findOneByName(name)
-        return if (jpaPot == null) null
-        else potConverter.fromJpa(
-            jpaPot,
-            potStateRepository.findFirstByPotOrderByDateDesc(jpaPot)
-        )
+
+    override fun findByCode(code: String): Pot? {
+        val pot: JpaPot? = potRepository.findOneByCode(code)
+        return if (pot == null) null else potConverter.fromJpa(pot)
     }
 
     @Transactional
@@ -53,12 +35,6 @@ class PotDaoJpa(private val potRepository: PotRepository, private val potStateRe
         } else {
             jpaPot = potRepository.save(potConverter.fromEntity(pot))
         }
-        if (pot.state == null) {
-            return potConverter.fromJpa(jpaPot)
-        }
-
-        val jpaState = stateConverter.fromEntity(pot.state!!)
-        jpaState.pot = jpaPot //todo хм
-        return potConverter.fromJpa(jpaPot, potStateRepository.save(jpaState))
+        return potConverter.fromJpa(jpaPot)
     }
 }

@@ -1,3 +1,3 @@
 package com.home.autowatering.model
 
-data class Pot(var id: Long? = null, var name: String, var description: String? = null, var state: PotState? = null)
+data class Pot(var id: Long? = null, var code: String, var name: String? = null, var humidity: Double? = null)

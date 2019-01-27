@@ -2,13 +2,12 @@ package com.home.autowatering.controller
 
 import com.home.autowatering.converter.PotConverter
 import com.home.autowatering.converter.PotStateConverter
-import com.home.autowatering.converter.PotStateFilterConverter
 import com.home.autowatering.dto.PotDto
 import com.home.autowatering.dto.PotStateDto
-import com.home.autowatering.dto.PotStateFilterDto
 import com.home.autowatering.dto.response.Response
 import com.home.autowatering.model.PotState
 import com.home.autowatering.model.filter.PotFilter
+import com.home.autowatering.model.filter.PotStateFilter
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
 import org.apache.commons.lang.Validate
@@ -23,7 +22,6 @@ import java.util.*
 class PotController(var potService: PotService, var potStateService: PotStateService) : AbstractController() {
     val potConverter = PotConverter()
     val potStateConverter = PotStateConverter()
-    val potStateFilterConverter = PotStateFilterConverter()
 
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(PotController::class.java)
@@ -38,40 +36,52 @@ class PotController(var potService: PotService, var potStateService: PotStateSer
         return potConverter.response(pots)
     }
 
-    @GetMapping("/{id}")
-    fun get(@PathVariable(value = "id") id: Long): Response<PotDto> {
-        LOGGER.info("received search pot by id request. Search executing...")
-        val pot = potService.find(PotFilter(id = id))
+    @GetMapping("/{pot}")
+    fun get(@PathVariable(value = "pot") potId: Long): Response<PotDto> {
+        LOGGER.info("received search pot by potCode request. Search executing...")
+        val pot = potService.find(PotFilter(id = potId))
         Validate.notNull(pot) //todo PotNotFoundException
         LOGGER.info("found pot [$pot] ")
         return potConverter.response(pot!!)
     }
 
-    @GetMapping("/{pot}/states")
-    fun states(
-        @PathVariable(value = "pot") pot: String,
-        @RequestParam(value = "dateFrom", required = false) @DateTimeFormat(pattern = DATE_FORMAT) dateFrom: Date?,
-        @RequestParam(value = "dateTo", required = false) @DateTimeFormat(pattern = DATE_FORMAT) dateTo: Date?
-    ): Response<List<PotStateDto>> {
-        LOGGER.info("received search pot state request. Search executing...")
-        val filter = potStateFilterConverter.fromDto(PotStateFilterDto(pot, dateFrom, dateTo))
-        val states: List<PotState> = potStateService.find(filter)
-        LOGGER.info("found ${states.size} records with getFilter [$filter]")
-        return potStateConverter.response(states)
-    }
-
     @PostMapping("/save")
     fun save(@RequestBody request: PotDto): Response<PotDto> {
         LOGGER.info("received saving pot request. Executing...")
-        //todo pot filter converter
-        val saved = potService.find(PotFilter(name = request.name))
+        val saved = potService.find(PotFilter(code = request.code))
         var pot = if (saved == null) potConverter.fromDto(request)
         else potService.merge(potConverter.fromDto(request), saved)
-
         pot = potService.save(pot)
         LOGGER.info("pot [$pot] saved successfully")
         return potConverter.response(pot)
     }
 
+    @GetMapping("/{pot}/history")
+    fun states(
+        @PathVariable(value = "pot") potId: Long,
+        @RequestParam(value = "dateFrom", required = false) @DateTimeFormat(pattern = DATE_FORMAT) dateFrom: Date?,
+        @RequestParam(value = "dateTo", required = false) @DateTimeFormat(pattern = DATE_FORMAT) dateTo: Date?
+    ): Response<List<PotStateDto>> {
+        LOGGER.info("received search pot state request. Search executing...")
+        val pot = potService.find(PotFilter(id = potId))
+        Validate.notNull(pot) //todo PotNotFoundException
+        val states: List<PotState> = potStateService.find(PotStateFilter(pot!!, dateFrom, dateTo))
+        LOGGER.info("found ${states.size} records")
+        return potStateConverter.response(states)
+    }
+
+
+    @PostMapping("/state/save")
+    fun saveState(@RequestBody request: PotStateDto): Response<PotStateDto> {
+        LOGGER.info("received saving pot request. Executing...")
+        var pot = potService.find(PotFilter(code = request.potCode))
+        Validate.notNull(pot) //todo PotNotFoundException
+        var state = potStateConverter.fromDto(request)
+        pot = potService.mergeState(state, pot!!)
+        potService.save(pot)
+        state = potStateService.save(state)
+        LOGGER.info("state for pot = [$pot] saved successfully")
+        return potStateConverter.response(state)
+    }
 
 }

@@ -1,7 +1,6 @@
 package com.home.autowatering.entity.hibernate.converter
 
 import com.home.autowatering.entity.hibernate.JpaPot
-import com.home.autowatering.entity.hibernate.JpaPotState
 import com.home.autowatering.model.Pot
 import java.util.function.Function
 
@@ -9,30 +8,26 @@ class JpaPotConverter : JpaConverter<JpaPot, Pot>(
     Function {
         Pot(
             id = it.id,
-            name = it.name!!,
-            description = it.description
+            code = it.code!!,
+            name = it.name,
+            humidity = it.humidity
         )
     },
     Function {
         JpaPot(
             id = it.id,
-            name = it.name,
-            description = it.description
+            name = it.code,
+            description = it.name,
+            humidity = it.humidity
         )
     }
 
 ) {
-    fun fromJpa(pot: JpaPot, state: JpaPotState?): Pot {
-        val potPojo = super.fromJpa(pot)
-        if (state != null) {
-            potPojo.state = JpaPotStateConverter().fromJpa(state)
-        }
-        return potPojo
-    }
 
     fun map(source: Pot, target: JpaPot): JpaPot {
+        target.code = source.code
         target.name = source.name
-        target.description = source.description
+        target.humidity = source.humidity
         return target
     }
 }

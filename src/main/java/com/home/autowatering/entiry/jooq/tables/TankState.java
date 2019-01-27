@@ -49,7 +49,7 @@ public class TankState extends TableImpl<TankStateRecord> {
      */
     public final TableField<TankStateRecord, Double> FILLED = createField("filled", org.jooq.impl.SQLDataType.DOUBLE.nullable(false), this, "");
     /**
-     * The column <code>tank_state.name</code>.
+     * The column <code>tank_state.code</code>.
      */
     public final TableField<TankStateRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
     /**

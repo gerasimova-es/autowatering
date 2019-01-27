@@ -7,8 +7,20 @@ import java.util.function.Function
 
 class TankStateConverter : RequestConverter<TankStateDto, TankState>(
     Function {
-        TankState(id = it.id, name = it.name, date = Date(it.date), volume = it.volume, filled = it.filled)
+        TankState(
+            id = it.id,
+            name = it.name,
+            date = if (it.date == null) Date() else Date(it.date),
+            volume = it.volume,
+            filled = it.filled
+        )
     },
     Function {
-        TankStateDto(id = it.id, name = it.name, date = it.date.time, volume = it.volume, filled = it.filled)
+        TankStateDto(
+            id = it.id,
+            name = it.name,
+            date = it.date.time,
+            volume = it.volume,
+            filled = it.filled
+        )
     })

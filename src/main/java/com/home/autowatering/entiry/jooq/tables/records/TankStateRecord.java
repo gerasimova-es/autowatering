@@ -96,14 +96,14 @@ public class TankStateRecord extends UpdatableRecordImpl<TankStateRecord> implem
     }
 
     /**
-     * Getter for <code>tank_state.name</code>.
+     * Getter for <code>tank_state.code</code>.
      */
     public String getName() {
         return (String) get(3);
     }
 
     /**
-     * Setter for <code>tank_state.name</code>.
+     * Setter for <code>tank_state.code</code>.
      */
     public TankStateRecord setName(String value) {
         set(3, value);
