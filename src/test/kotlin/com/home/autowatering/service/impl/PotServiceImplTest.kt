@@ -21,7 +21,7 @@ class PotServiceImplTest {
 
     @Test
     fun findAll() {
-        whenever(potDao.getAll()).thenReturn(arrayListOf(Pot(code = "pot1"), Pot(code = "2")))
+        whenever(potDao.findAll()).thenReturn(arrayListOf(Pot(code = "pot1"), Pot(code = "2")))
 
         val result = service.findAll()
 
@@ -29,21 +29,21 @@ class PotServiceImplTest {
         assertThat(result).hasSize(2)
         //todo check pots
 
-        verify(potDao, times(1)).getAll()
+        verify(potDao, times(1)).findAll()
         verifyNoMoreInteractions(potDao)
     }
 
     @Test
     fun findById() {
         val pot = Pot(code = "pot1")
-        whenever(potDao.getById(any())).thenReturn(pot)
+        whenever(potDao.findById(any())).thenReturn(pot)
 
         val result = service.find(PotFilter(id = 1, code = "code"))
 
         assertThat(result).isNotNull
         assertThat(result).isEqualTo(pot)
 
-        verify(potDao, times(1)).getById(eq(1))
+        verify(potDao, times(1)).findById(eq(1))
         verifyNoMoreInteractions(potDao)
     }
 

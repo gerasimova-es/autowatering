@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service
 class PotServiceImpl(@Autowired val potDao: PotDao) : PotService {
 
     override fun findAll(): List<Pot> =
-        potDao.getAll()
+        potDao.findAll()
 
     override fun find(filter: PotFilter): Pot? {
         Validate.notNull(filter)
         if (filter.id != null) {
-            return potDao.getById(filter.id!!)
+            return potDao.findById(filter.id!!)
         } else if (filter.code != null) {
             return potDao.findByCode(filter.code!!)
         }
