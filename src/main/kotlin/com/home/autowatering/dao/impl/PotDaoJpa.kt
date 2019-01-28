@@ -11,7 +11,7 @@ import javax.transaction.Transactional
 
 @Repository
 class PotDaoJpa(private val repository: PotRepository) : PotDao {
-    final val converter = JpaPotConverter()
+    private final val converter = JpaPotConverter()
 
     override fun findAll(): List<Pot> {
         return repository.findAll()
@@ -30,13 +30,13 @@ class PotDaoJpa(private val repository: PotRepository) : PotDao {
 
     @Transactional
     override fun save(pot: Pot): Pot {
-        var jpaPot: JpaPot? = null
+        val jpaPot: JpaPot?
         if (pot.id != null) {
             jpaPot = repository.findById(pot.id!!)
-                .orElseThrow { PotNotFoundException(pot.id) }
+                .orElseThrow { PotNotFoundException(pot.id!!) }
             converter.map(pot, jpaPot)
         } else {
-            converter.fromEntity(pot)
+            jpaPot = converter.fromEntity(pot)
         }
         return converter.fromJpa(repository.save(jpaPot!!))
     }

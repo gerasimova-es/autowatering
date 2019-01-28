@@ -19,5 +19,4 @@ abstract class AbstractController {
             if (exc.message == null) exc.javaClass.name else exc.message!!
         )
     }
-
 }

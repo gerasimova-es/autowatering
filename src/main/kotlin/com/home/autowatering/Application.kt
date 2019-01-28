@@ -1,4 +1,4 @@
-package com.home.autowatering.app
+package com.home.autowatering
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication

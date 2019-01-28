@@ -1,5 +1,6 @@
 package com.home.autowatering.integration
 
+import com.home.autowatering.Application
 import com.home.autowatering.dto.PotDto
 import com.home.autowatering.dto.PotStateDto
 import com.home.autowatering.dto.response.Response
@@ -16,10 +17,9 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.web.util.UriComponentsBuilder
-import java.util.*
 
 @RunWith(SpringRunner::class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = [Application::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PotControllerIntegrationTest {
 
     @Autowired
@@ -67,7 +67,8 @@ class PotControllerIntegrationTest {
     fun savePotAndSaveStateAndHistory() {
         val potDto = PotDto(
             code = "pot1",
-            name = "pot"
+            name = "pot",
+            humidity = 123.0
         )
 
         val savedPotDto = restTemplate.exchange(
@@ -111,8 +112,6 @@ class PotControllerIntegrationTest {
         assertThat(found.body?.status).isSameAs(ResponseStatus.SUCCESS)
         assertThat(found.body?.message).isEqualTo("message was handled successfully")
         assertThat(found.body?.payload).isInstanceOf(ArrayList::class.java)
-//        assertThat(found.body?.payload).hasSize(2) //todo check
-//        assertThat(found.body?.payload).hasOnlyElementsOfType(PotStateDto::class.java)
         //todo check elements
     }
 

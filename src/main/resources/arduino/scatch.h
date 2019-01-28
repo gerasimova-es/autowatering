@@ -76,7 +76,7 @@ void sendPotState(int humidity, boolean watering){
     HTTPClient http;
     http.begin("http://192.168.1.35:8080/autowatering/pot/state/save");
     http.addHeader("Content-Type", "application/json");
-    String body = String("{\"potCode\": \"AUTHORIUM\", \"humidity\": ") + String(humidity) + String(".0, \"watering\": " + String(watering) + " }");
+    String body = String("{\"potCode\": \"AUTHORIUM\", \"humidity\": ") + String(humidity) + ".0, \"watering\": " + String(watering) + " }";
     int httpCode = http.POST(body);
     Serial.println("request status: " + String(httpCode));
     if (httpCode > 0) {
@@ -117,6 +117,7 @@ boolean getTankIsFull(){
 int getHumidity(){
   Serial.println("включаем реле датчика влажности");
   digitalWrite(HUMIDITY_RELAY, LOW);
+  delay(1000);
   int humidity = map(analogRead(HUMIDITY), 1023, 0, 0, 1023);
   digitalWrite(HUMIDITY_RELAY, HIGH);
   return humidity;
