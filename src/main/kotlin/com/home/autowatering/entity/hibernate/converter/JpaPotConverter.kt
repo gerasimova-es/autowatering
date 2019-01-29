@@ -9,16 +9,14 @@ class JpaPotConverter : JpaConverter<JpaPot, Pot>(
         Pot(
             id = it.id,
             code = it.code!!,
-            name = it.name,
-            humidity = it.humidity
+            name = it.name
         )
     },
     Function {
         JpaPot(
             id = it.id,
             name = it.code,
-            description = it.name,
-            humidity = it.humidity
+            description = it.name
         )
     }
 
@@ -27,7 +25,6 @@ class JpaPotConverter : JpaConverter<JpaPot, Pot>(
     fun map(source: Pot, target: JpaPot): JpaPot {
         target.code = source.code
         target.name = source.name
-        target.humidity = source.humidity
         return target
     }
 }

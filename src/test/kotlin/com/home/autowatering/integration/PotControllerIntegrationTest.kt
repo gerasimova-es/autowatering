@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.web.util.UriComponentsBuilder
+import java.util.*
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Application::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -67,8 +68,7 @@ class PotControllerIntegrationTest {
     fun savePotAndSaveStateAndHistory() {
         val potDto = PotDto(
             code = "pot1",
-            name = "pot",
-            humidity = 123.0
+            name = "pot"
         )
 
         val savedPotDto = restTemplate.exchange(
@@ -99,7 +99,7 @@ class PotControllerIntegrationTest {
         assertThat(savedStateDto.body?.payload?.id).isGreaterThan(0)
         assertThat(savedStateDto.body?.payload?.watering).isTrue()
 
-        val builder = UriComponentsBuilder.fromPath("/pot/${savedPotDto?.body?.payload?.id}/history")
+        val builder = UriComponentsBuilder.fromPath("/pot/${savedPotDto?.body?.payload?.id}/state/list")
 
         val found = restTemplate.exchange(
             builder.build().encode().toUri(),
@@ -118,7 +118,7 @@ class PotControllerIntegrationTest {
     @Test
     fun savePotAndSaveStateAndFind() {
         val potDto = PotDto(
-            code = "pot",
+            code = "pot_savePotAndSaveStateAndFind",
             name = "pot"
         )
 
@@ -133,7 +133,7 @@ class PotControllerIntegrationTest {
         assertThat(savedPotDto.body?.status).isSameAs(ResponseStatus.SUCCESS)
 
         val stateDto = PotStateDto(
-            potCode = "pot",
+            potCode = "pot_savePotAndSaveStateAndFind",
             humidity = 100.0
         )
 

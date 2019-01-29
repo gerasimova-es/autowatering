@@ -11,7 +11,6 @@ insert into hibernate_sequence values (1);
 create table pot (
        id bigint not null,
         code varchar(255) not null,
-        humidity double,
         name varchar(255) not null,
         primary key (id)
 );

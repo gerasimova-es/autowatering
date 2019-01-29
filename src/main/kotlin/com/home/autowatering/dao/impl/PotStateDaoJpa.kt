@@ -7,6 +7,7 @@ import com.home.autowatering.entity.hibernate.JpaPotState
 import com.home.autowatering.entity.hibernate.converter.JpaPotStateConverter
 import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.exception.SavingException
+import com.home.autowatering.model.Pot
 import com.home.autowatering.model.PotState
 import com.home.autowatering.model.filter.PotStateFilter
 import com.home.autowatering.repository.PotRepository
@@ -26,7 +27,14 @@ class PotStateDaoJpa(
     private val potRepository: PotRepository,
     private val stateRepository: PotStateRepository
 ) : PotStateDao {
+
     val converter = JpaPotStateConverter()
+
+    override fun last(pot: Pot): PotState? {
+        val jpaPot = potRepository.findOneByCode(pot.code) ?: throw PotNotFoundException(pot.code)
+        val state = stateRepository.findFirstByPotOrderByDateDesc(jpaPot)
+        return if (state == null) null else converter.fromJpa(state)
+    }
 
     override fun find(filter: PotStateFilter): List<PotState> {
         val pot = Tables.POT
@@ -40,11 +48,9 @@ class PotStateDaoJpa(
         } else {
             condition.and(pot.CODE.eq(filter.pot.code))
         }
-
         if (filter.from != null) {
             condition.and(state.DATE.greaterOrEqual(java.sql.Date(filter.from!!.time)))
         }
-
         if (filter.to != null) {
             condition.and(state.DATE.lessOrEqual(java.sql.Date(filter.to!!.time)))
         }
@@ -76,10 +82,10 @@ class PotStateDaoJpa(
         try {
             val jpaPot = potRepository.findOneByCode(state.pot.code)
                 ?: throw PotNotFoundException("pot not found by code = ${state.pot.code}")
-            val jpaState = converter.fromEntity(state)
+            var jpaState = converter.fromEntity(state)
             jpaState.pot = jpaPot
-
-            return converter.fromJpa(stateRepository.save(jpaState))
+            jpaState = stateRepository.save(jpaState)
+            return converter.fromJpa(jpaState)
         } catch (exc: PersistenceException) {
             throw SavingException(exc)
         }

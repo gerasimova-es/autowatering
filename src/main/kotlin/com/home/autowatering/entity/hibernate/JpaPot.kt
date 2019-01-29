@@ -17,15 +17,11 @@ class JpaPot {
     @Column(name = "NAME", nullable = false)
     var name: String? = null
 
-    @Column(name = "HUMIDITY")
-    var humidity: Double? = null
-
     constructor()
 
-    constructor(id: Long? = null, name: String, description: String? = null, humidity: Double? = null) {
+    constructor(id: Long? = null, name: String, description: String? = null) {
         this.id = id
         this.code = name
         this.name = description
-        this.humidity = humidity
     }
 }

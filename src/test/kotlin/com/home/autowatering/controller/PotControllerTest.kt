@@ -34,7 +34,7 @@ class PotControllerTest {
             code = "pot",
             name = "desc"
         )
-        whenever(potService.find(any())).thenReturn(pot)
+        whenever(potService.find(any())).thenReturn(arrayListOf(pot))
 
         val response = controller.get(1)
 
@@ -58,7 +58,7 @@ class PotControllerTest {
             code = "pot",
             name = "pot"
         )
-        whenever(potService.find(any())).thenReturn(null)
+        whenever(potService.find(any())).thenReturn(arrayListOf())
         whenever(potService.save(any())).thenReturn(
             Pot(
                 id = 1,
@@ -86,27 +86,26 @@ class PotControllerTest {
     @Test
     fun savedExistedPot() {
         whenever(potService.find(any())).thenReturn(
-            Pot(
-                id = 1,
-                code = "pot",
-                name = "pot1",
-                humidity = 1.0
+            arrayListOf(
+                Pot(
+                    id = 1,
+                    code = "pot",
+                    name = "pot1"
+                )
             )
         )
         whenever(potService.merge(any(), any())).thenReturn(
             Pot(
                 id = 1,
                 code = "pot",
-                name = "pot2",
-                humidity = 1.0
+                name = "pot2"
             )
         )
         whenever(potService.save(any())).thenReturn(
             Pot(
                 id = 1,
                 code = "pot",
-                name = "pot3",
-                humidity = 1.0
+                name = "pot3"
             )
         )
 
@@ -134,7 +133,7 @@ class PotControllerTest {
 
     @Test
     fun findStateWithNotExistedPot() {
-        whenever(potService.find(any())).thenReturn(null)
+        whenever(potService.find(any())).thenReturn(arrayListOf())
         try {
             controller.states(1, Date(), Date())
             fail("expected PotNotFoundException")
@@ -147,7 +146,7 @@ class PotControllerTest {
 
     @Test
     fun failFindState() {
-        whenever(potService.find(any())).thenReturn(Pot(id = 1, code = "pot"))
+        whenever(potService.find(any())).thenReturn(arrayListOf(Pot(id = 1, code = "pot")))
         whenever(potStateService.find(any())).thenThrow(IllegalArgumentException("test"))
         try {
             controller.states(1, Date(), Date())
@@ -160,7 +159,7 @@ class PotControllerTest {
 
     @Test
     fun foundNoStateRecords() {
-        whenever(potService.find(any())).thenReturn(Pot(id = 1, code = "pot"))
+        whenever(potService.find(any())).thenReturn(arrayListOf(Pot(id = 1, code = "pot")))
         whenever(potStateService.find(any())).thenReturn(arrayListOf())
 
         val response = controller.states(1, Date(), Date())
@@ -175,7 +174,7 @@ class PotControllerTest {
     @Test
     fun foundOneStateRecord() {
         val state = PotState(1, Pot(code = "pot"), Date(), 1.0)
-        whenever(potService.find(any())).thenReturn(Pot(id = 1, code = "pot", name = "pot"))
+        whenever(potService.find(any())).thenReturn(arrayListOf(Pot(id = 1, code = "pot", name = "pot")))
         whenever(potStateService.find(any())).thenReturn(arrayListOf(state))
 
         val response = controller.states(1, Date(), Date())
@@ -201,7 +200,7 @@ class PotControllerTest {
     fun foundSomeStateRecords() {
         val state1 = PotState(1L, Pot(code = "pot"), Date(), 1.0)
         val state2 = PotState(2L, Pot(code = "pot"), Date(), 2.0)
-        whenever(potService.find(any())).thenReturn(Pot(id = 1, code = "pot", name = "pot"))
+        whenever(potService.find(any())).thenReturn(arrayListOf(Pot(id = 1, code = "pot", name = "pot")))
         whenever(potStateService.find(any())).thenReturn(arrayListOf(state1, state2))
 
         val response = controller.states(1, Date(), Date())

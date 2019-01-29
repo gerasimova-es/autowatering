@@ -23,7 +23,7 @@ open class RequestConverter<D, E>(
      * @param entity domain entity
      * @return The DTO representation - the result of the converting function application on domain entity.
      */
-    private fun fromEntity(entity: E): D {
+    protected fun fromEntity(entity: E): D {
         return fromEntity.apply(entity)
     }
 

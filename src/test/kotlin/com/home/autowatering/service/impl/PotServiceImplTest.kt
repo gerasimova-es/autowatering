@@ -41,7 +41,7 @@ class PotServiceImplTest {
         val result = service.find(PotFilter(id = 1, code = "code"))
 
         assertThat(result).isNotNull
-        assertThat(result).isEqualTo(pot)
+        assertThat(result).isEqualTo(arrayListOf(pot))
 
         verify(potDao, times(1)).findById(eq(1))
         verifyNoMoreInteractions(potDao)
@@ -55,7 +55,7 @@ class PotServiceImplTest {
         val result = service.find(PotFilter(code = "code"))
 
         assertThat(result).isNotNull
-        assertThat(result).isEqualTo(pot)
+        assertThat(result).isEqualTo(arrayListOf(pot))
 
         verify(potDao, times(1)).findByCode(eq("code"))
         verifyNoMoreInteractions(potDao)
@@ -66,14 +66,12 @@ class PotServiceImplTest {
         val source = Pot(
             id = 1,
             code = "pot1",
-            name = "desc1",
-            humidity = 1.0
+            name = "desc1"
         )
         val target = Pot(
             id = 2,
             code = "pot2",
-            name = "desc2",
-            humidity = 2.0
+            name = "desc2"
         )
 
         val result = service.merge(source, target)
@@ -81,7 +79,6 @@ class PotServiceImplTest {
         assertThat(result).isNotNull
         assertThat(result.code).isEqualTo(source.code)
         assertThat(result.name).isEqualTo(source.name)
-        assertThat(result.humidity).isEqualTo(source.humidity)
     }
 
 
