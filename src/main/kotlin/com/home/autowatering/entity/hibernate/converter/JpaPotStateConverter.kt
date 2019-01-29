@@ -2,7 +2,6 @@ package com.home.autowatering.entity.hibernate.converter
 
 import com.home.autowatering.entity.hibernate.JpaPotState
 import com.home.autowatering.model.PotState
-import java.util.*
 import java.util.function.Function
 
 class JpaPotStateConverter : JpaConverter<JpaPotState, PotState>(
@@ -10,7 +9,7 @@ class JpaPotStateConverter : JpaConverter<JpaPotState, PotState>(
         PotState(
             id = it.id,
             pot = JpaPotConverter().fromJpa(it.pot!!),
-            date = Date(it.date!!.time),
+            date = it.date!!,
             humidity = it.humidity!!,
             watering = it.watering
         )
@@ -19,7 +18,7 @@ class JpaPotStateConverter : JpaConverter<JpaPotState, PotState>(
         JpaPotState(
             id = it.id,
             pot = JpaPotConverter().fromEntity(it.pot),
-            date = java.sql.Date(it.date.time),
+            date = it.date,
             humidity = it.humidity,
             watering = it.watering
         )

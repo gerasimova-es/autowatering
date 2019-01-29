@@ -3,6 +3,7 @@ package com.home.autowatering.controller
 import com.home.autowatering.dto.PotDto
 import com.home.autowatering.dto.PotStateDto
 import com.home.autowatering.dto.response.ResponseStatus
+import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.model.Pot
 import com.home.autowatering.model.PotState
 import com.home.autowatering.service.interfaces.PotService
@@ -136,8 +137,8 @@ class PotControllerTest {
         whenever(potService.find(any())).thenReturn(null)
         try {
             controller.states(1, Date(), Date())
-            fail("expected IllegalArgumentException")
-        } catch (ignored: IllegalArgumentException) {
+            fail("expected PotNotFoundException")
+        } catch (ignored: PotNotFoundException) {
             verify(potService, times(1)).find(any())
             verifyNoMoreInteractions(potService)
             verifyZeroInteractions(potStateService)

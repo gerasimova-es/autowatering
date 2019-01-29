@@ -5,7 +5,6 @@ import com.home.autowatering.entity.hibernate.JpaTankState
 import com.home.autowatering.model.TankState
 import com.home.autowatering.repository.TankStateRepository
 import org.springframework.stereotype.Repository
-import java.util.*
 
 @Repository
 class TankStateDaoJpa(private val stateRepository: TankStateRepository) : TankStateDao {
@@ -13,7 +12,7 @@ class TankStateDaoJpa(private val stateRepository: TankStateRepository) : TankSt
         val tankStateData: JpaTankState = stateRepository.save(
             JpaTankState(
                 tankState.name,
-                java.sql.Date(tankState.date.time),
+                tankState.date,
                 tankState.volume,
                 tankState.filled
             )
@@ -22,7 +21,7 @@ class TankStateDaoJpa(private val stateRepository: TankStateRepository) : TankSt
         return TankState(
             tankStateData.id,
             tankStateData.name!!,
-            Date(tankStateData.date!!.time),
+            tankStateData.date!!,
             tankStateData.volume,
             tankStateData.filled
         )

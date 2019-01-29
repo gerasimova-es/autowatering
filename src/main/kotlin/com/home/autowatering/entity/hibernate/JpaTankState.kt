@@ -1,6 +1,6 @@
 package com.home.autowatering.entity.hibernate
 
-import java.sql.Date
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -14,6 +14,7 @@ class JpaTankState {
     @Column(name = "CODE", precision = 2, nullable = false)
     var name: String? = null
 
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "DATE", nullable = false)
     var date: Date? = null
 
