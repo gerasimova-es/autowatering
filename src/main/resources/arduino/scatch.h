@@ -18,6 +18,8 @@ const char* password = "kate_023";
 #define PUMP_RELAY D4
 // цифровой выход для поплавка
 #define FLOAT D7
+// цифровой выход для свистелки-перделки
+#define WHISTLE D3
 
 // статическая переменная для хранения времени
 unsigned long waitTime = 0;
@@ -37,22 +39,30 @@ void setup(){
   digitalWrite(PUMP_RELAY, HIGH);
   pinMode(HUMIDITY_RELAY, OUTPUT);
   pinMode(FLOAT, INPUT);
+  pinMode(WHISTLE, OUTPUT);
 }
 
 void loop(){
+  boolean tankIsFull = getTankIsFull();
+  Serial.println("float is up=" + String(tankIsFull));
+
+  //включаем свистелку-перделку, если резервуар опустошился
+  if(!tankIsFull){
+     digitalWrite(WHISTLE, HIGH);
+     Serial.println("включаем свистелку-перделку");
+     delay(100);
+     digitalWrite(WHISTLE, LOW);
+  }
 
   //если прошел заданный интервал времени
   if(timeExpired()){
      int humidity = getHumidity();
      Serial.println("humidity=" + String(humidity));
 
-     boolean tankIsFull = getTankIsFull();
-     Serial.println("float is up=" + String(tankIsFull));
-
      boolean needWatering = false;
      // если резервуар заполнен и влажность низкая
-     if (tankIsFull && humidity < MIN_HUMIDITY ) {
-      //включаем насос
+     if (tankIsFull && humidity < MIN_HUMIDITY) {
+        //включаем насос
         needWatering = true;
         watering();
      }
@@ -63,7 +73,7 @@ void loop(){
      waitTime = millis();
      Serial.println("--------------------");
   }
-  delay(10000);
+  delay(2000);
 }
 
 boolean timeExpired(){
