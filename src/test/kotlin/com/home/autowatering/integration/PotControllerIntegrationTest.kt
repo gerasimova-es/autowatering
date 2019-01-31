@@ -28,26 +28,67 @@ class PotControllerIntegrationTest {
 
     @Test
     fun saveAndFind() {
-        val dto = PotDto(
+        val autorium = PotDto(
             code = "AUTHORIUM",
-            name = "Ауториум"
+            name = "Ауториум",
+            minHumidity = 400
         )
 
-        val result = restTemplate.exchange(
+        val savedAutorium = restTemplate.exchange(
             "/pot/save",
             HttpMethod.POST,
-            HttpEntity(dto),
+            HttpEntity(autorium),
             object : ParameterizedTypeReference<Response<PotDto>>() {})
 
-        assertThat(result).isNotNull
-        assertThat(result.statusCode).isSameAs(HttpStatus.OK)
-        assertThat(result.body).isNotNull
-        assertThat(result.body?.status).isSameAs(ResponseStatus.SUCCESS)
-        assertThat(result.body?.payload?.code).isEqualTo(dto.code)
-        assertThat(result.body?.payload?.name).isEqualTo(dto.name)
-        assertThat(result.body?.payload?.id).isGreaterThan(0)
+        assertThat(savedAutorium).isNotNull
+        assertThat(savedAutorium.statusCode).isSameAs(HttpStatus.OK)
+        assertThat(savedAutorium.body).isNotNull
+        assertThat(savedAutorium.body?.status).isSameAs(ResponseStatus.SUCCESS)
+        assertThat(savedAutorium.body?.payload?.code).isEqualTo(autorium.code)
+        assertThat(savedAutorium.body?.payload?.name).isEqualTo(autorium.name)
+        assertThat(savedAutorium.body?.payload?.id).isGreaterThan(0)
 
-        val builder = UriComponentsBuilder.fromPath("/pot/${result.body?.payload?.id}")
+        val phalaenopsis = PotDto(
+            code = "PHALAENOPSIS",
+            name = "Фаленопсис",
+            minHumidity = 400
+        )
+
+        val savedPhalaenopsis = restTemplate.exchange(
+            "/pot/save",
+            HttpMethod.POST,
+            HttpEntity(phalaenopsis),
+            object : ParameterizedTypeReference<Response<PotDto>>() {})
+
+        assertThat(savedPhalaenopsis).isNotNull
+        assertThat(savedPhalaenopsis.statusCode).isSameAs(HttpStatus.OK)
+        assertThat(savedPhalaenopsis.body).isNotNull
+        assertThat(savedPhalaenopsis.body?.status).isSameAs(ResponseStatus.SUCCESS)
+        assertThat(savedPhalaenopsis.body?.payload?.code).isEqualTo(phalaenopsis.code)
+        assertThat(savedPhalaenopsis.body?.payload?.name).isEqualTo(phalaenopsis.name)
+        assertThat(savedPhalaenopsis.body?.payload?.id).isGreaterThan(0)
+
+        val eucharis = PotDto(
+            code = "EUCHARIS",
+            name = "Эухарис",
+            minHumidity = 400
+        )
+
+        val savedEucharis = restTemplate.exchange(
+            "/pot/save",
+            HttpMethod.POST,
+            HttpEntity(eucharis),
+            object : ParameterizedTypeReference<Response<PotDto>>() {})
+
+        assertThat(savedEucharis).isNotNull
+        assertThat(savedEucharis.statusCode).isSameAs(HttpStatus.OK)
+        assertThat(savedEucharis.body).isNotNull
+        assertThat(savedEucharis.body?.status).isSameAs(ResponseStatus.SUCCESS)
+        assertThat(savedEucharis.body?.payload?.code).isEqualTo(eucharis.code)
+        assertThat(savedEucharis.body?.payload?.name).isEqualTo(eucharis.name)
+        assertThat(savedEucharis.body?.payload?.id).isGreaterThan(0)
+
+        val builder = UriComponentsBuilder.fromPath("/pot/${savedAutorium.body?.payload?.id}")
         val found = restTemplate.exchange(
             builder.build().encode().toUri(),
             HttpMethod.GET,
@@ -59,8 +100,8 @@ class PotControllerIntegrationTest {
         assertThat(found.body?.message).isEqualTo("message was handled successfully")
         assertThat(found.body?.status).isSameAs(ResponseStatus.SUCCESS)
         assertThat(found.body?.payload).isInstanceOf(PotDto::class.java)
-        assertThat(found.body?.payload?.code).isEqualTo(dto.code)
-        assertThat(found.body?.payload?.name).isEqualTo(dto.name)
+        assertThat(found.body?.payload?.code).isEqualTo(autorium.code)
+        assertThat(found.body?.payload?.name).isEqualTo(autorium.name)
     }
 
 

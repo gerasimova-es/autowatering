@@ -11,14 +11,16 @@ class PotConverter : RequestConverter<PotDto, Pot>(
         Pot(
             id = it.id,
             code = it.code,
-            name = it.name
+            name = it.name,
+            minHumidity = it.minHumidity
         )
     },
     Function {
         PotDto(
             id = it.id,
             code = it.code,
-            name = it.name
+            name = it.name,
+            minHumidity = it.minHumidity
         )
     }
 ) {

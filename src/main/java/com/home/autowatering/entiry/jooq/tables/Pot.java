@@ -10,6 +10,7 @@ import com.home.autowatering.entiry.jooq.Keys;
 import com.home.autowatering.entiry.jooq.tables.records.PotRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 import javax.annotation.Generated;
@@ -47,6 +48,10 @@ public class Pot extends TableImpl<PotRecord> {
      * The column <code>pot.code</code>.
      */
     public final TableField<PotRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
+    /**
+     * The column <code>pot.code</code>.
+     */
+    public final TableField<PotRecord, Integer> MIN_HUMIDITY = createField("min_humidity", SQLDataType.INTEGER.nullable(false), this, "");
 
 
     /**

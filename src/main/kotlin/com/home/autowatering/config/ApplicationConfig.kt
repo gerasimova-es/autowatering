@@ -20,7 +20,7 @@ class ApplicationConfig {
 
 //    @Bean
 //    internal fun h2servletRegistration(): ServletRegistrationBean<*> {
-//        val registration = ServletRegistrationBean(WebServlet())
+//        val registration = ServletRegistrationBean(WebServlet( )
 //        registration.addUrlMappings("/console/*")
 //        return registration
 //    }

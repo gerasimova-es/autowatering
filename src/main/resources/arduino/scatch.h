@@ -5,13 +5,11 @@
 // WiFi Parameters
 const char* ssid = "kate";
 const char* password = "kate_023";
+// URL приложения
+const char* url = "http://192.168.1.35:8080/autowatering";
 
 // аналаговый выхода датчика влажности
 #define HUMIDITY A0
-// значение минимально допустимой влажности почвы
-#define MIN_HUMIDITY 300
-// интервал между проверкой на полив растения (10 минут)
-#define INTERVAL 60000 * 10
 // цифровой выход для датчика влажности на реле
 #define HUMIDITY_RELAY D2
 // цифровой выход для насоса на реле
@@ -21,8 +19,14 @@ const char* password = "kate_023";
 // цифровой выход для свистелки-перделки
 #define WHISTLE D3
 
+// значение минимально допустимой влажности почвы
+#define MIN_HUMIDITY 350
+// интервал между проверкой на полив растения (10 минут)
+#define INTERVAL 60000 * 10
+
 // статическая переменная для хранения времени
-unsigned long waitTime = 0;
+unsigned long lastCheckTime = 0;
+
 
 void setup(){
   Serial.begin(115200);
@@ -44,84 +48,62 @@ void setup(){
 
 void loop(){
   boolean tankIsFull = getTankIsFull();
-  Serial.println("float is up=" + String(tankIsFull));
-
-  //включаем свистелку-перделку, если резервуар опустошился
   if(!tankIsFull){
-     digitalWrite(WHISTLE, HIGH);
-     Serial.println("включаем свистелку-перделку");
-     delay(100);
-     digitalWrite(WHISTLE, LOW);
+     whistling();
   }
-
-  //если прошел заданный интервал времени
   if(timeExpired()){
      int humidity = getHumidity();
-     Serial.println("humidity=" + String(humidity));
-
      boolean needWatering = false;
-     // если резервуар заполнен и влажность низкая
      if (tankIsFull && humidity < MIN_HUMIDITY) {
-        //включаем насос
         needWatering = true;
         watering();
      }
      sendPotState(humidity, needWatering);
      sendTankState(tankIsFull);
 
-     //сохраняем текущее время проверки
-     waitTime = millis();
+     lastCheckTime = millis();
      Serial.println("--------------------");
   }
   delay(2000);
 }
 
-boolean timeExpired(){
-  return waitTime == 0 || millis() - waitTime > INTERVAL;
-}
-
 void sendPotState(int humidity, boolean watering){
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("sending post state save request...");
-    HTTPClient http;
-    http.begin("http://192.168.1.35:8080/autowatering/pot/state/save");
-    http.addHeader("Content-Type", "application/json");
-    String body = String("{\"potCode\": \"AUTHORIUM\", \"humidity\": ") + String(humidity) + ".0, \"watering\": " + String(watering) + " }";
-    int httpCode = http.POST(body);
-    Serial.println("request status: " + String(httpCode));
-    if (httpCode > 0) {
-      // Get the response pay
-      String payload = http.getString();
-      Serial.println("payload=" + String(payload));
-    }
-    http.end();
-  } else {
-      Serial.println("error in WiFi connection");
-  }
+  Serial.println("sending post state save request...");
+  String body = String("{\"potCode\": \"AUTHORIUM\", \"humidity\": ") + String(humidity) + ".0, \"watering\": " + String(watering) + " }";
+  sendToServer("/pot/state/save", body);
 }
 
 void sendTankState(boolean tankIsFull){
-  if (WiFi.status() == WL_CONNECTED) {
     Serial.println("sending tank state save request...");
-    HTTPClient http;
-    http.begin("http://192.168.1.35:8080/autowatering/tank/state/save");
-    http.addHeader("Content-Type", "application/json");
     String body = String("{\"name\": \"DEFAULT\", \"volume\": 2.178, \"filled\": ") + String(tankIsFull) + String(".0 }");
+    sendToServer("/tank/state/save", body);
+}
+
+void sendToServer(String service, String body){
+   if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("sending request...");
+    HTTPClient http;
+    http.begin(String(url) + service);
+    http.addHeader("Content-Type", "application/json");
     int httpCode = http.POST(body);
     Serial.println("request status: " + String(httpCode));
     if (httpCode > 0) {
-      // Get the response pay
-      String payload = http.getString();
-      Serial.println("payload=" + String(payload));
+      Serial.println("payload=" + String(http.getString()));
     }
     http.end();
   } else {
-      Serial.println("error in WiFi connection");
+      Serial.println("WiFi connection error. Request was not sent");
   }
 }
 
+boolean timeExpired(){
+  return lastCheckTime == 0 || millis() - lastCheckTime > INTERVAL;
+}
+
 boolean getTankIsFull(){
-  return !digitalRead(FLOAT);
+  boolean floatIsUp = !digitalRead(FLOAT);
+  Serial.println("float is up=" + String(floatIsUp));
+  return floatIsUp;
 }
 
 int getHumidity(){
@@ -130,12 +112,20 @@ int getHumidity(){
   delay(1000);
   int humidity = map(analogRead(HUMIDITY), 1023, 0, 0, 1023);
   digitalWrite(HUMIDITY_RELAY, HIGH);
+  Serial.println("humidity=" + String(humidity));
   return humidity;
 }
 
 void watering(){
   Serial.println("включаем помпу");
   digitalWrite(PUMP_RELAY, LOW);
-  delay(2000);
+  delay(3000);
   digitalWrite(PUMP_RELAY, HIGH);
+}
+
+void whistling(){
+   Serial.println("включаем свистелку-перделку");
+   digitalWrite(WHISTLE, HIGH);
+   delay(100);
+   digitalWrite(WHISTLE, LOW);
 }

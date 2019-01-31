@@ -9,14 +9,16 @@ class JpaPotConverter : JpaConverter<JpaPot, Pot>(
         Pot(
             id = it.id,
             code = it.code!!,
-            name = it.name
+            name = it.name,
+            minHumidity = it.minHumidity
         )
     },
     Function {
         JpaPot(
             id = it.id,
             name = it.code,
-            description = it.name
+            description = it.name,
+            minHumidity = it.minHumidity
         )
     }
 

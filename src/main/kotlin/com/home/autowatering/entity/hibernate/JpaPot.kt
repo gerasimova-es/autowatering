@@ -1,6 +1,8 @@
 package com.home.autowatering.entity.hibernate
 
 import javax.persistence.*
+import javax.validation.constraints.Max
+import javax.validation.constraints.Min
 
 
 @Entity
@@ -17,11 +19,17 @@ class JpaPot {
     @Column(name = "NAME", nullable = false)
     var name: String? = null
 
+    @Column(name = "MIN_HUMIDITY", nullable = false)
+    @Min(0)
+    @Max(1024)
+    var minHumidity: Int? = null
+
     constructor()
 
-    constructor(id: Long? = null, name: String, description: String? = null) {
+    constructor(id: Long? = null, name: String, description: String?, minHumidity: Int?) {
         this.id = id
         this.code = name
         this.name = description
+        this.minHumidity = minHumidity
     }
 }
