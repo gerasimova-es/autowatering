@@ -1,3 +1,10 @@
 package com.home.autowatering.model
 
-data class Pot(var id: Long? = null, var code: String, var name: String? = null, val minHumidity: Int? = null)
+data class Pot(
+    var id: Long? = null,
+    var code: String,
+    var name: String? = null,
+    var minHumidity: Int? = 300,
+    var checkInterval: Int? = 10,
+    var wateringDuration: Int? = 2
+)

@@ -58,11 +58,13 @@ class PotStateDaoJpa(
         val data =
             DSL.using(dataSource, SQLDialect.SQLITE) //todo use entity manager
                 .select(
-                    state.ID,
                     pot.ID,
                     pot.CODE,
                     pot.NAME,
                     pot.MIN_HUMIDITY,
+                    pot.CHECK_INTERVAL,
+                    pot.WATERING_DURATION,
+                    state.ID,
                     state.DATE,
                     state.HUMIDITY,
                     state.WATERING
@@ -76,11 +78,18 @@ class PotStateDaoJpa(
         return data.map { jpa ->
             converter.fromJpa(
                 JpaPotState(
-                    id = jpa[0] as Long,
-                    pot = JpaPot(jpa[1] as Long, jpa[2] as String, jpa[3] as String, jpa[4] as Int),
-                    date = jpa[5] as Date,
-                    humidity = jpa[6] as Double,
-                    watering = jpa[7] as Boolean
+                    id = jpa[6] as Long,
+                    pot = JpaPot(
+                        id = jpa[0] as Long?,
+                        code = jpa[1] as String,
+                        name = jpa[2] as String?,
+                        minHumidity = jpa[3] as Int?,
+                        checkInterval = jpa[4] as Int?,
+                        wateringDuration = jpa[5] as Int?
+                    ),
+                    date = jpa[7] as Date,
+                    humidity = jpa[8] as Double,
+                    watering = jpa[9] as Boolean
                 )
             )
         }

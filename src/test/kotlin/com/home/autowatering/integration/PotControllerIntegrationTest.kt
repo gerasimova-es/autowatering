@@ -31,7 +31,9 @@ class PotControllerIntegrationTest {
         val autorium = PotDto(
             code = "AUTHORIUM",
             name = "Ауториум",
-            minHumidity = 400
+            minHumidity = 400,
+            checkInterval = 10,
+            wateringDuration = 2
         )
 
         val savedAutorium = restTemplate.exchange(
@@ -44,14 +46,19 @@ class PotControllerIntegrationTest {
         assertThat(savedAutorium.statusCode).isSameAs(HttpStatus.OK)
         assertThat(savedAutorium.body).isNotNull
         assertThat(savedAutorium.body?.status).isSameAs(ResponseStatus.SUCCESS)
+        assertThat(savedAutorium.body?.payload?.id).isGreaterThan(0)
         assertThat(savedAutorium.body?.payload?.code).isEqualTo(autorium.code)
         assertThat(savedAutorium.body?.payload?.name).isEqualTo(autorium.name)
-        assertThat(savedAutorium.body?.payload?.id).isGreaterThan(0)
+        assertThat(savedAutorium.body?.payload?.minHumidity).isEqualTo(autorium.minHumidity)
+        assertThat(savedAutorium.body?.payload?.checkInterval).isEqualTo(autorium.checkInterval)
+        assertThat(savedAutorium.body?.payload?.wateringDuration).isEqualTo(autorium.wateringDuration)
 
         val phalaenopsis = PotDto(
             code = "PHALAENOPSIS",
             name = "Фаленопсис",
-            minHumidity = 400
+            minHumidity = 300,
+            checkInterval = 10,
+            wateringDuration = 2
         )
 
         val savedPhalaenopsis = restTemplate.exchange(
@@ -64,14 +71,19 @@ class PotControllerIntegrationTest {
         assertThat(savedPhalaenopsis.statusCode).isSameAs(HttpStatus.OK)
         assertThat(savedPhalaenopsis.body).isNotNull
         assertThat(savedPhalaenopsis.body?.status).isSameAs(ResponseStatus.SUCCESS)
+        assertThat(savedPhalaenopsis.body?.payload?.id).isGreaterThan(0)
         assertThat(savedPhalaenopsis.body?.payload?.code).isEqualTo(phalaenopsis.code)
         assertThat(savedPhalaenopsis.body?.payload?.name).isEqualTo(phalaenopsis.name)
-        assertThat(savedPhalaenopsis.body?.payload?.id).isGreaterThan(0)
+        assertThat(savedPhalaenopsis.body?.payload?.minHumidity).isEqualTo(phalaenopsis.minHumidity)
+        assertThat(savedPhalaenopsis.body?.payload?.checkInterval).isEqualTo(phalaenopsis.checkInterval)
+        assertThat(savedPhalaenopsis.body?.payload?.wateringDuration).isEqualTo(phalaenopsis.wateringDuration)
 
         val eucharis = PotDto(
             code = "EUCHARIS",
             name = "Эухарис",
-            minHumidity = 400
+            minHumidity = 400,
+            checkInterval = 11,
+            wateringDuration = 3
         )
 
         val savedEucharis = restTemplate.exchange(
@@ -84,9 +96,12 @@ class PotControllerIntegrationTest {
         assertThat(savedEucharis.statusCode).isSameAs(HttpStatus.OK)
         assertThat(savedEucharis.body).isNotNull
         assertThat(savedEucharis.body?.status).isSameAs(ResponseStatus.SUCCESS)
+        assertThat(savedEucharis.body?.payload?.id).isGreaterThan(0)
         assertThat(savedEucharis.body?.payload?.code).isEqualTo(eucharis.code)
         assertThat(savedEucharis.body?.payload?.name).isEqualTo(eucharis.name)
-        assertThat(savedEucharis.body?.payload?.id).isGreaterThan(0)
+        assertThat(savedEucharis.body?.payload?.minHumidity).isEqualTo(eucharis.minHumidity)
+        assertThat(savedEucharis.body?.payload?.checkInterval).isEqualTo(eucharis.checkInterval)
+        assertThat(savedEucharis.body?.payload?.wateringDuration).isEqualTo(eucharis.wateringDuration)
 
         val builder = UriComponentsBuilder.fromPath("/pot/${savedAutorium.body?.payload?.id}")
         val found = restTemplate.exchange(
@@ -102,6 +117,9 @@ class PotControllerIntegrationTest {
         assertThat(found.body?.payload).isInstanceOf(PotDto::class.java)
         assertThat(found.body?.payload?.code).isEqualTo(autorium.code)
         assertThat(found.body?.payload?.name).isEqualTo(autorium.name)
+        assertThat(found.body?.payload?.minHumidity).isEqualTo(autorium.minHumidity)
+        assertThat(found.body?.payload?.checkInterval).isEqualTo(autorium.checkInterval)
+        assertThat(found.body?.payload?.wateringDuration).isEqualTo(autorium.wateringDuration)
     }
 
 
@@ -109,7 +127,10 @@ class PotControllerIntegrationTest {
     fun savePotAndSaveStateAndHistory() {
         val potDto = PotDto(
             code = "pot1",
-            name = "pot"
+            name = "pot",
+            minHumidity = 100,
+            checkInterval = 1,
+            wateringDuration = 1
         )
 
         val savedPotDto = restTemplate.exchange(
@@ -122,6 +143,7 @@ class PotControllerIntegrationTest {
         assertThat(savedPotDto.body).isNotNull
         assertThat(savedPotDto.body?.status).isSameAs(ResponseStatus.SUCCESS)
         assertThat(savedPotDto.body?.payload?.id).isGreaterThan(0)
+
 
         val stateDto = PotStateDto(
             potCode = "pot1",
@@ -160,7 +182,10 @@ class PotControllerIntegrationTest {
     fun savePotAndSaveStateAndFind() {
         val potDto = PotDto(
             code = "pot_savePotAndSaveStateAndFind",
-            name = "pot"
+            name = "pot",
+            minHumidity = 100,
+            checkInterval = 1,
+            wateringDuration = 1
         )
 
         val savedPotDto = restTemplate.exchange(

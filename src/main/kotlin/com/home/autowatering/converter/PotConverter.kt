@@ -12,7 +12,9 @@ class PotConverter : RequestConverter<PotDto, Pot>(
             id = it.id,
             code = it.code,
             name = it.name,
-            minHumidity = it.minHumidity
+            minHumidity = it.minHumidity,
+            checkInterval = it.checkInterval,
+            wateringDuration = it.wateringDuration
         )
     },
     Function {
@@ -20,7 +22,9 @@ class PotConverter : RequestConverter<PotDto, Pot>(
             id = it.id,
             code = it.code,
             name = it.name,
-            minHumidity = it.minHumidity
+            minHumidity = it.minHumidity,
+            checkInterval = it.checkInterval,
+            wateringDuration = it.wateringDuration
         )
     }
 ) {

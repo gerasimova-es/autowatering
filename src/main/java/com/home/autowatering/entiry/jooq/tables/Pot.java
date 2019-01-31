@@ -52,6 +52,14 @@ public class Pot extends TableImpl<PotRecord> {
      * The column <code>pot.code</code>.
      */
     public final TableField<PotRecord, Integer> MIN_HUMIDITY = createField("min_humidity", SQLDataType.INTEGER.nullable(false), this, "");
+    /**
+     * The column <code>pot.code</code>.
+     */
+    public final TableField<PotRecord, Integer> CHECK_INTERVAL = createField("check_interval", SQLDataType.INTEGER.nullable(false), this, "");
+    /**
+     * The column <code>pot.code</code>.
+     */
+    public final TableField<PotRecord, Integer> WATERING_DURATION = createField("watering_duration", SQLDataType.INTEGER.nullable(false), this, "");
 
 
     /**

@@ -24,12 +24,31 @@ class JpaPot {
     @Max(1024)
     var minHumidity: Int? = null
 
+    @Column(name = "CHECK_INTERVAL", nullable = false)
+    @Min(1)
+    @Max(1440)
+    var checkInterval: Int? = null
+
+    @Column(name = "WATERING_DURATION", nullable = false)
+    @Min(1)
+    @Max(10)
+    var wateringDuration: Int? = null
+
     constructor()
 
-    constructor(id: Long? = null, name: String, description: String?, minHumidity: Int?) {
+    constructor(
+        id: Long? = null,
+        code: String,
+        name: String?,
+        minHumidity: Int?,
+        checkInterval: Int?,
+        wateringDuration: Int?
+    ) {
         this.id = id
-        this.code = name
-        this.name = description
+        this.code = code
+        this.name = name
         this.minHumidity = minHumidity
+        this.checkInterval = checkInterval
+        this.wateringDuration = wateringDuration
     }
 }
