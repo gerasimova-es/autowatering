@@ -1,6 +1,7 @@
 package com.home.autowatering.service.impl
 
 import com.home.autowatering.dao.interfaces.PotDao
+import com.home.autowatering.dao.interfaces.WateringSystemDao
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.service.interfaces.PotService
@@ -9,14 +10,17 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 
+
 class PotServiceImplTest {
     private lateinit var potDao: PotDao
     private lateinit var service: PotService
+    private lateinit var wateringSystemDao: WateringSystemDao
 
     @Before
     fun init() {
         potDao = mock()
-        service = PotServiceImpl(potDao)
+        wateringSystemDao = mock()
+        service = PotServiceImpl(potDao, wateringSystemDao)
     }
 
     @Test

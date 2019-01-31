@@ -1,13 +1,14 @@
 package com.home.autowatering.service.impl
 
 import com.home.autowatering.dao.interfaces.PotDao
+import com.home.autowatering.dao.interfaces.WateringSystemDao
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.service.interfaces.PotService
 import org.springframework.stereotype.Service
 
 @Service
-class PotServiceImpl(val potDao: PotDao) : PotService {
+class PotServiceImpl(val potDao: PotDao, val wateringSystemDao: WateringSystemDao) : PotService {
 
     override fun findAll(): List<Pot> =
         potDao.findAll()
@@ -24,10 +25,15 @@ class PotServiceImpl(val potDao: PotDao) : PotService {
     override fun merge(source: Pot, target: Pot): Pot {
         target.code = source.code
         target.name = source.name
+        target.minHumidity = source.minHumidity
+        target.checkInterval = source.checkInterval
+        target.wateringDuration = source.wateringDuration
         return target
     }
 
-    override fun save(pot: Pot): Pot =
-        potDao.save(pot)
+    override fun save(pot: Pot): Pot {
+        wateringSystemDao.saveSetting(pot) //todo save reuslt in pot
+        return potDao.save(pot)
+    }
 
 }

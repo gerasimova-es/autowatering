@@ -4,6 +4,7 @@ import com.home.autowatering.controller.dto.TankStateDto
 import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.controller.dto.response.ResponseStatus
 import org.assertj.core.api.Assertions
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,6 +16,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.junit4.SpringRunner
 
+@Ignore
 @RunWith(SpringRunner::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TankStateControllerIntegrationTest {
@@ -39,8 +41,8 @@ class TankStateControllerIntegrationTest {
         Assertions.assertThat(result.statusCode).isSameAs(HttpStatus.OK)
         Assertions.assertThat(result.body).isNotNull
         Assertions.assertThat(result.body!!.status).isSameAs(ResponseStatus.SUCCESS)
+        Assertions.assertThat(result.body!!.payload!!.id).isGreaterThan(0)
         Assertions.assertThat(result.body!!.payload!!.name).isEqualTo(dto.name)
         Assertions.assertThat(result.body!!.payload!!.volume).isEqualTo(dto.volume)
-        Assertions.assertThat(result.body!!.payload!!.id).isGreaterThan(0)
     }
 }

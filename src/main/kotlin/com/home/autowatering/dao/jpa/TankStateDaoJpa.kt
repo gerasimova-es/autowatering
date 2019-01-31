@@ -1,4 +1,4 @@
-package com.home.autowatering.dao.impl
+package com.home.autowatering.dao.jpa
 
 import com.home.autowatering.dao.interfaces.TankStateDao
 import com.home.autowatering.model.business.TankState

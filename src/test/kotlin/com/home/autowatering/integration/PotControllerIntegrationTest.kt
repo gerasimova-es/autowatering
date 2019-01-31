@@ -6,6 +6,7 @@ import com.home.autowatering.controller.dto.PotStateDto
 import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.controller.dto.response.ResponseStatus
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +22,7 @@ import java.util.*
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Application::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Ignore
 class PotControllerIntegrationTest {
 
     @Autowired

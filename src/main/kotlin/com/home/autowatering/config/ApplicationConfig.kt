@@ -11,10 +11,10 @@ class ApplicationConfig {
     @Bean
     fun requestLoggingFilter(): CommonsRequestLoggingFilter {
         val loggingFilter = CommonsRequestLoggingFilter()
-        loggingFilter.setIncludeClientInfo(false)
-        loggingFilter.setIncludeQueryString(false)
+        loggingFilter.setIncludeClientInfo(true)
+        loggingFilter.setIncludeQueryString(true)
         loggingFilter.setIncludePayload(true)
-        loggingFilter.setIncludeHeaders(false)
+        loggingFilter.setIncludeHeaders(true)
         return loggingFilter
     }
 

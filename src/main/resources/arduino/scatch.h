@@ -143,7 +143,7 @@ void changePotSettings() {
 
   lastCheckTime = 0;
 
-  server.send(200, "text/plain", "{ \"status\": \"SUCCESS\", \"message\": \"message was handled successfully\"}");
+  server.send(200, "applidation/json", "{ \"status\": \"SUCCESS\", \"message\": \"message was handled successfully\"}");
   Serial.println("--------------------");
 }
 

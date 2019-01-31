@@ -1,4 +1,4 @@
-package com.home.autowatering.dao.impl
+package com.home.autowatering.dao.jpa
 
 import com.home.autowatering.dao.interfaces.PotStateDao
 import com.home.autowatering.entity.jooq.Tables
