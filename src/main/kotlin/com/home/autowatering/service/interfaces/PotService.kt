@@ -1,7 +1,7 @@
 package com.home.autowatering.service.interfaces
 
-import com.home.autowatering.model.Pot
-import com.home.autowatering.model.filter.PotFilter
+import com.home.autowatering.model.business.Pot
+import com.home.autowatering.model.business.filter.PotFilter
 
 interface PotService {
     fun findAll(): List<Pot>

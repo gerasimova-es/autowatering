@@ -1,8 +1,8 @@
 package com.home.autowatering.controller
 
-import com.home.autowatering.converter.TankStateConverter
-import com.home.autowatering.dto.TankStateDto
-import com.home.autowatering.dto.response.Response
+import com.home.autowatering.controller.converter.TankStateConverter
+import com.home.autowatering.controller.dto.TankStateDto
+import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.service.interfaces.TankStateService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

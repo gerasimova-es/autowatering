@@ -1,6 +1,6 @@
 package com.home.autowatering.repository
 
-import com.home.autowatering.entity.hibernate.JpaTankState
+import com.home.autowatering.model.database.JpaTankState
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.sql.Date

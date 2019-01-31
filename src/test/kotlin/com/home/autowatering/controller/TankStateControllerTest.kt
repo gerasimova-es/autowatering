@@ -1,8 +1,8 @@
 package com.home.autowatering.controller
 
-import com.home.autowatering.dto.TankStateDto
-import com.home.autowatering.dto.response.ResponseStatus
-import com.home.autowatering.model.TankState
+import com.home.autowatering.controller.dto.TankStateDto
+import com.home.autowatering.controller.dto.response.ResponseStatus
+import com.home.autowatering.model.business.TankState
 import com.home.autowatering.service.interfaces.TankStateService
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat

@@ -1,7 +1,7 @@
 package com.home.autowatering.service.impl
 
 import com.home.autowatering.dao.interfaces.TankStateDao
-import com.home.autowatering.model.TankState
+import com.home.autowatering.model.business.TankState
 import com.home.autowatering.service.interfaces.TankStateService
 import org.apache.commons.lang.Validate
 import org.springframework.beans.factory.annotation.Autowired

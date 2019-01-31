@@ -56,7 +56,7 @@ void setup(){
   Serial.println(WiFi.localIP());
   server.on("/pot/settings/save", changePotSettings);
   server.begin();
-  Serial.println("servier listening started");
+  Serial.println("server listening started");
   Serial.println("--------------------");
 
   //добавить считывание настроек с сервера при старте

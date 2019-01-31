@@ -1,13 +1,13 @@
 package com.home.autowatering.controller
 
-import com.home.autowatering.converter.PotConverter
-import com.home.autowatering.converter.PotStateConverter
-import com.home.autowatering.dto.PotDto
-import com.home.autowatering.dto.PotStateDto
-import com.home.autowatering.dto.response.Response
+import com.home.autowatering.controller.converter.PotConverter
+import com.home.autowatering.controller.converter.PotStateConverter
+import com.home.autowatering.controller.dto.PotDto
+import com.home.autowatering.controller.dto.PotStateDto
+import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.exception.PotNotFoundException
-import com.home.autowatering.model.filter.PotFilter
-import com.home.autowatering.model.filter.PotStateFilter
+import com.home.autowatering.model.business.filter.PotFilter
+import com.home.autowatering.model.business.filter.PotStateFilter
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
 import org.springframework.format.annotation.DateTimeFormat
@@ -27,6 +27,7 @@ class PotController(var potService: PotService, var potStateService: PotStateSer
     @GetMapping("/list")
     fun list(): Response<List<PotDto>> {
         val pots = potService.findAll()
+        //todo set humidity to response
         return potConverter.response(pots)
     }
 

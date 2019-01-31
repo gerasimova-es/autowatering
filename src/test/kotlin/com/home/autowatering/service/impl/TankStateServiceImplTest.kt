@@ -2,7 +2,7 @@ package com.home.autowatering.service.impl
 
 import com.home.autowatering.dao.interfaces.TankStateDao
 import com.home.autowatering.exception.SavingException
-import com.home.autowatering.model.TankState
+import com.home.autowatering.model.business.TankState
 import com.home.autowatering.service.interfaces.TankStateService
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Assert.fail

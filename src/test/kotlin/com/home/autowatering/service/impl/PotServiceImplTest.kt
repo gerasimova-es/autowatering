@@ -1,8 +1,8 @@
 package com.home.autowatering.service.impl
 
 import com.home.autowatering.dao.interfaces.PotDao
-import com.home.autowatering.model.Pot
-import com.home.autowatering.model.filter.PotFilter
+import com.home.autowatering.model.business.Pot
+import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.service.interfaces.PotService
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
@@ -21,7 +21,12 @@ class PotServiceImplTest {
 
     @Test
     fun findAll() {
-        whenever(potDao.findAll()).thenReturn(arrayListOf(Pot(code = "pot1"), Pot(code = "2")))
+        whenever(potDao.findAll()).thenReturn(
+            arrayListOf(
+                Pot(code = "pot1"),
+                Pot(code = "2")
+            )
+        )
 
         val result = service.findAll()
 

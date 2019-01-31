@@ -1,11 +1,11 @@
 package com.home.autowatering.controller
 
-import com.home.autowatering.dto.PotDto
-import com.home.autowatering.dto.PotStateDto
-import com.home.autowatering.dto.response.ResponseStatus
+import com.home.autowatering.controller.dto.PotDto
+import com.home.autowatering.controller.dto.PotStateDto
+import com.home.autowatering.controller.dto.response.ResponseStatus
 import com.home.autowatering.exception.PotNotFoundException
-import com.home.autowatering.model.Pot
-import com.home.autowatering.model.PotState
+import com.home.autowatering.model.business.Pot
+import com.home.autowatering.model.business.PotState
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
 import com.nhaarman.mockitokotlin2.*
@@ -211,7 +211,14 @@ class PotControllerTest {
 
     @Test
     fun failFindState() {
-        whenever(potService.find(any())).thenReturn(arrayListOf(Pot(id = 1, code = "pot")))
+        whenever(potService.find(any())).thenReturn(
+            arrayListOf(
+                Pot(
+                    id = 1,
+                    code = "pot"
+                )
+            )
+        )
         whenever(potStateService.find(any())).thenThrow(IllegalArgumentException("test"))
         try {
             controller.states(1, Date(), Date())
@@ -224,7 +231,14 @@ class PotControllerTest {
 
     @Test
     fun foundNoStateRecords() {
-        whenever(potService.find(any())).thenReturn(arrayListOf(Pot(id = 1, code = "pot")))
+        whenever(potService.find(any())).thenReturn(
+            arrayListOf(
+                Pot(
+                    id = 1,
+                    code = "pot"
+                )
+            )
+        )
         whenever(potStateService.find(any())).thenReturn(arrayListOf())
 
         val response = controller.states(1, Date(), Date())
@@ -238,8 +252,21 @@ class PotControllerTest {
 
     @Test
     fun foundOneStateRecord() {
-        val state = PotState(1, Pot(code = "pot"), Date(), 1.0)
-        whenever(potService.find(any())).thenReturn(arrayListOf(Pot(id = 1, code = "pot", name = "pot")))
+        val state = PotState(
+            1,
+            Pot(code = "pot"),
+            Date(),
+            1.0
+        )
+        whenever(potService.find(any())).thenReturn(
+            arrayListOf(
+                Pot(
+                    id = 1,
+                    code = "pot",
+                    name = "pot"
+                )
+            )
+        )
         whenever(potStateService.find(any())).thenReturn(arrayListOf(state))
 
         val response = controller.states(1, Date(), Date())

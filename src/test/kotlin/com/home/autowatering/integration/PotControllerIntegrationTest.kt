@@ -1,10 +1,10 @@
 package com.home.autowatering.integration
 
 import com.home.autowatering.Application
-import com.home.autowatering.dto.PotDto
-import com.home.autowatering.dto.PotStateDto
-import com.home.autowatering.dto.response.Response
-import com.home.autowatering.dto.response.ResponseStatus
+import com.home.autowatering.controller.dto.PotDto
+import com.home.autowatering.controller.dto.PotStateDto
+import com.home.autowatering.controller.dto.response.Response
+import com.home.autowatering.controller.dto.response.ResponseStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith

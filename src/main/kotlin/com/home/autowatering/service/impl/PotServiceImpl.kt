@@ -1,8 +1,8 @@
 package com.home.autowatering.service.impl
 
 import com.home.autowatering.dao.interfaces.PotDao
-import com.home.autowatering.model.Pot
-import com.home.autowatering.model.filter.PotFilter
+import com.home.autowatering.model.business.Pot
+import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.service.interfaces.PotService
 import org.springframework.stereotype.Service
 

@@ -1,15 +1,15 @@
 package com.home.autowatering.dao.impl
 
 import com.home.autowatering.dao.interfaces.PotStateDao
-import com.home.autowatering.entiry.jooq.Tables
-import com.home.autowatering.entity.hibernate.JpaPot
-import com.home.autowatering.entity.hibernate.JpaPotState
-import com.home.autowatering.entity.hibernate.converter.JpaPotStateConverter
+import com.home.autowatering.entity.jooq.Tables
 import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.exception.SavingException
-import com.home.autowatering.model.Pot
-import com.home.autowatering.model.PotState
-import com.home.autowatering.model.filter.PotStateFilter
+import com.home.autowatering.model.business.Pot
+import com.home.autowatering.model.business.PotState
+import com.home.autowatering.model.business.filter.PotStateFilter
+import com.home.autowatering.model.database.JpaPot
+import com.home.autowatering.model.database.JpaPotState
+import com.home.autowatering.model.database.converter.JpaPotStateConverter
 import com.home.autowatering.repository.PotRepository
 import com.home.autowatering.repository.PotStateRepository
 import org.jooq.SQLDialect
@@ -56,7 +56,7 @@ class PotStateDaoJpa(
         }
 
         val data =
-            DSL.using(dataSource, SQLDialect.SQLITE) //todo use entity manager
+            DSL.using(dataSource, SQLDialect.SQLITE) //todo use database manager
                 .select(
                     pot.ID,
                     pot.CODE,

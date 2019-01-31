@@ -1,8 +1,8 @@
 package com.home.autowatering.dao.impl
 
 import com.home.autowatering.dao.interfaces.TankStateDao
-import com.home.autowatering.entity.hibernate.JpaTankState
-import com.home.autowatering.model.TankState
+import com.home.autowatering.model.business.TankState
+import com.home.autowatering.model.database.JpaTankState
 import com.home.autowatering.repository.TankStateRepository
 import org.springframework.stereotype.Repository
 
