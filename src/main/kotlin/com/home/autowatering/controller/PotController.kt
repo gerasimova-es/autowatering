@@ -5,6 +5,7 @@ import com.home.autowatering.controller.converter.PotStateConverter
 import com.home.autowatering.controller.dto.PotDto
 import com.home.autowatering.controller.dto.PotStateDto
 import com.home.autowatering.controller.dto.response.Response
+import com.home.autowatering.exception.PotAlreadyExistException
 import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.model.business.filter.PotStateFilter
@@ -39,11 +40,21 @@ class PotController(var potService: PotService, var potStateService: PotStateSer
         return potConverter.response(pot, state)
     }
 
-    @PostMapping("/save")
-    fun save(@RequestBody request: PotDto): Response<PotDto> {
-        val saved = potService.find(PotFilter(code = request.code)).singleOrNull()
-        var pot = if (saved == null) potConverter.fromDto(request)
-        else potService.merge(potConverter.fromDto(request), saved)
+    @PostMapping("/create")
+    fun create(@RequestBody request: PotDto): Response<PotDto> {
+        var pot = potService.find(PotFilter(code = request.code)).singleOrNull()
+        if (pot != null) {
+            throw PotAlreadyExistException(code = request.code)
+        }
+        pot = potService.save(potConverter.fromDto(request))
+        return potConverter.response(pot)
+    }
+
+    @PostMapping("/update")
+    fun update(@RequestBody request: PotDto): Response<PotDto> {
+        var pot = potService.find(PotFilter(code = request.code))
+            .singleOrNull() ?: throw PotNotFoundException(code = request.code)
+        pot = potService.merge(potConverter.fromDto(request), pot)
         pot = potService.save(pot)
         return potConverter.response(pot)
     }
