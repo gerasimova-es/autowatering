@@ -141,9 +141,10 @@ void changePotSettings() {
   wateringDuration = wateringDuration * 1000;
   Serial.println("wateringDuration=" + String(wateringDuration));
 
-  lastCheckTime = 0;
-
-  server.send(200, "applidation/json", "{ \"status\": \"SUCCESS\", \"message\": \"message was handled successfully\"}");
+  if(timeExpired()){
+     lastCheckTime = 0;
+  }
+  server.send(200, "application/json", "{ \"status\": \"SUCCESS\", \"message\": \"message was handled successfully\"}");
   Serial.println("--------------------");
 }
 
