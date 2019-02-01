@@ -6,7 +6,6 @@ import com.home.autowatering.controller.dto.PotStateDto
 import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.controller.dto.response.ResponseStatus
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,11 +21,88 @@ import java.util.*
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Application::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Ignore
 class PotControllerIntegrationTest {
 
     @Autowired
     lateinit var restTemplate: TestRestTemplate
+
+    @Test
+    fun savePotWithNotExistedId() {
+        val dto = PotDto(
+            id = 100000000000000,
+            code = "TEST",
+            name = "test",
+            minHumidity = 400,
+            checkInterval = 10,
+            wateringDuration = 2
+        )
+
+        val savedAutorium = restTemplate.exchange(
+            "/pot/save",
+            HttpMethod.POST,
+            HttpEntity(dto),
+            object : ParameterizedTypeReference<Response<PotDto>>() {})
+
+        assertThat(savedAutorium).isNotNull
+        assertThat(savedAutorium.statusCode).isSameAs(HttpStatus.OK)
+        assertThat(savedAutorium.body).isNotNull
+        assertThat(savedAutorium.body?.status).isSameAs(ResponseStatus.ERROR)
+    }
+
+    @Test
+    fun savaAndUpdate() {
+        val dto1 = PotDto(
+            code = "TEST1",
+            name = "test1",
+            minHumidity = 100,
+            checkInterval = 10,
+            wateringDuration = 2
+        )
+
+        val savePot1 = restTemplate.exchange(
+            "/pot/save",
+            HttpMethod.POST,
+            HttpEntity(dto1),
+            object : ParameterizedTypeReference<Response<PotDto>>() {})
+
+        assertThat(savePot1).isNotNull
+        assertThat(savePot1.statusCode).isSameAs(HttpStatus.OK)
+        assertThat(savePot1.body).isNotNull
+        assertThat(savePot1.body?.status).isSameAs(ResponseStatus.SUCCESS)
+        assertThat(savePot1.body?.payload?.id).isGreaterThan(0)
+        assertThat(savePot1.body?.payload?.code).isEqualTo(dto1.code)
+        assertThat(savePot1.body?.payload?.name).isEqualTo(dto1.name)
+        assertThat(savePot1.body?.payload?.minHumidity).isEqualTo(dto1.minHumidity)
+        assertThat(savePot1.body?.payload?.checkInterval).isEqualTo(dto1.checkInterval)
+        assertThat(savePot1.body?.payload?.wateringDuration).isEqualTo(dto1.wateringDuration)
+
+        val dto2 = PotDto(
+            id = savePot1.body!!.payload!!.id,
+            code = "TEST",
+            name = "test2",
+            minHumidity = 150,
+            checkInterval = 13,
+            wateringDuration = 3
+        )
+
+        val savePot2 = restTemplate.exchange(
+            "/pot/save",
+            HttpMethod.POST,
+            HttpEntity(dto2),
+            object : ParameterizedTypeReference<Response<PotDto>>() {})
+
+        assertThat(savePot2).isNotNull
+        assertThat(savePot2.statusCode).isSameAs(HttpStatus.OK)
+        assertThat(savePot2.body).isNotNull
+        assertThat(savePot2.body?.status).isSameAs(ResponseStatus.SUCCESS)
+        assertThat(savePot2.body?.payload?.id).isGreaterThan(0)
+        assertThat(savePot2.body?.payload?.code).isEqualTo(dto2.code)
+        assertThat(savePot2.body?.payload?.name).isEqualTo(dto2.name)
+        assertThat(savePot2.body?.payload?.minHumidity).isEqualTo(dto2.minHumidity)
+        assertThat(savePot2.body?.payload?.checkInterval).isEqualTo(dto2.checkInterval)
+        assertThat(savePot2.body?.payload?.wateringDuration).isEqualTo(dto2.wateringDuration)
+
+    }
 
     @Test
     fun saveAndFind() {

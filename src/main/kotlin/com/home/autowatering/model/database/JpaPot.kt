@@ -13,7 +13,7 @@ class JpaPot {
     @GeneratedValue
     var id: Long? = null
 
-    @Column(name = "CODE", nullable = false)
+    @Column(name = "CODE", nullable = false, unique = true)
     var code: String? = null
 
     @Column(name = "NAME", nullable = false)
