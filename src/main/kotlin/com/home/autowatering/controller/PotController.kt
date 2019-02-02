@@ -35,16 +35,15 @@ class PotController(var potService: PotService, var potStateService: PotStateSer
     fun info(@RequestParam(value = "code") potCode: String): Response<PotDto> {
         val pot = potService.find(PotFilter(code = potCode))
             .singleOrNull() ?: throw PotNotFoundException(potCode)
-        return potConverter.response(pot)
+        val state = potStateService.last(pot)
+        return potConverter.response(pot, state)
     }
 
     @GetMapping("/{pot}")
-    @Deprecated("use info")
     fun get(@PathVariable(value = "pot") potId: Long): Response<PotDto> {
         val pot = potService.find(PotFilter(id = potId))
             .singleOrNull() ?: throw PotNotFoundException(potId)
-        val state = potStateService.last(pot)
-        return potConverter.response(pot, state)
+        return potConverter.response(pot)
     }
 
     @PostMapping("/save")
