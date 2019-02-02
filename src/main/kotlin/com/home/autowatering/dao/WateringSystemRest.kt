@@ -8,6 +8,7 @@ import com.home.autowatering.dao.interfaces.WateringSystemDao
 import com.home.autowatering.model.business.Pot
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
@@ -17,22 +18,23 @@ import org.springframework.web.client.RestTemplate
 
 @Repository
 class WateringSystemRest : WateringSystemDao {
-    val converter = PotConverter()
-
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(AbstractController::class.java)
+        const val SERVICE = "/pot/settings/save"
     }
 
-    //todo переписать
-    override fun saveSetting(pot: Pot) {
-        val url = "http://192.168.1.34:80/pot/settings/save"
-        val restTemplate = RestTemplate()
+    @Value("\${watering.url}")
+    var url: String? = null
 
-        val response = restTemplate.exchange(
-            url,
+    val converter = PotConverter()
+
+    override fun refresh(pot: Pot) {
+        val response = RestTemplate().exchange(
+            url + SERVICE,
             HttpMethod.POST,
             HttpEntity(converter.fromEntity(pot)),
             object : ParameterizedTypeReference<Response<PotDto>>() {})
-        LOGGER.info("response = $response")
+
+        LOGGER.debug("response = $response")
     }
 }
