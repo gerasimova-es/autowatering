@@ -12,7 +12,13 @@ import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
 import com.home.autowatering.service.interfaces.WateringSystemService
 import org.springframework.format.annotation.DateTimeFormat
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 @RestController
@@ -43,13 +49,6 @@ class PotController(
         return potConverter.response(pot, state)
     }
 
-    @GetMapping("/{pot}")
-    fun get(@PathVariable(value = "pot") potId: Long): Response<PotDto> {
-        val pot = potService.find(PotFilter(id = potId))
-            .singleOrNull() ?: throw PotNotFoundException(potId)
-        return potConverter.response(pot)
-    }
-
     @PostMapping("/save")
     fun save(@RequestBody request: PotDto): Response<PotDto> {
         val saved = potService.find(PotFilter(id = request.id, code = request.code)).singleOrNull()
@@ -68,14 +67,14 @@ class PotController(
         return potConverter.response(pot)
     }
 
-    @GetMapping("/{pot}/state/list")
+    @GetMapping("/statistic/{pot}")
     fun states(
-        @PathVariable(value = "pot") potId: Long,
+        @PathVariable(value = "pot") potCode: String,
         @RequestParam(value = "dateFrom", required = false) @DateTimeFormat(pattern = DATE_FORMAT) dateFrom: Date?,
         @RequestParam(value = "dateTo", required = false) @DateTimeFormat(pattern = DATE_FORMAT) dateTo: Date?
     ): Response<List<PotStateDto>> {
-        val pot = potService.find(PotFilter(id = potId))
-            .singleOrNull() ?: throw PotNotFoundException(potId)
+        val pot = potService.find(PotFilter(code = potCode))
+            .singleOrNull() ?: throw PotNotFoundException(potCode)
         val states = potStateService.find(PotStateFilter(pot, dateFrom, dateTo))
         return potStateConverter.response(states)
     }

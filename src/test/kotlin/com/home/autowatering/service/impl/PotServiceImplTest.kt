@@ -5,7 +5,13 @@ import com.home.autowatering.dao.interfaces.WateringSystemDao
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.service.interfaces.PotService
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -86,7 +92,7 @@ class PotServiceImplTest {
         val result = service.merge(source, target)
 
         assertThat(result).isNotNull
-        assertThat(result.code).isEqualTo(source.code)
+        assertThat(result.code).isEqualTo(target.code)
         assertThat(result.name).isEqualTo(source.name)
     }
 

@@ -84,7 +84,7 @@ class PotControllerTest {
     fun getNothing() {
         whenever(potService.find(any())).thenReturn(arrayListOf())
         try {
-            val response = controller.get(1)
+            val response = controller.info("pot")
             fail("expected PotNotFoundException")
         } catch (exc: PotNotFoundException) {
             verify(potService, times(1)).find(any())
@@ -96,7 +96,7 @@ class PotControllerTest {
     fun getException() {
         whenever(potService.find(any())).thenThrow(IllegalArgumentException())
         try {
-            val response = controller.get(1)
+            val response = controller.info("pot")
             fail("expected IllegalArgumentException")
         } catch (exc: IllegalArgumentException) {
             verify(potService, times(1)).find(any())
@@ -113,7 +113,7 @@ class PotControllerTest {
         )
         whenever(potService.find(any())).thenReturn(arrayListOf(pot))
 
-        val response = controller.get(1)
+        val response = controller.info("pot")
 
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
         assertThat(response.message).isEqualTo("message was handled successfully")
@@ -244,7 +244,7 @@ class PotControllerTest {
     fun findStateNotExistedPot() {
         whenever(potService.find(any())).thenReturn(arrayListOf())
         try {
-            controller.states(1, Date(), Date())
+            controller.states("pot", Date(), Date())
             fail("expected PotNotFoundException")
         } catch (ignored: PotNotFoundException) {
             verify(potService, times(1)).find(any())
@@ -265,7 +265,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenThrow(IllegalArgumentException("test"))
         try {
-            controller.states(1, Date(), Date())
+            controller.states("pot", Date(), Date())
             fail("expected IllegalArgumentException")
         } catch (ignored: IllegalArgumentException) {
             verify(potStateService, times(1)).find(any())
@@ -285,7 +285,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenReturn(arrayListOf())
 
-        val response = controller.states(1, Date(), Date())
+        val response = controller.states("pot", Date(), Date())
 
         verify(potService, times(1)).find(any())
         verifyNoMoreInteractions(potService)
@@ -313,7 +313,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenReturn(arrayListOf(state))
 
-        val response = controller.states(1, Date(), Date())
+        val response = controller.states("pot", Date(), Date())
 
         assertThat(response).isNotNull
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
@@ -357,7 +357,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenReturn(arrayListOf(state1, state2))
 
-        val response = controller.states(1, Date(), Date())
+        val response = controller.states("pot", Date(), Date())
 
         assertThat(response).isNotNull
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
