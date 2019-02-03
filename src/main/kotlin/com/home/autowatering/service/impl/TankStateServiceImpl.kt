@@ -12,7 +12,14 @@ class TankStateServiceImpl(@Autowired val tankStateDao: TankStateDao) : TankStat
 
     override fun save(state: TankState): TankState {
         Validate.notNull(state)
-        Validate.noNullElements(arrayOf(state.date, state.name, state.volume, state.filled))
+        Validate.noNullElements(
+            arrayOf(
+                state.date,
+                state.name,
+                state.volume,
+                state.filled
+            )
+        )
         return tankStateDao.save(state)
     }
 }

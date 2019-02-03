@@ -19,7 +19,7 @@ class WateringSystemServiceImpl(val wateringSystemDao: WateringSystemDao) : Wate
                 pot.wateringDuration
             )
         )
-        //todo runBlocking
+        //todo use coroutines or not?
         val job = GlobalScope.launch {
             wateringSystemDao.refresh(pot)
         }

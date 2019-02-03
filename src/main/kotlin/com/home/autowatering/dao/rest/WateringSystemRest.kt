@@ -1,4 +1,4 @@
-package com.home.autowatering.dao
+package com.home.autowatering.dao.rest
 
 import com.home.autowatering.controller.converter.PotConverter
 import com.home.autowatering.controller.dto.PotDto
