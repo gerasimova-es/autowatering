@@ -81,6 +81,8 @@ class PotController(
 
     @PostMapping("/state/save")
     fun saveState(@RequestBody request: PotStateDto): Response<PotStateDto> {
+        val pot = potService.find(PotFilter(code = request.potCode))
+            .singleOrNull() ?: throw PotNotFoundException(request.potCode)
         var state = potStateConverter.fromDto(request)
         state = potStateService.save(state)
         return potStateConverter.response(state)
