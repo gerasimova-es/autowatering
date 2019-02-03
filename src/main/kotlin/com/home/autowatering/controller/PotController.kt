@@ -59,14 +59,6 @@ class PotController(
         return potConverter.response(pot)
     }
 
-    @GetMapping("/refresh")
-    fun refresh(@RequestParam(value = "code") potCode: String): Response<PotDto> {
-        val pot = potService.find(PotFilter(code = potCode))
-            .singleOrNull() ?: throw PotNotFoundException(potCode)
-        wateringSystemService.refresh(pot)
-        return potConverter.response(pot)
-    }
-
     @GetMapping("/statistic/{pot}")
     fun states(
         @PathVariable(value = "pot") potCode: String,
