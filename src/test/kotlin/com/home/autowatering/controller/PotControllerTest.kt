@@ -9,7 +9,13 @@ import com.home.autowatering.model.business.PotState
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
 import com.home.autowatering.service.interfaces.WateringSystemService
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert.fail
 import org.junit.Before
@@ -119,6 +125,41 @@ class PotControllerTest {
 
         verify(potService, times(1)).find(any())
         verifyNoMoreInteractions(potService)
+    }
+
+    @Test
+    fun info() {
+        val pot = Pot(
+            id = 1L,
+            code = "pot",
+            name = "desc"
+        )
+        val potState = PotState(
+            id = 1,
+            pot = pot,
+            date = Date(),
+            humidity = 400.0,
+            watering = true
+        )
+
+        whenever(potService.find(any())).thenReturn(arrayListOf(pot))
+        whenever(potStateService.last(any())).thenReturn(potState)
+
+        val response = controller.info("pot")
+
+        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.message).isEqualTo("message was handled successfully")
+        assertThat(response.payload).isNotNull
+        assertThat(response.payload).isInstanceOf(PotDto::class.java)
+        assertThat(response.payload?.id).isEqualTo(pot.id)
+        assertThat(response.payload?.code).isEqualTo(pot.code)
+        assertThat(response.payload?.name).isEqualTo(pot.name)
+        assertThat(response.payload?.humidity).isEqualTo(potState.humidity)
+
+        verify(potService, times(1)).find(any())
+        verifyNoMoreInteractions(potService)
+        verify(potStateService, times(1)).last(any())
+        verifyZeroInteractions(potStateService)
     }
 
 
