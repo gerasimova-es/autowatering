@@ -6,7 +6,6 @@ import com.home.autowatering.controller.dto.PotStateDto
 import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.controller.dto.response.ResponseStatus
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.web.util.UriComponentsBuilder
 import java.util.*
 
-@Ignore
+
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Application::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PotControllerIntegrationTest {
@@ -228,7 +227,8 @@ class PotControllerIntegrationTest {
         val stateDto = PotStateDto(
             potCode = "pot1",
             humidity = 100.0,
-            watering = true
+            watering = true,
+            date = Date().time
         )
         val savedStateDto = restTemplate.exchange(
             "/pot/state/save",
@@ -255,6 +255,7 @@ class PotControllerIntegrationTest {
         assertThat(found.body?.status).isSameAs(ResponseStatus.SUCCESS)
         assertThat(found.body?.message).isEqualTo("message was handled successfully")
         assertThat(found.body?.payload).isInstanceOf(ArrayList::class.java)
+        assertThat(found.body?.payload).hasSize(1)
         //todo check elements
     }
 
@@ -295,6 +296,8 @@ class PotControllerIntegrationTest {
         assertThat(savedStateDto.body?.payload?.id).isGreaterThan(0)
 
         val builder = UriComponentsBuilder.fromPath("/pot/${savedPotDto.body?.payload?.id}")
+            .uriVariables(mapOf("dateFrom" to stateDto.date, "dateTo" to stateDto.date))
+
         val found = restTemplate.exchange(
             builder.build().encode().toUri(),
             HttpMethod.GET,
@@ -308,6 +311,5 @@ class PotControllerIntegrationTest {
         assertThat(found.body?.payload).isInstanceOf(PotDto::class.java)
         assertThat(found.body?.payload?.code).isEqualTo(savedPotDto.body?.payload?.code)
         assertThat(found.body?.payload?.name).isEqualTo(savedPotDto.body?.payload?.name)
-        assertThat(found.body?.payload?.humidity).isEqualTo(stateDto.humidity)
     }
 }
