@@ -52,7 +52,7 @@ class PotControllerIntegrationTest {
     }
 
     @Test
-    fun savaAndUpdate() {
+    fun saveAndUpdate() {
         val dto1 = PotDto(
             code = "TEST1",
             name = "test1",
@@ -80,7 +80,7 @@ class PotControllerIntegrationTest {
 
         val dto2 = PotDto(
             id = savePot1.body!!.payload!!.id,
-            code = "TEST",
+            code = "TEST2",
             name = "test2",
             minHumidity = 150,
             checkInterval = 13,

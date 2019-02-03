@@ -10,13 +10,17 @@ import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.model.business.filter.PotStateFilter
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
+import com.home.autowatering.service.interfaces.WateringSystemService
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
 @RequestMapping("/pot")
-class PotController(var potService: PotService, var potStateService: PotStateService) : AbstractController() {
+class PotController(
+    var potService: PotService, var potStateService: PotStateService,
+    var wateringSystemService: WateringSystemService
+) : AbstractController() {
     private final val potConverter = PotConverter()
     private final val potStateConverter = PotStateConverter()
 
@@ -52,6 +56,15 @@ class PotController(var potService: PotService, var potStateService: PotStateSer
         var pot = if (saved == null) potConverter.fromDto(request)
         else potService.merge(potConverter.fromDto(request), saved)
         pot = potService.save(pot)
+        wateringSystemService.refresh(pot)
+        return potConverter.response(pot)
+    }
+
+    @GetMapping("/refresh")
+    fun refresh(@RequestParam(value = "code") potCode: String): Response<PotDto> {
+        val pot = potService.find(PotFilter(code = potCode))
+            .singleOrNull() ?: throw PotNotFoundException(potCode)
+        wateringSystemService.refresh(pot)
         return potConverter.response(pot)
     }
 

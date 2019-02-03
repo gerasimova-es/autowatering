@@ -32,7 +32,6 @@ class PotServiceImpl(val potDao: PotDao, val wateringSystemDao: WateringSystemDa
     }
 
     override fun save(pot: Pot): Pot {
-        wateringSystemDao.refresh(pot) //todo save reuslt in pot
         return potDao.save(pot)
     }
 

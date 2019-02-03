@@ -8,6 +8,7 @@ import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
+import com.home.autowatering.service.interfaces.WateringSystemService
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert.fail
@@ -18,13 +19,15 @@ import java.util.*
 class PotControllerTest {
     private lateinit var potService: PotService
     private lateinit var potStateService: PotStateService
+    private lateinit var wateringSystemService: WateringSystemService
     private lateinit var controller: PotController
 
     @Before
     fun init() {
         potService = mock()
         potStateService = mock()
-        controller = PotController(potService, potStateService)
+        wateringSystemService = mock()
+        controller = PotController(potService, potStateService, wateringSystemService)
     }
 
     @Test
