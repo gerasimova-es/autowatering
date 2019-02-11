@@ -23,11 +23,12 @@ class PotServiceImpl(val potDao: PotDao, val wateringSystemDao: WateringSystemDa
     }
 
     override fun merge(source: Pot, target: Pot): Pot {
-        target.name = source.name
-        target.minHumidity = source.minHumidity
-        target.checkInterval = source.checkInterval
-        target.wateringDuration = source.wateringDuration
-        return target
+        return target.copy(
+            name = source.name,
+            minHumidity = source.minHumidity,
+            checkInterval = source.checkInterval,
+            wateringDuration = source.wateringDuration
+        )
     }
 
     override fun save(pot: Pot): Pot {

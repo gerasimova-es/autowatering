@@ -4,7 +4,7 @@ import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.database.JpaPot
 import java.util.function.Function
 
-class JpaPotConverter : JpaConverter<JpaPot, Pot>(
+object JpaPotConverter : JpaConverter<JpaPot, Pot>(
     Function {
         Pot(
             id = it.id,
@@ -28,12 +28,12 @@ class JpaPotConverter : JpaConverter<JpaPot, Pot>(
 
 ) {
 
-    fun map(source: Pot, target: JpaPot): JpaPot {
-        target.code = source.code
-        target.name = source.name
-        target.minHumidity = source.minHumidity
-        target.checkInterval = source.checkInterval
-        target.wateringDuration = source.wateringDuration
-        return target
-    }
+    fun map(source: Pot, target: JpaPot): JpaPot =
+        target.also {
+            it.code = source.code
+            it.name = source.name
+            it.minHumidity = source.minHumidity
+            it.checkInterval = source.checkInterval
+            it.wateringDuration = source.wateringDuration
+        }
 }

@@ -6,7 +6,7 @@ import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
 import java.util.function.Function
 
-class PotConverter : RequestConverter<PotDto, Pot>(
+object PotConverter : RequestConverter<PotDto, Pot>(
     Function {
         Pot(
             id = it.id,
@@ -32,8 +32,8 @@ class PotConverter : RequestConverter<PotDto, Pot>(
         if (state == null) {
             return super.response(pot)
         }
-        val dto = fromEntity(pot)
-        dto.humidity = state.humidity
-        return Response(dto)
+        return Response(fromEntity(pot).also {
+            it.humidity = state.humidity
+        })
     }
 }

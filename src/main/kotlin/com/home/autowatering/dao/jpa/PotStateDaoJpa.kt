@@ -28,12 +28,10 @@ class PotStateDaoJpa(
     private val stateRepository: PotStateRepository
 ) : PotStateDao {
 
-    val converter = JpaPotStateConverter()
-
     override fun last(pot: Pot): PotState? {
         val jpaPot = potRepository.findOneByCode(pot.code) ?: throw PotNotFoundException(pot.code)
         val state = stateRepository.findFirstByPotOrderByDateDesc(jpaPot)
-        return if (state == null) null else converter.fromJpa(state)
+        return if (state == null) null else JpaPotStateConverter.fromJpa(state)
     }
 
     override fun find(filter: PotStateFilter): List<PotState> {
@@ -76,7 +74,7 @@ class PotStateDaoJpa(
                 .fetch()
 
         return data.map { jpa ->
-            converter.fromJpa(
+            JpaPotStateConverter.fromJpa(
                 JpaPotState(
                     id = jpa[6] as Long,
                     pot = JpaPot(
@@ -100,10 +98,10 @@ class PotStateDaoJpa(
         try {
             val jpaPot = potRepository.findOneByCode(state.pot.code)
                 ?: throw PotNotFoundException("pot not found by code = ${state.pot.code}")
-            var jpaState = converter.fromEntity(state)
+            var jpaState = JpaPotStateConverter.fromEntity(state)
             jpaState.pot = jpaPot
             jpaState = stateRepository.save(jpaState)
-            return converter.fromJpa(jpaState)
+            return JpaPotStateConverter.fromJpa(jpaState)
         } catch (exc: PersistenceException) {
             throw SavingException(exc)
         }

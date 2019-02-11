@@ -15,13 +15,9 @@ class PotStateServiceImpl(
     override fun last(pot: Pot): PotState? =
         stateDao.last(pot)
 
+    override fun save(state: PotState): PotState =
+        stateDao.save(state)
 
-    override fun save(state: PotState): PotState {
-        return stateDao.save(state)
-    }
-
-    override fun find(filter: PotStateFilter): List<PotState> {
-        return stateDao.find(filter)
-    }
-
+    override fun find(filter: PotStateFilter): List<PotState> =
+        stateDao.find(filter)
 }

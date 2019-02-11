@@ -9,14 +9,14 @@ import org.springframework.web.filter.CommonsRequestLoggingFilter
 class ApplicationConfig {
 
     @Bean
-    fun requestLoggingFilter(): CommonsRequestLoggingFilter {
-        val loggingFilter = CommonsRequestLoggingFilter()
-        loggingFilter.setIncludeClientInfo(true)
-        loggingFilter.setIncludeQueryString(true)
-        loggingFilter.setIncludePayload(true)
-        loggingFilter.setIncludeHeaders(true)
-        return loggingFilter
-    }
+    fun requestLoggingFilter(): CommonsRequestLoggingFilter =
+        CommonsRequestLoggingFilter()
+            .also {
+                it.setIncludeClientInfo(true)
+                it.setIncludeQueryString(true)
+                it.setIncludePayload(true)
+                it.setIncludeHeaders(true)
+            }
 
 //    @Bean
 //    internal fun h2servletRegistration(): ServletRegistrationBean<*> {

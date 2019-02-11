@@ -12,11 +12,10 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/tank")
 class TankStateController(val tankStateService: TankStateService) : AbstractController() {
-    val converter = TankStateConverter()
 
     @PostMapping("/state/save")
     fun save(@RequestBody request: TankStateDto): Response<TankStateDto> {
-        val result = tankStateService.save(converter.fromDto(request))
-        return converter.response(result)
+        val result = tankStateService.save(TankStateConverter.fromDto(request))
+        return TankStateConverter.response(result)
     }
 }

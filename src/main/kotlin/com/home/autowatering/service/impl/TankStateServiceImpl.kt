@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service
 class TankStateServiceImpl(@Autowired val tankStateDao: TankStateDao) : TankStateService {
 
     override fun save(state: TankState): TankState {
-        Validate.notNull(state)
         Validate.noNullElements(
             arrayOf(
                 state.date,

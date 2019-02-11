@@ -5,8 +5,6 @@ open class Response<T> {
     var message: String = "message was handled successfully"
     var payload: T? = null
 
-    constructor()
-
     constructor(payload: T) {
         this.payload = payload
     }

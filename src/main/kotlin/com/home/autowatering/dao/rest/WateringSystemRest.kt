@@ -22,13 +22,11 @@ class WateringSystemRest : WateringSystemDao {
     @Value("\${watering.url}")
     var url: String? = null
 
-    val converter = PotConverter()
-
     override fun refresh(pot: Pot) {
         val response = RestTemplate().exchange(
             url + REFRESH_SERVICE,
             HttpMethod.POST,
-            HttpEntity(converter.fromEntity(pot)),
+            HttpEntity(PotConverter.fromEntity(pot)),
             object : ParameterizedTypeReference<Response<PotDto>>() {})
     }
 }

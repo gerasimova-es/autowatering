@@ -5,7 +5,7 @@ import com.home.autowatering.model.business.TankState
 import java.util.*
 import java.util.function.Function
 
-class TankStateConverter : RequestConverter<TankStateDto, TankState>(
+object TankStateConverter : RequestConverter<TankStateDto, TankState>(
     Function {
         TankState(
             id = it.id,

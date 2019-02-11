@@ -6,7 +6,7 @@ import com.home.autowatering.model.business.PotState
 import java.util.*
 import java.util.function.Function
 
-class PotStateConverter : RequestConverter<PotStateDto, PotState>(
+object PotStateConverter : RequestConverter<PotStateDto, PotState>(
     Function {
         PotState(
             id = it.id,
