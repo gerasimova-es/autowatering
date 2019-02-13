@@ -28,10 +28,6 @@ class PotController(
     var wateringSystemService: WateringSystemService
 ) : AbstractController() {
 
-    companion object {
-        const val DATE_FORMAT = "yyyy-MM-dd HH:mm:ss"
-    }
-
     @GetMapping("/list")
     fun list(): Response<List<PotDto>> {
         val pots = potService.findAll()
@@ -60,8 +56,14 @@ class PotController(
     @GetMapping("/statistic/{pot}")
     fun states(
         @PathVariable(value = "pot") potCode: String,
-        @RequestParam(value = "dateFrom", required = false) @DateTimeFormat(pattern = DATE_FORMAT) dateFrom: Date?,
-        @RequestParam(value = "dateTo", required = false) @DateTimeFormat(pattern = DATE_FORMAT) dateTo: Date?
+        @RequestParam(
+            value = "dateFrom",
+            required = false
+        ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) dateFrom: Date?,
+        @RequestParam(
+            value = "dateTo",
+            required = false
+        ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) dateTo: Date?
     ): Response<List<PotStateDto>> {
         val pot = potService.find(PotFilter(code = potCode))
             .singleOrNull() ?: throw PotNotFoundException(potCode)

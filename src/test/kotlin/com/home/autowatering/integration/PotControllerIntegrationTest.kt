@@ -229,7 +229,7 @@ class PotControllerIntegrationTest {
             potCode = "pot1",
             humidity = 100.0,
             watering = true,
-            date = Date().time
+            date = Date()
         )
         val savedStateDto = restTemplate.exchange(
             "/pot/state/save",
@@ -243,7 +243,7 @@ class PotControllerIntegrationTest {
         assertThat(savedStateDto.body?.payload?.id).isGreaterThan(0)
         assertThat(savedStateDto.body?.payload?.watering).isTrue()
 
-        val builder = UriComponentsBuilder.fromPath("/pot/${savedPotDto?.body?.payload?.id}/state/list")
+        val builder = UriComponentsBuilder.fromPath("/pot/statistic/${savedPotDto?.body?.payload?.code}")
 
         val found = restTemplate.exchange(
             builder.build().encode().toUri(),
@@ -282,7 +282,8 @@ class PotControllerIntegrationTest {
 
         val stateDto = PotStateDto(
             potCode = "pot_savePotAndSaveStateAndFind",
-            humidity = 100.0
+            humidity = 100.0,
+            date = Date()
         )
 
         val savedStateDto = restTemplate.exchange(

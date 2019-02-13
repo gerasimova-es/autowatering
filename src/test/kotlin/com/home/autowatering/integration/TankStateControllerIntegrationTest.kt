@@ -15,6 +15,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.junit4.SpringRunner
+import java.util.*
 
 @Ignore
 @RunWith(SpringRunner::class)
@@ -28,7 +29,8 @@ class TankStateControllerIntegrationTest {
         val dto = TankStateDto(
             name = "tank",
             volume = 2.178,
-            filled = 0.0
+            filled = 0.0,
+            date = Date()
         )
 
         val result = restTemplate.exchange(

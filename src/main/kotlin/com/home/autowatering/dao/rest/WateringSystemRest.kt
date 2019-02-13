@@ -1,7 +1,6 @@
 package com.home.autowatering.dao.rest
 
 import com.home.autowatering.controller.converter.PotConverter
-import com.home.autowatering.controller.dto.PotDto
 import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.dao.interfaces.WateringSystemDao
 import com.home.autowatering.model.business.Pot
@@ -27,6 +26,6 @@ class WateringSystemRest : WateringSystemDao {
             url + REFRESH_SERVICE,
             HttpMethod.POST,
             HttpEntity(PotConverter.fromEntity(pot)),
-            object : ParameterizedTypeReference<Response<PotDto>>() {})
+            object : ParameterizedTypeReference<Response<*>>() {})
     }
 }

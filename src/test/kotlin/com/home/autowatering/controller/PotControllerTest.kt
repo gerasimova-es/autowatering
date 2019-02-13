@@ -296,11 +296,12 @@ class PotControllerTest {
 
     @Test
     fun foundOneStateRecord() {
+        val dateFrom = Date()
         val state = PotState(
-            1,
-            Pot(code = "pot"),
-            Date(),
-            1.0
+            id = 1,
+            pot = Pot(code = "pot"),
+            date = dateFrom,
+            humidity = 1.0
         )
         whenever(potService.find(any())).thenReturn(
             arrayListOf(
@@ -313,7 +314,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenReturn(arrayListOf(state))
 
-        val response = controller.states("pot", Date(), Date())
+        val response = controller.states("pot", dateFrom, Date())
 
         assertThat(response).isNotNull
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
@@ -322,7 +323,7 @@ class PotControllerTest {
         assertThat(response.payload).isInstanceOf(ArrayList::class.java)
         assertThat(response.payload).hasOnlyOneElementSatisfying { element ->
             assertThat(element.id).isEqualTo(state.id)
-            assertThat(element.date).isEqualTo(state.date.time)
+            assertThat(element.date).isEqualTo(state.date)
             assertThat(element.humidity).isEqualTo(state.humidity)
         }
         verify(potService, times(1)).find(any())
@@ -380,7 +381,7 @@ class PotControllerTest {
             val response = controller.saveState(
                 PotStateDto(
                     potCode = "pot",
-                    date = Date().time,
+                    date = Date(),
                     humidity = 10.0,
                     watering = false
                 )
@@ -406,7 +407,7 @@ class PotControllerTest {
         val response = controller.saveState(
             PotStateDto(
                 potCode = "pot",
-                date = Date().time,
+                date = Date(),
                 humidity = 10.0,
                 watering = false
             )
@@ -417,7 +418,7 @@ class PotControllerTest {
         assertThat(response.message).isEqualTo("message was handled successfully")
         assertThat(response.payload).isNotNull
         assertThat(response.payload?.id).isEqualTo(state.id)
-        assertThat(response.payload?.date).isEqualTo(state.date.time)
+        assertThat(response.payload?.date).isEqualTo(state.date)
         assertThat(response.payload?.humidity).isEqualTo(state.humidity)
 
 

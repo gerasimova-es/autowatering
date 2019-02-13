@@ -10,7 +10,7 @@ object TankStateConverter : RequestConverter<TankStateDto, TankState>(
         TankState(
             id = it.id,
             name = it.name,
-            date = if (it.date == null) Date() else Date(it.date),
+            date = it.date ?: Date(),
             volume = it.volume,
             filled = it.filled
         )
@@ -19,7 +19,7 @@ object TankStateConverter : RequestConverter<TankStateDto, TankState>(
         TankStateDto(
             id = it.id,
             name = it.name,
-            date = it.date.time,
+            date = it.date,
             volume = it.volume,
             filled = it.filled
         )

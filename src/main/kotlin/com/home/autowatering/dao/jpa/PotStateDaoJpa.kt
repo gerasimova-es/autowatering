@@ -73,7 +73,7 @@ class PotStateDaoJpa(
                 .orderBy(state.DATE)
                 .fetch()
 
-        return data.map { jpa ->
+        var filtered = data.map { jpa ->
             JpaPotStateConverter.fromJpa(
                 JpaPotState(
                     id = jpa[6] as Long,
@@ -91,6 +91,16 @@ class PotStateDaoJpa(
                 )
             )
         }
+
+        if (filter.from != null) {
+            filtered = filtered.filter { s -> s.date.after(filter.from) || s.date == filter.from }
+        }
+
+        if (filter.to != null) {
+            filtered = filtered.filter { s -> s.date.before(filter.to) || s.date == filter.from }
+        }
+
+        return filtered
 
     }
 
