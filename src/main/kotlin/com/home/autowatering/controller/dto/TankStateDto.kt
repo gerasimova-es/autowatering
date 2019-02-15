@@ -12,7 +12,7 @@ class TankStateDto {
         shape = JsonFormat.Shape.STRING,
         pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
     )
-    lateinit var date: Date
+    var date: Date = Date()
     var volume: Double = 0.0
     var filled: Double = 0.0
 

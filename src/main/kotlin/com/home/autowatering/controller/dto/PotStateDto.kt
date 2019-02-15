@@ -12,7 +12,7 @@ class PotStateDto {
         shape = JsonFormat.Shape.STRING,
         pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
     )
-    lateinit var date: Date
+    var date: Date = Date()
     var humidity: Double = 0.0
     var watering: Boolean? = false
 
