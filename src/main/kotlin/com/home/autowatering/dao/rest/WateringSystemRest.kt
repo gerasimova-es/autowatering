@@ -1,6 +1,7 @@
 package com.home.autowatering.dao.rest
 
 import com.home.autowatering.controller.converter.PotConverter
+import com.home.autowatering.controller.dto.PotDto
 import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.dao.interfaces.WateringSystemDao
 import com.home.autowatering.model.business.Pot
@@ -22,10 +23,10 @@ class WateringSystemRest : WateringSystemDao {
     var url: String? = null
 
     override fun refresh(pot: Pot) {
-        val response = RestTemplate().exchange(
+        RestTemplate().exchange(
             url + REFRESH_SERVICE,
             HttpMethod.POST,
             HttpEntity(PotConverter.fromEntity(pot)),
-            object : ParameterizedTypeReference<Response<*>>() {})
+            object : ParameterizedTypeReference<Response<PotDto>>() {})
     }
 }
