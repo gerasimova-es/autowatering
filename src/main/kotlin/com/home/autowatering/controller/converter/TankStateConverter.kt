@@ -2,10 +2,9 @@ package com.home.autowatering.controller.converter
 
 import com.home.autowatering.controller.dto.TankStateDto
 import com.home.autowatering.model.business.TankState
-import java.util.function.Function
 
 object TankStateConverter : RequestConverter<TankStateDto, TankState>(
-    Function {
+    {
         TankState(
             id = it.id,
             name = it.name,
@@ -14,7 +13,7 @@ object TankStateConverter : RequestConverter<TankStateDto, TankState>(
             filled = it.filled
         )
     },
-    Function {
+    {
         TankStateDto(
             id = it.id,
             name = it.name,

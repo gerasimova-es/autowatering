@@ -1,28 +1,20 @@
 package com.home.autowatering.model.database.converter
 
-import java.util.function.Function
-import java.util.stream.Collectors
-
 open class JpaConverter<J, E>(
-    private val fromJpa: Function<J, E>,
-    private val fromEntity: Function<E, J>
+    private val fromJpa: (jpa: J) -> E,
+    private val fromEntity: (entity: E) -> J
 ) {
     fun fromJpa(jpa: J): E =
-        fromJpa.apply(jpa)
+        fromJpa.invoke(jpa)
 
 
     fun fromEntity(entity: E): J =
-        fromEntity.apply(entity)
+        fromEntity.invoke(entity)
 
     fun fromJpas(jpas: Collection<J>): List<E> =
-        jpas.stream()
-            .map { fromJpa(it) }
-            .collect(Collectors.toList<E>())
-
+        jpas.map { fromJpa(it) }
 
     fun fromEntities(entities: Collection<E>): List<J> =
-        entities.stream()
-            .map { fromEntity(it) }
-            .collect(Collectors.toList<J>())
+        entities.map { fromEntity(it) }
 
 }

@@ -1,29 +1,28 @@
 package com.home.autowatering.controller.converter
 
 import com.home.autowatering.controller.dto.response.Response
-import java.util.function.Function
 import java.util.stream.Collectors
 
 /**
  * JpaConverter between DTO and Entities
  */
 open class RequestConverter<D, E>(
-    private val fromDto: Function<D, E>,
-    private val fromEntity: Function<E, D>
+    private val fromDto: (dto: D) -> E,
+    private val fromEntity: (entity: E) -> D
 ) {
     /**
      * @param dto DTO database
      * @return The domain representation - the result of the converting function application on dto database.
      */
     fun fromDto(dto: D): E =
-        fromDto.apply(dto)
+        fromDto.invoke(dto)
 
     /**
      * @param entity domain database
      * @return The DTO representation - the result of the converting function application on domain database.
      */
     fun fromEntity(entity: E): D =
-        fromEntity.apply(entity)
+        fromEntity.invoke(entity)
 
     /**
      * @param dtos collection of DTO entities

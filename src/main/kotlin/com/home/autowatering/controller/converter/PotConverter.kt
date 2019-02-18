@@ -4,10 +4,9 @@ import com.home.autowatering.controller.dto.PotDto
 import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
-import java.util.function.Function
 
 object PotConverter : RequestConverter<PotDto, Pot>(
-    Function {
+    {
         Pot(
             id = it.id,
             code = it.code,
@@ -17,7 +16,7 @@ object PotConverter : RequestConverter<PotDto, Pot>(
             wateringDuration = it.wateringDuration
         )
     },
-    Function {
+    {
         PotDto(
             id = it.id,
             code = it.code,

@@ -2,10 +2,9 @@ package com.home.autowatering.model.database.converter
 
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.database.JpaPot
-import java.util.function.Function
 
 object JpaPotConverter : JpaConverter<JpaPot, Pot>(
-    Function {
+    {
         Pot(
             id = it.id,
             code = it.code!!,
@@ -15,7 +14,7 @@ object JpaPotConverter : JpaConverter<JpaPot, Pot>(
             wateringDuration = it.wateringDuration
         )
     },
-    Function {
+    {
         JpaPot(
             id = it.id,
             code = it.code,
