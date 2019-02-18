@@ -6,6 +6,6 @@ data class PotState(
     var id: Long? = null,
     val pot: Pot,
     val date: Date,
-    val humidity: Double,
+    val humidity: Int,
     val watering: Boolean? = false
 )

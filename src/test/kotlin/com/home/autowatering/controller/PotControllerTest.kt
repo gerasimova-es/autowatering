@@ -138,7 +138,7 @@ class PotControllerTest {
             id = 1,
             pot = pot,
             date = Date(),
-            humidity = 400.0,
+            humidity = 400,
             watering = true
         )
 
@@ -301,7 +301,7 @@ class PotControllerTest {
             id = 1,
             pot = Pot(code = "pot"),
             date = dateFrom,
-            humidity = 1.0
+            humidity = 1
         )
         whenever(potService.find(any())).thenReturn(
             arrayListOf(
@@ -339,13 +339,13 @@ class PotControllerTest {
             id = 1L,
             pot = Pot(code = "pot"),
             date = Date(),
-            humidity = 1.0
+            humidity = 1
         )
         val state2 = PotState(
             id = 2L,
             pot = Pot(code = "pot"),
             date = Date(),
-            humidity = 2.0
+            humidity = 2
         )
         whenever(potService.find(any())).thenReturn(
             arrayListOf(
@@ -382,7 +382,7 @@ class PotControllerTest {
                 PotStateDto(
                     potCode = "pot",
                     date = Date(),
-                    humidity = 10.0,
+                    humidity = 10,
                     watering = false
                 )
             )
@@ -399,7 +399,7 @@ class PotControllerTest {
             id = 1L,
             pot = Pot(code = "pot"),
             date = Date(),
-            humidity = 1.0,
+            humidity = 1,
             watering = false
         )
         whenever(potStateService.save(any())).thenReturn(state)
@@ -408,7 +408,7 @@ class PotControllerTest {
             PotStateDto(
                 potCode = "pot",
                 date = Date(),
-                humidity = 10.0,
+                humidity = 10,
                 watering = false
             )
         )

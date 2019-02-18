@@ -31,7 +31,11 @@ class PotController(
     @GetMapping("/list")
     fun list(): Response<List<PotDto>> {
         val pots = potService.findAll()
-        //todo set humidity to response
+            .map { pot ->
+                pot.apply {
+                    this.humidity = potStateService.last(this)?.humidity
+                }
+            }
         return PotConverter.response(pots)
     }
 

@@ -227,7 +227,7 @@ class PotControllerIntegrationTest {
 
         val stateDto = PotStateDto(
             potCode = "pot1",
-            humidity = 100.0,
+            humidity = 100,
             watering = true,
             date = Date()
         )
@@ -282,7 +282,7 @@ class PotControllerIntegrationTest {
 
         val stateDto = PotStateDto(
             potCode = "pot_savePotAndSaveStateAndFind",
-            humidity = 100.0,
+            humidity = 100,
             date = Date()
         )
 

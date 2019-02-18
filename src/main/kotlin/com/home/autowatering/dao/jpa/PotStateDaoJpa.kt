@@ -86,7 +86,7 @@ class PotStateDaoJpa(
                         wateringDuration = jpa[5] as Int?
                     ),
                     date = jpa[7] as Date,
-                    humidity = jpa[8] as Double,
+                    humidity = jpa[8] as Int,
                     watering = jpa[9] as Boolean
                 )
             )

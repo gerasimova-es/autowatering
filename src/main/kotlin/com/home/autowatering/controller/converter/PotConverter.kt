@@ -23,7 +23,8 @@ object PotConverter : RequestConverter<PotDto, Pot>(
             name = it.name,
             minHumidity = it.minHumidity,
             checkInterval = it.checkInterval,
-            wateringDuration = it.wateringDuration
+            wateringDuration = it.wateringDuration,
+            humidity = it.humidity
         )
     }
 ) {

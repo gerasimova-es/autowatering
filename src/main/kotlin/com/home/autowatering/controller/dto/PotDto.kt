@@ -10,7 +10,7 @@ class PotDto {
     var minHumidity: Int? = null
     var checkInterval: Int? = null
     var wateringDuration: Int? = null
-    var humidity: Double? = null
+    var humidity: Int? = null
 
     constructor()
     constructor(
@@ -20,7 +20,7 @@ class PotDto {
         minHumidity: Int? = null,
         checkInterval: Int? = null,
         wateringDuration: Int? = null,
-        humidity: Double? = null
+        humidity: Int? = null
     ) {
         this.id = id
         this.code = code

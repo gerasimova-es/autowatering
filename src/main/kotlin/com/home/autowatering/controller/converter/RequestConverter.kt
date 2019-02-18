@@ -39,7 +39,7 @@ open class RequestConverter<D, E>(
      * @return List of domain representation of provided entities retrieved by
      * mapping each of them with the conversion function
      */
-    private fun fromEntities(entities: Collection<E>): List<D> =
+    fun fromEntities(entities: Collection<E>): List<D> =
         entities.stream()
             .map { fromEntity(it) }
             .collect(Collectors.toList<D>())

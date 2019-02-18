@@ -13,7 +13,7 @@ class PotStateDto {
         pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
     )
     var date: Date = Date()
-    var humidity: Double = 0.0
+    var humidity: Int = 0
     var watering: Boolean? = false
 
     constructor()
@@ -22,7 +22,7 @@ class PotStateDto {
         id: Long? = null,
         potCode: String,
         date: Date,
-        humidity: Double,
+        humidity: Int,
         watering: Boolean? = null
     ) {
         this.id = id

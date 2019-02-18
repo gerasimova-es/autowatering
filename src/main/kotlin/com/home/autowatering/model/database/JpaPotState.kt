@@ -1,7 +1,16 @@
 package com.home.autowatering.model.database
 
 import java.util.*
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.Id
+import javax.persistence.Index
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
+import javax.persistence.Table
+import javax.persistence.Temporal
+import javax.persistence.TemporalType
 
 @Entity
 @Table(
@@ -22,15 +31,15 @@ class JpaPotState {
     @JoinColumn(name = "POT_ID", nullable = false)
     var pot: JpaPot? = null
 
-    @Column(name = "HUMIDITY", precision = 2, nullable = false)
-    var humidity: Double? = null
+    @Column(name = "HUMIDITY", nullable = false)
+    var humidity: Int? = null
 
     @Column(name = "WATERING")
     var watering: Boolean? = null
 
     constructor()
 
-    constructor(id: Long? = null, pot: JpaPot? = null, date: Date, humidity: Double, watering: Boolean?) {
+    constructor(id: Long? = null, pot: JpaPot? = null, date: Date, humidity: Int, watering: Boolean?) {
         this.id = id
         this.pot = pot
         this.date = date
