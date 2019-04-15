@@ -9,7 +9,7 @@ const char* password = "kate_023";
 ESP8266WebServer server(80);
 
 // application url
-const char* url = "http://192.168.1.35:8080/autowatering";
+const char* url = "http://192.168.1.34:8080/autowatering";
 
 //pins
 #define HUMIDITY A0
@@ -89,7 +89,7 @@ void loadSettings(){
    String result = sendGetRequest("/pot/info?code=AUTHORIUM");
    if(result == "error"){
       Serial.println("load setting error for pot AUTHORIUM. Setting default values...");
-      authorium.minHumidity = 350;
+      authorium.minHumidity = 200;
       authorium.checkInterval = 10*60000;
       authorium.wateringDuration = 3*1000;
    } else {
@@ -209,17 +209,21 @@ boolean getTankIsFull(){
 }
 
 int getHumidity(){
+  Serial.println("включаем датчик влажности");
   digitalWrite(HUMIDITY_RELAY, LOW);
   delay(1000);
   int humidity = map(analogRead(HUMIDITY), 1023, 0, 0, 1023);
   digitalWrite(HUMIDITY_RELAY, HIGH);
+  Serial.println("выключаем датчик влажности");
   return humidity;
 }
 
 void watering(){
+  Serial.println("включаем помпу");
   digitalWrite(PUMP_RELAY, LOW);
   delay(authorium.wateringDuration);
   digitalWrite(PUMP_RELAY, HIGH);
+  Serial.println("выключаем помпу");
 }
 
 void whistling(){
