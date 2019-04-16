@@ -4,17 +4,16 @@ import com.home.autowatering.controller.converter.TankStateConverter
 import com.home.autowatering.controller.dto.TankStateDto
 import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.service.interfaces.TankStateService
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
 
-@RestController
-@RequestMapping("/tank")
+//@RestController
+//@RequestMapping("/tank")
 class TankStateController(val tankStateService: TankStateService) : AbstractController() {
 
-    @PostMapping("/state/save")
-    fun save(@RequestBody request: TankStateDto): Response<TankStateDto> {
+    //    @PostMapping("/state/save")
+    fun save(
+//    @RequestBody
+        request: TankStateDto
+    ): Response<TankStateDto> {
         val result = tankStateService.save(TankStateConverter.fromDto(request))
         return TankStateConverter.response(result)
     }

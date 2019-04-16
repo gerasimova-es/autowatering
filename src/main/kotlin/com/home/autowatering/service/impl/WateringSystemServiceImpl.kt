@@ -6,9 +6,8 @@ import com.home.autowatering.service.interfaces.WateringSystemService
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.apache.commons.lang3.Validate
-import org.springframework.stereotype.Service
 
-@Service
+//@Service
 class WateringSystemServiceImpl(val wateringSystemDao: WateringSystemDao) : WateringSystemService {
     override fun refresh(pot: Pot) {
         Validate.noNullElements(

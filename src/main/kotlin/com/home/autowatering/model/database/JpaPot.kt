@@ -5,8 +5,6 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.Table
-import javax.validation.constraints.Max
-import javax.validation.constraints.Min
 
 
 @Entity
@@ -24,18 +22,18 @@ class JpaPot {
     var name: String? = null
 
     @Column(name = "MIN_HUMIDITY", nullable = false)
-    @Min(0)
-    @Max(1024)
+//    @Min(0)
+//    @Max(1024)
     var minHumidity: Int? = null
 
     @Column(name = "CHECK_INTERVAL", nullable = false)
-    @Min(1)
-    @Max(1440)
+//    @Min(1)
+//    @Max(1440)
     var checkInterval: Int? = null
 
     @Column(name = "WATERING_DURATION", nullable = false)
-    @Min(1)
-    @Max(10)
+//    @Min(1)
+//    @Max(10)
     var wateringDuration: Int? = null
 
     constructor()

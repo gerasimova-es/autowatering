@@ -5,9 +5,8 @@ import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
 import com.home.autowatering.model.business.filter.PotStateFilter
 import com.home.autowatering.service.interfaces.PotStateService
-import org.springframework.stereotype.Service
 
-@Service
+//@Service
 class PotStateServiceImpl(
     val stateDao: PotStateDao
 ) : PotStateService {
