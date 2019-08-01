@@ -19,10 +19,8 @@ class Application : AbstractVerticle() {
                     startFuture.complete()
                     println("HTTP server started on port 8888")
                 } else {
-                    startFuture.fail(http.cause());
+                    startFuture.fail(http.cause())
                 }
             }
-
     }
-
 }
