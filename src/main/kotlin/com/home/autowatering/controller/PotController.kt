@@ -11,17 +11,19 @@ import com.home.autowatering.model.business.filter.PotStateFilter
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
 import com.home.autowatering.service.interfaces.WateringSystemService
+import io.vertx.ext.web.RoutingContext
 import java.util.*
 
 //@RestController
 //@RequestMapping("/pot")
 class PotController(
-    var potService: PotService, var potStateService: PotStateService,
-    var wateringSystemService: WateringSystemService
+    val potService: PotService,
+    val potStateService: PotStateService,
+    val wateringSystemService: WateringSystemService
 ) : AbstractController() {
 
     //    @GetMapping("/list")
-    fun list(): Response<List<PotDto>> {
+    fun list(context: RoutingContext): Response<List<PotDto>> {
         val pots = potService.findAll()
             .map { pot ->
                 pot.apply {
