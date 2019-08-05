@@ -14,6 +14,22 @@ jar {
     version = '0.0.1'
 }
 
+def mainVerticleName = 'com.home.autowatering.Application'
+def watchForChange = 'src/**/*'
+def doOnChange = './gradlew classes'
+
+shadowJar {
+    baseName = 'autowatering'
+    version = '0.0.1'
+    classifier = 'shadow'
+    manifest {
+        attributes 'Main-Verticle': mainVerticleName
+    }
+    mergeServiceFiles {
+        include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+    }
+}
+
 sourceCompatibility = 1.8
 
 repositories {
@@ -85,19 +101,8 @@ sourceSets {
     main.resources.srcDirs = ['src/main/resources']
 }
 
-def mainVerticleName = 'com.home.autowatering.Application'
-def watchForChange = 'src/**/*'
-def doOnChange = './gradlew classes'
 
-shadowJar {
-    classifier = 'fat'
-    manifest {
-        attributes 'Main-Verticle': mainVerticleName
-    }
-    mergeServiceFiles {
-        include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
-    }
-}
+
 
 test {
     useJUnitPlatform()
