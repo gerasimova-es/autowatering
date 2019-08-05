@@ -1,11 +1,13 @@
 package com.home.autowatering.controller.dto.response
 
 open class Response<T> {
-    var status: ResponseStatus = ResponseStatus.SUCCESS
-    var message: String = "message was handled successfully"
+    val status: ResponseStatus
+    val message: String
     var payload: T? = null
 
     constructor(payload: T) {
+        this.status = ResponseStatus.SUCCESS
+        this.message = "message was handled successfully"
         this.payload = payload
     }
 
