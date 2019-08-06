@@ -8,30 +8,34 @@ import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.model.business.filter.PotStateFilter
+import com.home.autowatering.service.impl.PotServiceImpl
+import com.home.autowatering.service.impl.PotStateServiceImpl
+import com.home.autowatering.service.impl.WateringSystemServiceImpl
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
 import com.home.autowatering.service.interfaces.WateringSystemService
-import io.vertx.ext.web.RoutingContext
 import java.util.*
 
 //@RestController
 //@RequestMapping("/pot")
 class PotController(
-    val potService: PotService,
-    val potStateService: PotStateService,
-    val wateringSystemService: WateringSystemService
+    private val potService: PotService = PotServiceImpl(),
+    private val potStateService: PotStateService = PotStateServiceImpl(),
+    private val wateringSystemService: WateringSystemService = WateringSystemServiceImpl()
 ) : AbstractController() {
 
     //    @GetMapping("/list")
-    fun list(context: RoutingContext): Response<List<PotDto>> {
-        val pots = potService.findAll()
+    fun list(): Response<List<PotDto>> =
+        with(potService.findAll()
             .map { pot ->
                 pot.apply {
                     this.humidity = potStateService.last(this)?.humidity
                 }
             }
-        return PotConverter.response(pots)
-    }
+        ) {
+            PotConverter.response(this)
+        }
+
 
     //    @GetMapping("/info")
     fun info(
@@ -74,8 +78,9 @@ class PotController(
     ): Response<List<PotStateDto>> {
         val pot = potService.find(PotFilter(code = potCode))
             .singleOrNull() ?: throw PotNotFoundException(potCode)
-        val states = potStateService.find(PotStateFilter(pot, dateFrom, dateTo))
-        return PotStateConverter.response(states)
+        return PotStateConverter.response(
+            potStateService.find(PotStateFilter(pot, dateFrom, dateTo))
+        )
     }
 
     //    @PostMapping("/state/save")
@@ -84,8 +89,9 @@ class PotController(
         request: PotStateDto
     ): Response<PotStateDto> {
         var state = PotStateConverter.fromDto(request)
-        state = potStateService.save(state)
-        return PotStateConverter.response(state)
+        return PotStateConverter.response(
+            potStateService.save(state)
+        )
     }
 
 }

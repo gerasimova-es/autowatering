@@ -1,12 +1,15 @@
 package com.home.autowatering.service.impl
 
 import com.home.autowatering.dao.interfaces.PotDao
+import com.home.autowatering.dao.jpa.PotDaoExposed
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.service.interfaces.PotService
 
 //@Service
-class PotServiceImpl(val potDao: PotDao) : PotService {
+class PotServiceImpl(
+    private val potDao: PotDao = PotDaoExposed()
+) : PotService {
 
     override fun findAll(): List<Pot> =
         potDao.findAll()

@@ -1,28 +1,24 @@
 package com.home.autowatering.dao.jpa
 
 import com.home.autowatering.dao.interfaces.PotStateDao
-import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
 import com.home.autowatering.model.business.filter.PotStateFilter
-import com.home.autowatering.model.database.converter.JpaPotStateConverter
-import com.home.autowatering.repository.PotRepository
-import com.home.autowatering.repository.PotStateRepository
 import java.sql.Date
-import javax.sql.DataSource
 
 
 //@Repository
 class PotStateDaoJpa(
-    private val dataSource: DataSource,
-    private val potRepository: PotRepository,
-    private val stateRepository: PotStateRepository
+//    private val dataSource: DataSource,
+//    private val potRepository: PotRepository,
+//    private val stateRepository: PotStateRepository
 ) : PotStateDao {
 
     override fun last(pot: Pot): PotState? {
-        val jpaPot = potRepository.findOneByCode(pot.code) ?: throw PotNotFoundException(pot.code)
-        val state = stateRepository.findFirstByPotOrderByDateDesc(jpaPot)
-        return if (state == null) null else JpaPotStateConverter.fromJpa(state)
+        return null
+//        val jpaPot = potRepository.findOneByCode(pot.code) ?: throw PotNotFoundException(pot.code)
+//        val state = stateRepository.findFirstByPotOrderByDateDesc(jpaPot)
+//        return if (state == null) null else JpaPotStateConverter.fromJpa(state)
     }
 
     override fun find(filter: PotStateFilter): List<PotState> {

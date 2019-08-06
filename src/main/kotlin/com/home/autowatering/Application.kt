@@ -1,67 +1,46 @@
 package com.home.autowatering
 
+import com.home.autowatering.controller.PotController
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
-import io.vertx.core.eventbus.EventBus
-import io.vertx.core.json.JsonObject
-import io.vertx.ext.auth.AuthProvider
+import io.vertx.core.json.Json
 import io.vertx.ext.web.Router
-import io.vertx.ext.web.RoutingContext
-import io.vertx.ext.web.handler.JWTAuthHandler
-
 
 //https://www.mednikov.net/case-studies/an-easy-introduction-to-microservices-with-vertx-and-java/
-class Application : AbstractVerticle() {
-    private lateinit var eventBus: EventBus
-    private lateinit var authProvider: AuthProvider
+class Application(
+    private val potController: PotController = PotController()
+) : AbstractVerticle() {
 
-    override fun start(startFuture: Future<Void>) {
-        super.start(startFuture)
-        val initSteps = initAuthProvider().compose({ verticle -> initServer() })
-        initSteps.setHandler(startFuture.completer())
+    override fun start(future: Future<Void>) {
+        super.start(future)
+        val initSteps = initServer()
+        initSteps.setHandler(future)
     }
 
-    fun initServer(): Future<Void> {
-        val future = Future.future<Void>()
-        //initialize web server and router
+    private fun initServer(): Future<Void> {
         val server = vertx.createHttpServer()
         val router = Router.router(vertx)
 
-        //Don't forget to get an eventbus reference!
-        this.eventBus = vertx.eventBus()
-
-
-        //secure routes with AuthProvider
-        router.route("/secure/*").handler(JWTAuthHandler.create(authProvider))
-        //assign hanlder to routes
-        router.get("/secure/chat/:id").handler { this.getChats() }
-
-        //assign server
-        server.requestHandler(router).listen(4567) { res ->
-            if (res.succeeded()) {
-                println("Created a server on port 4567")
-            } else {
-                System.out.println("Unable to create server: \n" + res.cause().localizedMessage)
-                future.fail(res.cause())
-            }
+        router.route("/pot/list").handler { context ->
+            val response = potController.list()
+            context.response()
+                .putHeader("content-type", "application/json")
+                .setStatusCode(200)
+                .end(Json.encodePrettily(response))
         }
-        return future
-    }
 
-    private fun getChats(ctx: RoutingContext) {
-        val chatId = ctx.pathParam("id")
-        val request = JsonObject()
-        request.put("chatId", chatId)
-        //send request to consumer
-        eventBus.send("consumer.service.messages.getchat", request, { res ->
-            if (res.succeeded()) {
-                ctx.response()
-                    .setStatusCode(200)
-                    .end(Json.encodePrettily(res.result().body()))
-            } else {
-                System.out.println("Unable to get a chat:\n" + res.cause().getLocalizedMessage())
-                ctx.response().setStatusCode(404).end()
-            }
-        })
+        with(Future.future<Void>()) {
+            //assign server
+            server.requestHandler(router)
+                .listen(8080) { res ->
+                    if (res.succeeded()) {
+                        println("Created a server on port 8080")
+                    } else {
+                        println("Unable to create server: \n" + res.cause().localizedMessage)
+                        this.fail(res.cause())
+                    }
+                }
+            return this
+        }
     }
 }

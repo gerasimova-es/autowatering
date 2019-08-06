@@ -2,18 +2,14 @@ package com.home.autowatering.dao.jpa
 
 import com.home.autowatering.dao.interfaces.PotDao
 import com.home.autowatering.model.business.Pot
-import com.home.autowatering.model.database.JpaPot
-import com.home.autowatering.model.database.converter.JpaPotConverter
-import com.home.autowatering.repository.PotRepository
+import com.home.autowatering.model.database.PotTable
+import com.home.autowatering.model.database.converter.PotConverter
+import org.jetbrains.exposed.sql.selectAll
 
-//@Repository
-class PotDaoJpa(private val repository: PotRepository) : PotDao {
-
-    override fun findAll(): List<Pot> {
-        return arrayListOf()
-//        return repository.findAll()
-//            .map { JpaPotConverter.fromJpa(it) }
-    }
+class PotDaoExposed : PotDao {
+    override fun findAll(): List<Pot> =
+        PotTable.selectAll()
+            .map { PotConverter.fromJpa(it) }
 
     override fun findById(id: Long): Pot =
         Pot(code = "1")
@@ -23,8 +19,9 @@ class PotDaoJpa(private val repository: PotRepository) : PotDao {
 //        )
 
     override fun findByCode(code: String): Pot? {
-        val pot: JpaPot? = repository.findOneByCode(code)
-        return if (pot == null) null else JpaPotConverter.fromJpa(pot)
+        return null
+//        val pot: JpaPot? = repository.findOneByCode(code)
+//        return if (pot == null) null else JpaPotConverter.fromJpa(pot)
     }
 
     //    @Transactional

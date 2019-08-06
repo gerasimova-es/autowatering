@@ -1,11 +1,11 @@
 package com.home.autowatering.repository
 
-import com.home.autowatering.model.database.JpaPot
-import com.home.autowatering.model.database.JpaPotState
+import com.home.autowatering.model.database.PotStateTable
+import com.home.autowatering.model.database.PotTable
 
 //@Repository
 interface PotStateRepository
 //    : JpaRepository<JpaPotState, Long>
 {
-    fun findFirstByPotOrderByDateDesc(pot: JpaPot): JpaPotState?
+    fun findFirstByPotOrderByDateDesc(pot: PotTable): PotStateTable?
 }

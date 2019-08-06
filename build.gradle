@@ -53,6 +53,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion" // Required for Kotlin integration
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1"
+    compile "org.jetbrains.exposed:exposed:0.10.4"
 
     //sqlite
     compile('org.xerial:sqlite-jdbc:3.25.2')
@@ -69,6 +70,7 @@ dependencies {
     testCompile(group: 'junit', name: 'junit', version: '4.12')
     testCompile(group: 'com.nhaarman.mockitokotlin2', name: 'mockito-kotlin', version: '2.0.0')
     testCompile("org.assertj:assertj-core:3.11.1")
+    testCompile("com.jayway.restassured:rest-assured:2.4.0")
 
     testImplementation("io.vertx:vertx-junit5:$vertxVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterEngineVersion")

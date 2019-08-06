@@ -1,6 +1,6 @@
 package com.home.autowatering.model.database.converter
 
-open class JpaConverter<J, E>(
+open class Converter<J, E>(
     private val fromJpa: (jpa: J) -> E,
     private val fromEntity: (entity: E) -> J
 ) {

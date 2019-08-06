@@ -1,9 +1,38 @@
 package com.home.autowatering.integration
 
-import org.junit.Ignore
+import com.jayway.restassured.RestAssured.basePath
+import com.jayway.restassured.RestAssured.given
+import com.jayway.restassured.RestAssured.port
+import com.jayway.restassured.RestAssured.reset
+import com.jayway.restassured.http.ContentType
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
 
-@Ignore
 class PotControllerIntegrationTest {
+
+    @Before
+    fun init() {
+        basePath = "http://localhost"
+        port = Integer.getInteger("http.port", 8080)
+    }
+
+    @After
+    fun cleanUp() {
+        reset()
+    }
+
+    @Test
+    fun list() {
+        given()
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+            .`when`()
+            .get(EndPoints.POT_LIST.path)
+            .then()
+            .assertThat()
+            .statusCode(200)
+    }
 
 //    @Autowired
 //    lateinit var restTemplate: TestRestTemplate
