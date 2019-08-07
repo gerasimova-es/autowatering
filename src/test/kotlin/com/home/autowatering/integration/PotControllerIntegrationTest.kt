@@ -1,37 +1,38 @@
 package com.home.autowatering.integration
 
-import com.jayway.restassured.RestAssured.basePath
-import com.jayway.restassured.RestAssured.given
-import com.jayway.restassured.RestAssured.port
-import com.jayway.restassured.RestAssured.reset
-import com.jayway.restassured.http.ContentType
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import com.home.autowatering.Application
+import io.vertx.core.Vertx
+import io.vertx.junit5.VertxExtension
+import io.vertx.junit5.VertxTestContext
+import io.vertx.reactivex.ext.web.client.WebClient
+import io.vertx.reactivex.ext.web.codec.BodyCodec
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+
+@ExtendWith(VertxExtension::class)
 class PotControllerIntegrationTest {
-
-    @Before
-    fun init() {
-        basePath = "http://localhost"
-        port = Integer.getInteger("http.port", 8080)
-    }
-
-    @After
-    fun cleanUp() {
-        reset()
+    @BeforeEach
+    fun deploy_verticle(vertx: Vertx, testContext: VertxTestContext) {
+        vertx.deployVerticle(Application(), testContext.completing())
     }
 
     @Test
-    fun list() {
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .`when`()
-            .get(EndPoints.POT_LIST.path)
-            .then()
-            .assertThat()
-            .statusCode(200)
+    fun list(vertx: io.vertx.reactivex.core.Vertx, testContext: VertxTestContext) {
+        val client = WebClient.create(vertx)
+
+        client.get(8080, "localhost", EndPoints.POT_LIST.path)
+            .`as`(BodyCodec.jsonObject())
+            .send(testContext.succeeding { response ->
+                testContext.verify {
+                    assertThat(response.body()).isNotNull
+                    testContext.completeNow()
+                    println("!!!!!!!!")
+                }
+            })
+
     }
 
 //    @Autowired

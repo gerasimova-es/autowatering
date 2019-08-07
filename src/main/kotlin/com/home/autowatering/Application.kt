@@ -32,7 +32,7 @@ class Application(
         with(Future.future<Void>()) {
             //assign server
             server.requestHandler(router)
-                .listen(8080) { res ->
+                .listen(config().getInteger("http.port", 8080)) { res ->
                     if (res.succeeded()) {
                         println("Created a server on port 8080")
                     } else {
@@ -42,5 +42,7 @@ class Application(
                 }
             return this
         }
+
     }
+
 }

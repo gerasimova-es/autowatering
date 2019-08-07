@@ -4,7 +4,7 @@ import com.home.autowatering.controller.dto.response.Response
 import java.util.stream.Collectors
 
 /**
- * JpaConverter between DTO and Entities
+ * Converter between DTO and Entities
  */
 open class RequestConverter<D, E>(
     private val fromDto: (dto: D) -> E,
