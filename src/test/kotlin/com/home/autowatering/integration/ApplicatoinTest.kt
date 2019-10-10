@@ -18,7 +18,7 @@ class ApplicatoinTest {
             .requestHandler { req -> req.response().end() }
             .listen(16969, testContext.completing())
 
-        assertThat(testContext.awaitCompletion(5, TimeUnit.SECONDS)).isTrue()
+        assertThat(testContext.awaitCompletion(5, TimeUnit.SECONDS)).isTrue
         if (testContext.failed()) {
             throw testContext.causeOfFailure()
         }

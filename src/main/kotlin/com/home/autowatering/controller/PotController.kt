@@ -25,17 +25,15 @@ class PotController(
 ) : AbstractController() {
 
     //    @GetMapping("/list")
-    fun list(): Response<List<PotDto>> =
-        with(potService.findAll()
+    fun list(): Response<List<PotDto>> {
+        val found = potService.findAll()
             .map { pot ->
                 pot.apply {
                     this.humidity = potStateService.last(this)?.humidity
                 }
             }
-        ) {
-            PotConverter.response(this)
-        }
-
+        return PotConverter.response(found)
+    }
 
     //    @GetMapping("/info")
     fun info(
@@ -53,12 +51,14 @@ class PotController(
 //    @RequestBody
         request: PotDto
     ): Response<PotDto> {
-        val saved = potService.find(PotFilter(id = request.id, code = request.code)).singleOrNull()
-        var pot = if (saved == null) PotConverter.fromDto(request)
+        val saved = potService.find(PotFilter(id = request.id, code = request.code))
+            .singleOrNull()
+        val pot = if (saved == null) PotConverter.fromDto(request)
         else potService.merge(PotConverter.fromDto(request), saved)
-        pot = potService.save(pot)
-        wateringSystemService.refresh(pot)
-        return PotConverter.response(pot)
+        return with(potService.save(pot)) {
+            wateringSystemService.refresh(pot)
+            PotConverter.response(pot)
+        }
     }
 
     //    @GetMapping("/statistic/{pot}")
@@ -88,7 +88,7 @@ class PotController(
 //    @RequestBody
         request: PotStateDto
     ): Response<PotStateDto> {
-        var state = PotStateConverter.fromDto(request)
+        val state = PotStateConverter.fromDto(request)
         return PotStateConverter.response(
             potStateService.save(state)
         )

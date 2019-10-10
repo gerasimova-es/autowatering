@@ -14,6 +14,7 @@ class WateringSystemRest : WateringSystemDao {
     var url: String? = null
 
     override fun refresh(pot: Pot) {
+
 //        RestTemplate().exchange(
 //            url + REFRESH_SERVICE,
 //            HttpMethod.POST,

@@ -7,9 +7,8 @@ import io.vertx.core.json.Json
 import io.vertx.ext.web.Router
 
 //https://www.mednikov.net/case-studies/an-easy-introduction-to-microservices-with-vertx-and-java/
-class Application(
-    private val potController: PotController = PotController()
-) : AbstractVerticle() {
+class Application : AbstractVerticle() {
+    private lateinit var potController: PotController
 
     override fun start(future: Future<Void>) {
         super.start(future)
@@ -21,12 +20,13 @@ class Application(
         val server = vertx.createHttpServer()
         val router = Router.router(vertx)
 
+        potController = PotController()
+
         router.route("/pot/list").handler { context ->
-            val response = potController.list()
             context.response()
                 .putHeader("content-type", "application/json")
                 .setStatusCode(200)
-                .end(Json.encodePrettily(response))
+                .end(Json.encodePrettily(potController.list()))
         }
 
         with(Future.future<Void>()) {
