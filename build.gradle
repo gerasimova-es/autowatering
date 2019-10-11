@@ -75,6 +75,7 @@ dependencies {
     testImplementation("io.vertx:vertx-junit5:$vertxVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterEngineVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterEngineVersion")
+    testCompile group: 'io.vertx', name: 'vertx-unit', version: '3.0.0'
 
     //if it is running on java 11
     compile('javax.xml.bind:jaxb-api:2.3.0')

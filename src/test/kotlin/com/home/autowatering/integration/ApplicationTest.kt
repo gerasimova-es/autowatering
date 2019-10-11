@@ -9,7 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import java.util.concurrent.TimeUnit
 
 @ExtendWith(VertxExtension::class)
-class ApplicatoinTest {
+class ApplicationTest {
     @Test
     fun startHttpServer() {
         val testContext = VertxTestContext()
@@ -18,7 +18,7 @@ class ApplicatoinTest {
             .requestHandler { req -> req.response().end() }
             .listen(16969, testContext.completing())
 
-        assertThat(testContext.awaitCompletion(5, TimeUnit.SECONDS)).isTrue
+        assertThat(testContext.awaitCompletion(5, TimeUnit.SECONDS)).isTrue()
         if (testContext.failed()) {
             throw testContext.causeOfFailure()
         }

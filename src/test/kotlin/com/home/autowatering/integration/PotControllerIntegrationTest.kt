@@ -15,7 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 @ExtendWith(VertxExtension::class)
 class PotControllerIntegrationTest {
     @BeforeEach
-    fun deploy_verticle(vertx: Vertx, testContext: VertxTestContext) {
+    fun deployVerticle(vertx: Vertx, testContext: VertxTestContext) {
         vertx.deployVerticle(Application(), testContext.completing())
     }
 
