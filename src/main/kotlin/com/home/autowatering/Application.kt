@@ -1,48 +1,97 @@
 package com.home.autowatering
 
+import com.home.autowatering.config.Config
+import com.home.autowatering.config.DatabaseConnector
+import com.home.autowatering.config.EndPoints
 import com.home.autowatering.controller.PotController
+import com.home.autowatering.dao.jpa.PotDaoExposed
+import com.home.autowatering.dao.jpa.PotStateDaoJpa
+import com.home.autowatering.dao.rest.WateringSystemRest
+import com.home.autowatering.exception.ConfigLoadException
+import com.home.autowatering.exception.ConfigNotFoundException
+import com.home.autowatering.service.impl.PotServiceImpl
+import com.home.autowatering.service.impl.PotStateServiceImpl
+import com.home.autowatering.service.impl.WateringSystemServiceImpl
+import io.vertx.config.ConfigRetriever
+import io.vertx.config.ConfigRetrieverOptions
+import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
 import io.vertx.core.json.Json
+import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-//https://www.mednikov.net/case-studies/an-easy-introduction-to-microservices-with-vertx-and-java/
+
 class Application : AbstractVerticle() {
-    private lateinit var potController: PotController
+    companion object {
+        val LOGGER: Logger = LoggerFactory.getLogger(Application::class.java)
+    }
 
     override fun start(future: Future<Void>) {
         super.start(future)
-        val initSteps = initServer()
-        initSteps.setHandler(future)
-    }
+        ConfigRetriever.create(
+            vertx, ConfigRetrieverOptions()
+                .addStore(
+                    ConfigStoreOptions()
+                        .setType("file")
+                        .setFormat("json")
+                        .setConfig(
+                            JsonObject().put(
+                                "path",
+                                "C:\\work\\repo\\autowatering\\src\\main\\resources\\config\\application.json"
+                            )
+                        )
+                )
+        ).getConfig { initial ->
+            if (initial.failed()) {
+                throw ConfigLoadException(initial.cause().message)
+            }
+            val config = initial.result()?.mapTo(Config::class.java)
+                ?: throw ConfigNotFoundException()
 
-    private fun initServer(): Future<Void> {
-        val server = vertx.createHttpServer()
-        val router = Router.router(vertx)
 
-        potController = PotController()
+            LOGGER.info("loaded properties = $config")
 
-        router.route("/pot/list").handler { context ->
-            context.response()
-                .putHeader("content-type", "application/json")
-                .setStatusCode(200)
-                .end(Json.encodePrettily(potController.list()))
-        }
+            //todo async
+            DatabaseConnector(
+                config.jdbc ?: throw ConfigNotFoundException("jdbc")
+            ).connect()
 
-        with(Future.future<Void>()) {
+
+            val potController = PotController(
+                potService = PotServiceImpl(
+                    potDao = PotDaoExposed()
+                ),
+                potStateService = PotStateServiceImpl(
+                    stateDao = PotStateDaoJpa()
+                ),
+                wateringSystemService = WateringSystemServiceImpl(
+                    wateringSystemDao = WateringSystemRest()
+                )
+            )
+
+            val server = vertx.createHttpServer()
+            val router = Router.router(vertx)
+
+            router.route(EndPoints.POT_LIST.path).handler { context ->
+                context.response()
+                    .putHeader("content-type", EndPoints.POT_LIST.content)
+                    .setStatusCode(200)
+                    .end(Json.encodePrettily(potController.list()))
+            }
+
             //assign server
             server.requestHandler(router)
                 .listen(config().getInteger("http.port", 8080)) { res ->
                     if (res.succeeded()) {
-                        println("Created a server on port 8080")
+                        LOGGER.info("Created a server on port 8080")
                     } else {
-                        println("Unable to create server: \n" + res.cause().localizedMessage)
-                        this.fail(res.cause())
+                        LOGGER.error("Unable to create server: \n" + res.cause().localizedMessage)
+                        future.fail(res.cause())
                     }
                 }
-            return this
         }
-
     }
-
 }

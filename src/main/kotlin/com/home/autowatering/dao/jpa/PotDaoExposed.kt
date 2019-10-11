@@ -5,11 +5,25 @@ import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.database.PotTable
 import com.home.autowatering.model.database.converter.PotConverter
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class PotDaoExposed : PotDao {
+    companion object {
+        val LOGGER: Logger = LoggerFactory.getLogger(PotDaoExposed::class.java)
+    }
+
     override fun findAll(): List<Pot> =
-        PotTable.selectAll()
-            .map { PotConverter.fromJpa(it) }
+        try {
+            transaction {
+                PotTable.selectAll()
+                    .map { PotConverter.fromJpa(it) }
+            }
+        } catch (exc: Exception) {
+            LOGGER.error("error ", exc)
+            throw exc
+        }
 
     override fun findById(id: Long): Pot =
         Pot(code = "1")

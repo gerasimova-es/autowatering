@@ -8,9 +8,6 @@ import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.model.business.filter.PotStateFilter
-import com.home.autowatering.service.impl.PotServiceImpl
-import com.home.autowatering.service.impl.PotStateServiceImpl
-import com.home.autowatering.service.impl.WateringSystemServiceImpl
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
 import com.home.autowatering.service.interfaces.WateringSystemService
@@ -19,9 +16,9 @@ import java.util.*
 //@RestController
 //@RequestMapping("/pot")
 class PotController(
-    private val potService: PotService = PotServiceImpl(),
-    private val potStateService: PotStateService = PotStateServiceImpl(),
-    private val wateringSystemService: WateringSystemService = WateringSystemServiceImpl()
+    private val potService: PotService,
+    private val potStateService: PotStateService,
+    private val wateringSystemService: WateringSystemService
 ) : AbstractController() {
 
     //    @GetMapping("/list")

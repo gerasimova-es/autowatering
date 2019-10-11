@@ -1,12 +1,16 @@
 package com.home.autowatering.integration
 
 import com.home.autowatering.Application
+import com.home.autowatering.config.EndPoints
+import com.opentable.db.postgres.embedded.LiquibasePreparer
+import com.opentable.db.postgres.junit.EmbeddedPostgresRules
 import io.vertx.core.Vertx
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
 import io.vertx.reactivex.ext.web.client.WebClient
 import io.vertx.reactivex.ext.web.codec.BodyCodec
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Rule
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -14,6 +18,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(VertxExtension::class)
 class PotControllerIntegrationTest {
+    @Rule
+    var db = EmbeddedPostgresRules.preparedDatabase(
+        LiquibasePreparer.forClasspathLocation("db/liquibase/changelog.json")
+    )
+
     @BeforeEach
     fun deployVerticle(vertx: Vertx, testContext: VertxTestContext) {
         vertx.deployVerticle(Application(), testContext.completing())
@@ -29,7 +38,6 @@ class PotControllerIntegrationTest {
                 testContext.verify {
                     assertThat(response.body()).isNotNull
                     testContext.completeNow()
-                    println("!!!!!!!!")
                 }
             })
 

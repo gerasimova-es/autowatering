@@ -56,12 +56,13 @@ dependencies {
     compile "org.jetbrains.exposed:exposed:0.10.4"
 
     //sqlite
-    compile('org.xerial:sqlite-jdbc:3.25.2')
-    compile('com.zsoltfabok:sqlite-dialect:1.0')
+//    compile('org.xerial:sqlite-jdbc:3.25.2')
+//    compile('com.zsoltfabok:sqlite-dialect:1.0')
 
     //postgres
     runtime('org.postgresql:postgresql:42.2.2')
-    compile('ru.yandex.qatools.embed:postgresql-embedded:2.9')
+    compile group: 'com.opentable.components', name: 'otj-pg-embedded', version: '0.13.2'
+//    compile('com.opentable.components:otj-pg-embedded:2.9')
 
     //h2
     compile('com.h2database:h2:1.0.60')
@@ -77,6 +78,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterEngineVersion")
     testCompile group: 'io.vertx', name: 'vertx-unit', version: '3.0.0'
 
+
     //if it is running on java 11
     compile('javax.xml.bind:jaxb-api:2.3.0')
     compile('javax.activation:activation:1.1')
@@ -86,9 +88,14 @@ dependencies {
     compile "io.vertx:vertx-core:$vertxVersion"
     compile "io.vertx:vertx-lang-kotlin:$vertxVersion"
     compile "io.vertx:vertx-web:$vertxVersion"
+    compile "io.vertx:vertx-web-client:$vertxVersion"
+    compile "io.vertx:vertx-config:$vertxVersion"
+    compile "io.vertx:vertx-jdbc-client:$vertxVersion"
 
     //other
     compile('commons-lang:commons-lang:2.6')
+//    compile group: 'org.yaml', name: 'snakeyaml', version: '1.25'
+    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.8.0'
 }
 
 compileKotlin {
