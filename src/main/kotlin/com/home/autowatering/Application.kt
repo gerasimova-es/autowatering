@@ -40,6 +40,7 @@ class Application : AbstractVerticle() {
                         .setConfig(
                             JsonObject().put(
                                 "path",
+                                //todo classpath
                                 "C:\\work\\repo\\autowatering\\src\\main\\resources\\config\\application.json"
                             )
                         )
@@ -56,7 +57,7 @@ class Application : AbstractVerticle() {
 
             //todo async
             DatabaseConnector(
-                config.jdbc ?: throw ConfigNotFoundException("jdbc")
+                config.database?.jdbc ?: throw ConfigNotFoundException("jdbc")
             ).connect()
 
 

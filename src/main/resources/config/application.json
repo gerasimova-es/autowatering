@@ -1,8 +1,14 @@
 {
-  "jdbc": {
-    "driver": "org.postgresql.Driver",
-    "url": "jdbc:postgresql://localhost:8081/postgres",
-    "user": "postgres",
-    "password": "postgres"
+  "board": {
+    "url": "http://192.168.1.33:80"
+  },
+  "database": {
+    "fill": true,
+    "jdbc": {
+      "driver": "org.postgresql.Driver",
+      "url": "jdbc:postgresql://localhost:8081/postgres",
+      "user": "postgres",
+      "password": "postgres"
+    }
   }
 }
