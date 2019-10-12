@@ -1,30 +1,43 @@
 {
-  "changeSet": {
-    "id": "initialize",
-    "author": "ekaterina",
-    "changes": [
-      {
-        "sqlFile": {
-          "dbms": "postgresql",
-          "encoding": "utf8",
-          "endDelimiter": "\\nGO",
-          "path": "db/liquibase/create-database.sql",
-          "relativeToChangelogFile": true,
-          "splitStatements": true,
-          "stripComments": true
+  "databaseChangeLog": [
+    {
+      "preConditions": [
+        {
+          "runningAs": {
+            "username": "postgres"
+          }
         }
-      },
-      {
-        "sqlFile": {
-          "dbms": "postgresql",
-          "encoding": "utf8",
-          "endDelimiter": "\\nGO",
-          "path": "db/liquibase/fill-database.sql",
-          "relativeToChangelogFile": true,
-          "splitStatements": true,
-          "stripComments": true
-        }
+      ]
+    },
+    {
+      "changeSet": {
+        "id": "initialize",
+        "author": "ekaterina",
+        "changes": [
+          {
+            "sqlFile": {
+              "dbms": "postgresql",
+              "encoding": "utf8",
+              "endDelimiter": "\\nGO",
+              "path": "create-database.sql",
+              "relativeToChangelogFile": true,
+              "splitStatements": true,
+              "stripComments": true
+            }
+          },
+          {
+            "sqlFile": {
+              "dbms": "postgresql",
+              "encoding": "utf8",
+              "endDelimiter": "\\nGO",
+              "path": "fill-database.sql",
+              "relativeToChangelogFile": true,
+              "splitStatements": true,
+              "stripComments": true
+            }
+          }
+        ]
       }
-    ]
-  }
+    }
+  ]
 }

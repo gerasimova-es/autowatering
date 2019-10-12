@@ -12,15 +12,15 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 
 class PotServiceImplTest {
     private lateinit var potDao: PotDao
     private lateinit var service: PotService
 
-    @Before
+    @BeforeEach
     fun init() {
         potDao = mock()
         service = PotServiceImpl(potDao)

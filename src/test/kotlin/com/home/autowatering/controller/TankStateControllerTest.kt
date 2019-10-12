@@ -10,16 +10,16 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Assert.fail
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.fail
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.util.*
 
 class TankStateControllerTest {
     private lateinit var service: TankStateService
     private lateinit var controller: TankStateController
 
-    @Before
+    @BeforeEach
     fun init() {
         service = mock()
         controller = TankStateController(service)
@@ -32,7 +32,7 @@ class TankStateControllerTest {
             controller.save(
                 TankStateDto(name = "", date = Date(), volume = 0.0, filled = 0.0)
             )
-            fail("expected IllegalArgumentException")
+            fail<String>("expected IllegalArgumentException")
         } catch (ignored: IllegalArgumentException) {
             verify(service, times(1)).save(any())
         }

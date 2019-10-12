@@ -17,9 +17,9 @@ import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Assert.fail
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 import java.util.*
 
 class PotControllerTest {
@@ -28,7 +28,7 @@ class PotControllerTest {
     private lateinit var wateringSystemService: WateringSystemService
     private lateinit var controller: PotController
 
-    @Before
+    @BeforeEach
     fun init() {
         potService = mock()
         potStateService = mock()

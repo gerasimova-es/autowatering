@@ -1,4 +1,4 @@
-package com.home.autowatering.dao.jpa
+package com.home.autowatering.dao.exposed
 
 import com.home.autowatering.dao.interfaces.PotDao
 import com.home.autowatering.model.business.Pot
@@ -32,11 +32,11 @@ class PotDaoExposed : PotDao {
 //            .orElseThrow { PotNotFoundException(id) }
 //        )
 
-    override fun findByCode(code: String): Pot? {
-        return null
+    override fun findByCode(code: String): Pot? =
+        Pot(code = "1")
 //        val pot: JpaPot? = repository.findOneByCode(code)
 //        return if (pot == null) null else JpaPotConverter.fromJpa(pot)
-    }
+
 
     //    @Transactional
     override fun save(pot: Pot): Pot {

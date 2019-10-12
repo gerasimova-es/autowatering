@@ -1,31 +1,25 @@
 package com.home.autowatering.integration
 
-import com.home.autowatering.Application
 import com.home.autowatering.config.EndPoints
-import com.opentable.db.postgres.embedded.LiquibasePreparer
-import com.opentable.db.postgres.junit.EmbeddedPostgresRules
-import io.vertx.core.Vertx
-import io.vertx.junit5.VertxExtension
+import com.home.autowatering.controller.dto.PotDto
+import com.home.autowatering.controller.dto.response.Response
 import io.vertx.junit5.VertxTestContext
 import io.vertx.reactivex.ext.web.client.WebClient
 import io.vertx.reactivex.ext.web.codec.BodyCodec
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Rule
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 
 
-@ExtendWith(VertxExtension::class)
-class PotControllerIntegrationTest {
-    @Rule
-    var db = EmbeddedPostgresRules.preparedDatabase(
-        LiquibasePreparer.forClasspathLocation("db/liquibase/changelog.json")
-    )
+class PotControllerIntegrationTest : BaseIntegrationTest() {
 
-    @BeforeEach
-    fun deployVerticle(vertx: Vertx, testContext: VertxTestContext) {
-        vertx.deployVerticle(Application(), testContext.completing())
+    private val potListType = with(mapper) {
+        typeFactory.constructParametricType(
+            Response::class.java,
+            typeFactory.constructCollectionType(
+                List::class.java,
+                PotDto::class.java
+            )
+        )
     }
 
     @Test
@@ -36,7 +30,16 @@ class PotControllerIntegrationTest {
             .`as`(BodyCodec.jsonObject())
             .send(testContext.succeeding { response ->
                 testContext.verify {
-                    assertThat(response.body()).isNotNull
+                    val result = mapper.readValue<Response<List<PotDto>>>(response.body().encode(), potListType)
+                    assertThat(result.payload).hasSize(1)
+                    assertThat(result.payload).hasOnlyOneElementSatisfying { element ->
+                        assertThat(element.id).isNotNull()
+                        assertThat(element.code).isEqualTo("AUTHORIUM")
+                        assertThat(element.name).isEqualTo("Ауториум")
+                        assertThat(element.minHumidity).isEqualTo(200)
+                        assertThat(element.checkInterval).isEqualTo(60)
+                        assertThat(element.wateringDuration).isEqualTo(2)
+                    }
                     testContext.completeNow()
                 }
             })

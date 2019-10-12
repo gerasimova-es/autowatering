@@ -4,7 +4,7 @@ import com.home.autowatering.config.Config
 import com.home.autowatering.config.DatabaseConnector
 import com.home.autowatering.config.EndPoints
 import com.home.autowatering.controller.PotController
-import com.home.autowatering.dao.jpa.PotDaoExposed
+import com.home.autowatering.dao.exposed.PotDaoExposed
 import com.home.autowatering.dao.jpa.PotStateDaoJpa
 import com.home.autowatering.dao.rest.WateringSystemRest
 import com.home.autowatering.exception.ConfigLoadException

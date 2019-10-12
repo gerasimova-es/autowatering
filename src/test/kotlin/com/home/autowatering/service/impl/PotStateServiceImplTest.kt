@@ -12,16 +12,16 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Assert.fail
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.util.*
 
 class PotStateServiceImplTest {
     private lateinit var potStateDao: PotStateDao
     private lateinit var service: PotStateService
 
-    @Before
+    @BeforeEach
     fun init() {
         potStateDao = mock()
         service = PotStateServiceImpl(potStateDao)
@@ -32,7 +32,7 @@ class PotStateServiceImplTest {
         whenever(potStateDao.find(any())).thenThrow(IllegalArgumentException("test"))
         try {
             service.find(PotStateFilter(Pot(code = "pot")))
-            fail("expected IllegalArgumentException")
+            Assertions.fail<String>("expected IllegalArgumentException")
         } catch (ignored: IllegalArgumentException) {
             verify(potStateDao, times(1)).find(any())
             verifyNoMoreInteractions(potStateDao)

@@ -1,6 +1,7 @@
 package com.home.autowatering.integration
 
-import org.junit.Ignore
+import jdk.nashorn.internal.ir.annotations.Ignore
+
 
 @Ignore
 class TankStateControllerIntegrationTest {
