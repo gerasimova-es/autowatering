@@ -1,7 +1,6 @@
 package com.home.autowatering
 
 import com.home.autowatering.config.Config
-import com.home.autowatering.config.DatabaseConfig
 import com.home.autowatering.config.EndPoint
 import com.home.autowatering.controller.PotController
 import com.home.autowatering.dao.exposed.PotDaoExposed
@@ -38,27 +37,32 @@ class Application : AbstractVerticle() {
 
     override fun start() {
         val steps = getConfigAsFuture(configurer(vertx))
-            .compose { config -> prepareDatabase(config.convert<Config>().database!!) }
-            .compose { startHttpServer(vertx) }
+            .compose { json ->
+                val config = json.convert<Config>()
+                prepareDatabase(config)
+            }.compose { config ->
+                startHttpServer(vertx, config)
+            }
         steps.result()
     }
 
-    private fun prepareDatabase(config: DatabaseConfig): Future<Any> =
-        future<Any> { feature ->
+    private fun prepareDatabase(config: Config): Future<Config> =
+        future<Config> { feature ->
             try {
-                val datasource = datasource(config)
+                val datasource = datasource(config.database!!)
                 val connection = Database.connect(datasource)
-                if (config.fill) {
+                if (config.database!!.fill) {
                     Database.fill(connection)
                 }
+                feature.complete(config)
             } catch (exc: Exception) {
                 LOGGER.error("database error: {}", exc.message)
                 feature.fail(exc.cause)
             }
         }
 
-    private fun startHttpServer(vertx: Vertx): Future<Any> =
-        future<Any> { feature ->
+    private fun startHttpServer(vertx: Vertx, config: Config): Future<Void> =
+        future<Void> { feature ->
             val server = vertx.createHttpServer()
             val router = Router.router(vertx)
 
@@ -70,6 +74,7 @@ class Application : AbstractVerticle() {
                 router.routeTo(EndPoint.POT_LIST) { list() }
                     .routeTo(EndPoint.POT_INFO) { context -> info(context.get("code")) }
                     .routeTo(EndPoint.POT_SAVE) { context -> save(context.bodyAsJson.convert()) }
+                    .routeTo(EndPoint.POT_STATE_SAVE) { context -> saveState(context.bodyAsJson.convert()) }
                     .routeTo(EndPoint.POT_STATISTIC) { context ->
                         statistic(
                             context.request().getParam("potCode"),
@@ -77,13 +82,12 @@ class Application : AbstractVerticle() {
                             context.request().getParam("dateTo").toISODate()
                         )
                     }
-                    .routeTo(EndPoint.POT_STATE_SAVE) { context -> saveState(context.bodyAsJson.convert()) }
             }
 
             server.requestHandler(router)
-                .listen(8080) { result ->
+                .listen(config.port!!) { result ->
                     if (result.succeeded()) {
-                        LOGGER.info("Created a server on port ${8080}")
+                        LOGGER.info("Created a server on port ${config.port!!}")
                     } else {
                         LOGGER.error("Unable to create server: \n" + result.cause().message)
                         feature.fail(result.cause())
