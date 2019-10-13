@@ -2,7 +2,7 @@ package com.home.autowatering.controller.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonInclude
-import java.util.*
+import java.time.ZonedDateTime
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class PotStateDto(
@@ -12,7 +12,7 @@ data class PotStateDto(
         shape = JsonFormat.Shape.STRING,
         pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
     )
-    val date: Date = Date(),
+    val date: ZonedDateTime = ZonedDateTime.now(),
     val humidity: Int = 0,
     val watering: Boolean? = false
 )

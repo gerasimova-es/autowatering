@@ -20,6 +20,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
+import java.time.ZonedDateTime
 import java.util.*
 
 class PotControllerTest {
@@ -137,7 +138,7 @@ class PotControllerTest {
         val potState = PotState(
             id = 1,
             pot = pot,
-            date = Date(),
+            date = ZonedDateTime.now(),
             humidity = 400,
             watering = true
         )
@@ -244,7 +245,7 @@ class PotControllerTest {
     fun findStateNotExistedPot() {
         whenever(potService.find(any())).thenReturn(arrayListOf())
         try {
-            controller.states("pot", Date(), Date())
+            controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
             fail("expected PotNotFoundException")
         } catch (ignored: PotNotFoundException) {
             verify(potService, times(1)).find(any())
@@ -265,7 +266,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenThrow(IllegalArgumentException("test"))
         try {
-            controller.states("pot", Date(), Date())
+            controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
             fail("expected IllegalArgumentException")
         } catch (ignored: IllegalArgumentException) {
             verify(potStateService, times(1)).find(any())
@@ -285,7 +286,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenReturn(arrayListOf())
 
-        val response = controller.states("pot", Date(), Date())
+        val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
 
         verify(potService, times(1)).find(any())
         verifyNoMoreInteractions(potService)
@@ -296,7 +297,7 @@ class PotControllerTest {
 
     @Test
     fun foundOneStateRecord() {
-        val dateFrom = Date()
+        val dateFrom = ZonedDateTime.now()
         val state = PotState(
             id = 1,
             pot = Pot(code = "pot"),
@@ -314,7 +315,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenReturn(arrayListOf(state))
 
-        val response = controller.states("pot", dateFrom, Date())
+        val response = controller.statistic("pot", dateFrom, ZonedDateTime.now())
 
         assertThat(response).isNotNull
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
@@ -338,13 +339,13 @@ class PotControllerTest {
         val state1 = PotState(
             id = 1L,
             pot = Pot(code = "pot"),
-            date = Date(),
+            date = ZonedDateTime.now(),
             humidity = 1
         )
         val state2 = PotState(
             id = 2L,
             pot = Pot(code = "pot"),
-            date = Date(),
+            date = ZonedDateTime.now(),
             humidity = 2
         )
         whenever(potService.find(any())).thenReturn(
@@ -358,7 +359,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenReturn(arrayListOf(state1, state2))
 
-        val response = controller.states("pot", Date(), Date())
+        val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
 
         assertThat(response).isNotNull
         assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
@@ -381,7 +382,7 @@ class PotControllerTest {
             val response = controller.saveState(
                 PotStateDto(
                     potCode = "pot",
-                    date = Date(),
+                    date = ZonedDateTime.now(),
                     humidity = 10,
                     watering = false
                 )
@@ -398,7 +399,7 @@ class PotControllerTest {
         val state = PotState(
             id = 1L,
             pot = Pot(code = "pot"),
-            date = Date(),
+            date = ZonedDateTime.now(),
             humidity = 1,
             watering = false
         )
@@ -407,7 +408,7 @@ class PotControllerTest {
         val response = controller.saveState(
             PotStateDto(
                 potCode = "pot",
-                date = Date(),
+                date = ZonedDateTime.now(),
                 humidity = 10,
                 watering = false
             )

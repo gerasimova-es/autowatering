@@ -1,11 +1,11 @@
 package com.home.autowatering.model.business.filter
 
 import com.home.autowatering.model.business.Pot
-import java.util.*
+import java.time.ZonedDateTime
 
 data class PotStateFilter(
     var pot: Pot,
-    var from: Date? = null,
-    var to: Date? = null,
+    var from: ZonedDateTime? = null,
+    var to: ZonedDateTime? = null,
     var limit: Int? = null
 )

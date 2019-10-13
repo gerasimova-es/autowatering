@@ -1,9 +1,10 @@
 package com.home.autowatering.integration
 
-import com.home.autowatering.config.EndPoints
+import com.home.autowatering.config.EndPoint
 import com.home.autowatering.controller.dto.PotDto
 import com.home.autowatering.controller.dto.response.Response
 import io.vertx.junit5.VertxTestContext
+import io.vertx.reactivex.core.Vertx
 import io.vertx.reactivex.ext.web.client.WebClient
 import io.vertx.reactivex.ext.web.codec.BodyCodec
 import org.assertj.core.api.Assertions.assertThat
@@ -23,10 +24,10 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
     }
 
     @Test
-    fun list(vertx: io.vertx.reactivex.core.Vertx, testContext: VertxTestContext) {
+    fun list(vertx: Vertx, testContext: VertxTestContext) {
         val client = WebClient.create(vertx)
 
-        client.get(8080, "localhost", EndPoints.POT_LIST.path)
+        client.get(8080, "localhost", EndPoint.POT_LIST.path)
             .`as`(BodyCodec.jsonObject())
             .send(testContext.succeeding { response ->
                 testContext.verify {

@@ -1,9 +1,6 @@
 package com.home.autowatering.integration
 
-import jdk.nashorn.internal.ir.annotations.Ignore
 
-
-@Ignore
 class TankStateControllerIntegrationTest {
 
 //    lateinit var restTemplate: TestRestTemplate

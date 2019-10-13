@@ -4,7 +4,7 @@ import com.home.autowatering.dao.interfaces.PotStateDao
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
 import com.home.autowatering.model.business.filter.PotStateFilter
-import java.sql.Date
+import java.time.ZonedDateTime
 
 
 //@Repository
@@ -93,7 +93,7 @@ class PotStateDaoJpa(
     }
 
     override fun save(state: PotState): PotState {
-        return PotState(pot = Pot(code = "1"), date = Date(1L), humidity = 1)
+        return PotState(pot = Pot(code = "1"), date = ZonedDateTime.now(), humidity = 1)
 //        try {
 //            val jpaPot = potRepository.findOneByCode(state.pot.code)
 //                ?: throw PotNotFoundException("pot not found by code = ${state.pot.code}")

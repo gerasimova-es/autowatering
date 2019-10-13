@@ -3,5 +3,5 @@ package com.home.autowatering.service.interfaces
 import com.home.autowatering.model.business.Pot
 
 interface WateringSystemService {
-    fun refresh(pot: Pot)
+    fun refresh(pot: Pot, timeout: Long = 5000)
 }

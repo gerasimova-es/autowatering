@@ -11,7 +11,7 @@ import com.home.autowatering.model.business.filter.PotStateFilter
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
 import com.home.autowatering.service.interfaces.WateringSystemService
-import java.util.*
+import java.time.ZonedDateTime
 
 //@RestController
 //@RequestMapping("/pot")
@@ -59,19 +59,19 @@ class PotController(
     }
 
     //    @GetMapping("/statistic/{pot}")
-    fun states(
+    fun statistic(
 //        @PathVariable(value = "pot")
         potCode: String,
 //        @RequestParam(
 //            value = "dateFrom",
 //            required = false
 //        ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-        dateFrom: Date?,
+        dateFrom: ZonedDateTime?,
 //        @RequestParam(
 //            value = "dateTo",
 //            required = false
 //        ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-        dateTo: Date?
+        dateTo: ZonedDateTime?
     ): Response<List<PotStateDto>> {
         val pot = potService.find(PotFilter(code = potCode))
             .singleOrNull() ?: throw PotNotFoundException(potCode)

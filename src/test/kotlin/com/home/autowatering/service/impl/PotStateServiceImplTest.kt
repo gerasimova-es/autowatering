@@ -15,7 +15,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
+import java.time.ZonedDateTime
 
 class PotStateServiceImplTest {
     private lateinit var potStateDao: PotStateDao
@@ -45,7 +45,7 @@ class PotStateServiceImplTest {
             PotState(
                 id = 1,
                 pot = Pot(code = "pot"),
-                date = Date(),
+                date = ZonedDateTime.now(),
                 humidity = 1
             )
         )
