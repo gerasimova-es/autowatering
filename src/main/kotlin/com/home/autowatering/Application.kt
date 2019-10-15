@@ -15,12 +15,10 @@ import com.home.autowatering.util.convert
 import com.home.autowatering.util.toISODate
 import io.vertx.config.ConfigRetriever
 import io.vertx.config.ConfigRetriever.create
-import io.vertx.config.ConfigRetriever.getConfigAsFuture
 import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
-import io.vertx.core.Future.future
 import io.vertx.core.Vertx
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
@@ -35,65 +33,61 @@ class Application : AbstractVerticle() {
         val LOGGER: Logger = LoggerFactory.getLogger(Application::class.java)
     }
 
-    override fun start() {
-        val steps = getConfigAsFuture(configurer(vertx))
-            .compose { json ->
-                val config = json.convert<Config>()
-                prepareDatabase(config)
-            }.compose { config ->
-                startHttpServer(vertx, config)
+    override fun start(future: Future<Void>) {
+        configurer(vertx).getConfig { json ->
+            val config = json.result().convert<Config>().apply {
+                LOGGER.info("config = $this")
             }
-        steps.result()
+            vertx.executeBlocking<Any>({ blocking ->
+                prepareDatabase(config)
+                blocking.complete()
+            }, {
+                startHttpServer(vertx, future, config)
+            })
+        }
     }
 
-    private fun prepareDatabase(config: Config): Future<Config> =
-        future<Config> { feature ->
-            try {
-                val datasource = datasource(config.database!!)
-                val connection = Database.connect(datasource)
-                if (config.database!!.fill) {
-                    Database.fill(connection)
-                }
-                feature.complete(config)
-            } catch (exc: Exception) {
-                LOGGER.error("database error: {}", exc.message)
-                feature.fail(exc.cause)
-            }
+    private fun prepareDatabase(config: Config) {
+        val datasource = datasource(config.database!!)
+        val connection = Database.connect(datasource)
+        if (config.database!!.fill) {
+            Database.fill(connection)
         }
+    }
 
-    private fun startHttpServer(vertx: Vertx, config: Config): Future<Void> =
-        future<Void> { feature ->
-            val server = vertx.createHttpServer()
-            val router = Router.router(vertx)
+    private fun startHttpServer(vertx: Vertx, future: Future<*>, config: Config) {
+        val server = vertx.createHttpServer()
+        val router = Router.router(vertx)
 
-            PotController(
-                PotServiceImpl(PotDaoExposed()),
-                PotStateServiceImpl(PotStateDaoJpa()),
-                WateringSystemServiceImpl(WateringSystemRest())
-            ).apply {
-                router.routeTo(EndPoint.POT_LIST) { list() }
-                    .routeTo(EndPoint.POT_INFO) { context -> info(context.get("code")) }
-                    .routeTo(EndPoint.POT_SAVE) { context -> save(context.bodyAsJson.convert()) }
-                    .routeTo(EndPoint.POT_STATE_SAVE) { context -> saveState(context.bodyAsJson.convert()) }
-                    .routeTo(EndPoint.POT_STATISTIC) { context ->
-                        statistic(
-                            context.request().getParam("potCode"),
-                            context.request().getParam("dateFrom").toISODate(),
-                            context.request().getParam("dateTo").toISODate()
-                        )
-                    }
-            }
-
-            server.requestHandler(router)
-                .listen(config.port!!) { result ->
-                    if (result.succeeded()) {
-                        LOGGER.info("Created a server on port ${config.port!!}")
-                    } else {
-                        LOGGER.error("Unable to create server: \n" + result.cause().message)
-                        feature.fail(result.cause())
-                    }
+        PotController(
+            PotServiceImpl(PotDaoExposed()),
+            PotStateServiceImpl(PotStateDaoJpa()),
+            WateringSystemServiceImpl(WateringSystemRest())
+        ).apply {
+            router.routeTo(EndPoint.POT_LIST) { list() }
+                .routeTo(EndPoint.POT_INFO) { context -> info(context.get("code")) }
+                .routeTo(EndPoint.POT_SAVE) { context -> save(context.bodyAsJson.convert()) }
+                .routeTo(EndPoint.POT_STATE_SAVE) { context -> saveState(context.bodyAsJson.convert()) }
+                .routeTo(EndPoint.POT_STATISTIC) { context ->
+                    statistic(
+                        context.request().getParam("potCode"),
+                        context.request().getParam("dateFrom").toISODate(),
+                        context.request().getParam("dateTo").toISODate()
+                    )
                 }
         }
+
+        server.requestHandler(router)
+            .listen(config.port!!) { result ->
+                if (result.succeeded()) {
+                    LOGGER.info("Created a server on port ${config.port!!}")
+                    future.complete()
+                } else {
+                    LOGGER.error("Unable to create server: \n" + result.cause().message)
+                    future.fail(result.cause())
+                }
+            }
+    }
 }
 
 fun configurer(vertx: Vertx): ConfigRetriever =
@@ -107,7 +101,7 @@ fun configurer(vertx: Vertx): ConfigRetriever =
                         JsonObject().put(
                             "path",
                             //todo classpath
-                            "C:\\work\\repo\\autowatering\\src\\main\\resources\\config\\application.json"
+                            "C:\\work\\repo\\autowatering\\src\\main\\resources\\config\\config.json"
                         )
                     )
             )

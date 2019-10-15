@@ -3,12 +3,14 @@ package com.home.autowatering.integration
 import com.home.autowatering.config.EndPoint
 import com.home.autowatering.controller.dto.PotDto
 import com.home.autowatering.controller.dto.response.Response
+import io.vertx.junit5.Timeout
 import io.vertx.junit5.VertxTestContext
 import io.vertx.reactivex.core.Vertx
 import io.vertx.reactivex.ext.web.client.WebClient
 import io.vertx.reactivex.ext.web.codec.BodyCodec
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.util.concurrent.TimeUnit
 
 
 class PotControllerIntegrationTest : BaseIntegrationTest() {
@@ -24,6 +26,7 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
     }
 
     @Test
+    @Timeout(value = 120, timeUnit = TimeUnit.SECONDS)
     fun list(vertx: Vertx, testContext: VertxTestContext) {
         val client = WebClient.create(vertx)
 
@@ -44,7 +47,6 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
                     testContext.completeNow()
                 }
             })
-
     }
 
 //    @Autowired
@@ -61,16 +63,16 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
 //            wateringDuration = 2
 //        )
 //
-//        val savedAutorium = restTemplate.exchange(
+//        val savedAuthorium = restTemplate.exchange(
 //            "/pot/save",
 //            HttpMethod.POST,
 //            HttpEntity(dto),
 //            object : ParameterizedTypeReference<Response<PotDto>>() {})
 //
-//        assertThat(savedAutorium).isNotNull
-//        assertThat(savedAutorium.statusCode).isSameAs(HttpStatus.OK)
-//        assertThat(savedAutorium.body).isNotNull
-//        assertThat(savedAutorium.body?.status).isSameAs(ResponseStatus.ERROR)
+//        assertThat(savedAuthorium).isNotNull
+//        assertThat(savedAuthorium.statusCode).isSameAs(HttpStatus.OK)
+//        assertThat(savedAuthorium.body).isNotNull
+//        assertThat(savedAuthorium.body?.status).isSameAs(ResponseStatus.ERROR)
 //    }
 //
 //    @Test

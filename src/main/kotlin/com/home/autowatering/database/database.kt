@@ -38,9 +38,10 @@ fun datasource(config: DatabaseConfig): () -> DataSource {
             {
                 EmbeddedPostgres.builder()
                     .setPort(8081) //todo port to tunes
+                    .setLocaleConfig("locale", "en-us")
+                    .setLocaleConfig("encoding", "UTF-8")
                     .start()
                     .getDatabase(source.user, "postgres")
-
             }
         }
         DatabaseMode.REMOTE -> {
