@@ -1,9 +1,11 @@
 package com.home.autowatering.dao.exposed
 
 import com.home.autowatering.dao.interfaces.PotDao
+import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.database.PotTable
 import com.home.autowatering.model.database.converter.PotConverter
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.Logger
@@ -13,30 +15,27 @@ class PotDaoExposed : PotDao {
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(PotDaoExposed::class.java)
     }
-
     override fun findAll(): List<Pot> =
-        try {
-            transaction {
-                PotTable.selectAll()
-                    .map { PotConverter.fromJpa(it) }
-            }
-        } catch (exc: Exception) {
-            LOGGER.error("error ", exc)
-            throw exc
+        transaction {
+            PotTable.selectAll()
+                .map { PotConverter.fromJpa(it) }
         }
 
     override fun findById(id: Long): Pot =
-        Pot(code = "1")
-//        JpaPotConverter.fromJpa(
-//            repository.findById(id)
-//            .orElseThrow { PotNotFoundException(id) }
-//        )
+        transaction {
+            PotTable.select {
+                PotTable.id eq id
+            }.singleOrNull()
+        }?.let { PotConverter.fromJpa(it) }
+            ?: throw PotNotFoundException(id)
+
 
     override fun findByCode(code: String): Pot? =
-        Pot(code = "1")
-//        val pot: JpaPot? = repository.findOneByCode(code)
-//        return if (pot == null) null else JpaPotConverter.fromJpa(pot)
-
+        transaction {
+            PotTable.select {
+                PotTable.code eq code
+            }.singleOrNull()
+        }?.let { PotConverter.fromJpa(it) }
 
     //    @Transactional
     override fun save(pot: Pot): Pot {

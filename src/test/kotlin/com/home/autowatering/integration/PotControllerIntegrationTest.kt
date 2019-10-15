@@ -24,6 +24,12 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
             )
         )
     }
+    private val potType = with(mapper) {
+        typeFactory.constructParametricType(
+            Response::class.java,
+            PotDto::class.java
+        )
+    }
 
     @Test
     @Timeout(value = 120, timeUnit = TimeUnit.SECONDS)
@@ -44,6 +50,26 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
                         assertThat(element.checkInterval).isEqualTo(60)
                         assertThat(element.wateringDuration).isEqualTo(2)
                     }
+                    testContext.completeNow()
+                }
+            })
+    }
+
+    @Test
+    @Timeout(value = 120, timeUnit = TimeUnit.SECONDS)
+    fun info(vertx: Vertx, testContext: VertxTestContext) {
+        val client = WebClient.create(vertx)
+
+        client.get(8080, "localhost", "${EndPoint.POT_INFO.path}?code=AUTHORIUM")
+            .`as`(BodyCodec.jsonObject())
+            .send(testContext.succeeding { response ->
+                testContext.verify {
+                    val result = mapper.readValue<Response<PotDto>>(response.body().encode(), potType)
+                    assertThat(result.payload?.code).isEqualTo("AUTHORIUM")
+                    assertThat(result.payload?.name).isEqualTo("Ауториум")
+                    assertThat(result.payload?.minHumidity).isEqualTo(200)
+                    assertThat(result.payload?.checkInterval).isEqualTo(60)
+                    assertThat(result.payload?.wateringDuration).isEqualTo(2)
                     testContext.completeNow()
                 }
             })

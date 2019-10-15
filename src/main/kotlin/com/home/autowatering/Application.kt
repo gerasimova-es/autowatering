@@ -65,7 +65,7 @@ class Application : AbstractVerticle() {
             WateringSystemServiceImpl(WateringSystemRest())
         ).apply {
             router.routeTo(EndPoint.POT_LIST) { list() }
-                .routeTo(EndPoint.POT_INFO) { context -> info(context.get("code")) }
+                .routeTo(EndPoint.POT_INFO) { context -> info(context.request().getParam("code")) }
                 .routeTo(EndPoint.POT_SAVE) { context -> save(context.bodyAsJson.convert()) }
                 .routeTo(EndPoint.POT_STATE_SAVE) { context -> saveState(context.bodyAsJson.convert()) }
                 .routeTo(EndPoint.POT_STATISTIC) { context ->
