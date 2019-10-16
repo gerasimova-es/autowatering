@@ -23,20 +23,20 @@ object PotConverter : Converter<ResultRow, Pot>(
     },
     {
         //todo
-        ResultRow(1, emptyMap())
-//        PotTable(
-//            id = it.id,
-//            code = it.code,
-//            name = it.name,
-//            minHumidity = it.minHumidity,
-//            checkInterval = it.checkInterval,
-//            wateringDuration = it.wateringDuration
-//        )
+        ResultRow(1,
+            mapOf(
+                PotTable.id to it.id,
+                PotTable.code to it.code,
+                PotTable.name to it.name,
+                PotTable.minHumidity to it.minHumidity,
+                PotTable.checkInterval to it.checkInterval,
+                PotTable.wateringDuration to it.wateringDuration
+            )
     }
 
 ) {
 
-    fun map(source: Pot, target: PotTable): PotTable =
+    fun map(source: Pot, target: ResultRow): ResultRow =
         //todo
         PotTable
 //        target.also {

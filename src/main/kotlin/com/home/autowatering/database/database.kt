@@ -9,6 +9,9 @@ import liquibase.Liquibase
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.ClassLoaderResourceAccessor
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.statements.InsertStatement
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import java.sql.Connection
 import javax.sql.DataSource
 
@@ -56,6 +59,28 @@ fun datasource(config: DatabaseConfig): () -> DataSource {
             }
         }
     }
+}
+
+fun <T : Table> T.save(
+    data: ResultRow,
+    vararg duplicated: Column<*> = arrayOf(this.columns.first { it.columnType.isAutoInc })
+) =
+    InsertOrUpdate<Number>(this, duplicated = *duplicated)
+        .apply {
+            
+            execute(TransactionManager.current())
+        }
+
+class InsertOrUpdate<K : Any>(
+    table: Table,
+    private vararg val duplicated: Column<*>
+) : InsertStatement<K>(table) {
+    override fun prepareSQL(transaction: Transaction): String =
+        with(TransactionManager.current()) {
+            val updateSetter = table.columns.joinToString { "${identity(it)} = EXCLUDED.${identity(it)}" }
+            val onConflict = "ON CONFLICT (${duplicated.joinToString { identity(it) }}) DO UPDATE SET $updateSetter"
+            "${super.prepareSQL(transaction)} $onConflict"
+        }
 }
 
 

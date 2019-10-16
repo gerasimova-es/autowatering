@@ -1,20 +1,20 @@
 package com.home.autowatering.model.database.converter
 
 open class Converter<J, E>(
-    private val fromJpa: (jpa: J) -> E,
-    private val fromEntity: (entity: E) -> J
+    private val fromDB: (jpa: J) -> E,
+    private val toDB: (entity: E) -> J
 ) {
-    fun fromJpa(jpa: J): E =
-        fromJpa.invoke(jpa)
+    fun fromDB(jpa: J): E =
+        fromDB.invoke(jpa)
 
 
-    fun fromEntity(entity: E): J =
-        fromEntity.invoke(entity)
+    fun fromPojo(pojo: E): J =
+        toDB.invoke(pojo)
 
-    fun fromJpas(jpas: Collection<J>): List<E> =
-        jpas.map { fromJpa(it) }
+    fun fromPojos(jpas: Collection<J>): List<E> =
+        jpas.map { fromDB(it) }
 
-    fun fromEntities(entities: Collection<E>): List<J> =
-        entities.map { fromEntity(it) }
+    fun fromDBs(entities: Collection<E>): List<J> =
+        entities.map { fromPojo(it) }
 
 }
