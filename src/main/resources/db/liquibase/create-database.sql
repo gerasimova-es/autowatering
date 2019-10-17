@@ -1,15 +1,9 @@
-drop table if exists hibernate_sequence;
 drop table if exists pot;
 drop table if exists pot_state;
 drop table if exists tank_state;
 
-create table hibernate_sequence (next_val bigint);
-insert into hibernate_sequence values (1);
-insert into hibernate_sequence values (1);
-insert into hibernate_sequence values (1);
-
 create table pot (
-        id bigint not null,
+        id serial,
         code varchar(255) not null,
         name varchar(255) not null,
         min_humidity integer not null,
@@ -18,14 +12,14 @@ create table pot (
         primary key (id)
 );
 create table pot_state (
-       id bigint not null,
+       id serial,
         date date not null,
         humidity decimal not null,
         pot_id bigint not null,
         primary key (id)
 );
 create table tank_state (
-       id bigint not null,
+       id serial,
         date date not null,
         filled decimal not null,
         code varchar(255) not null,

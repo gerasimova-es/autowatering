@@ -1,14 +1,15 @@
 package com.home.autowatering.dao.exposed
 
 import com.home.autowatering.dao.interfaces.PotDao
-import com.home.autowatering.database.save
 import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.database.PotTable
 import com.home.autowatering.model.database.converter.PotConverter
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 
 class PotDaoExposed : PotDao {
 
@@ -40,14 +41,25 @@ class PotDaoExposed : PotDao {
                     .single()
             }
             if (found == null) {
-                PotTable.save(
-                    PotConverter.fromPojo(pot)
-                )
+                val id = PotTable.insert {
+                    it[code] = pot.code
+                    it[name] = pot.name!!
+                    it[minHumidity] = pot.minHumidity!!
+                    it[checkInterval] = pot.checkInterval!!
+                    it[wateringDuration] = pot.wateringDuration!!
+                }
+                pot.id = id.generatedKey?.toLong()
             } else {
-                PotTable.save(
-                    PotConverter.map(pot, found)
-                )
+                PotTable.update({ PotTable.id eq pot.id!! }) {
+                    it[code] = pot.code
+                    it[name] = pot.name!!
+                    it[minHumidity] = pot.minHumidity!!
+                    it[checkInterval] = pot.checkInterval!!
+                    it[wateringDuration] = pot.wateringDuration!!
+                }
             }
         }
+        //todo return converted from DB pot
+        return pot
     }
 }

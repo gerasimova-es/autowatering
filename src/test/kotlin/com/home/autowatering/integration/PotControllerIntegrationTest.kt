@@ -9,11 +9,12 @@ import io.vertx.reactivex.core.Vertx
 import io.vertx.reactivex.ext.web.client.WebClient
 import io.vertx.reactivex.ext.web.codec.BodyCodec
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import java.util.concurrent.TimeUnit
 
-
 class PotControllerIntegrationTest : BaseIntegrationTest() {
+    private val port = 8080
 
     private val potListType = with(mapper) {
         typeFactory.constructParametricType(
@@ -36,7 +37,7 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
     fun list(vertx: Vertx, testContext: VertxTestContext) {
         val client = WebClient.create(vertx)
 
-        client.get(8080, "localhost", EndPoint.POT_LIST.path)
+        client.get(port, "localhost", EndPoint.POT_LIST.path)
             .`as`(BodyCodec.jsonObject())
             .send(testContext.succeeding { response ->
                 testContext.verify {
@@ -60,7 +61,7 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
     fun info(vertx: Vertx, testContext: VertxTestContext) {
         val client = WebClient.create(vertx)
 
-        client.get(8080, "localhost", "${EndPoint.POT_INFO.path}?code=AUTHORIUM")
+        client.get(port, "localhost", "${EndPoint.POT_INFO.path}?code=AUTHORIUM")
             .`as`(BodyCodec.jsonObject())
             .send(testContext.succeeding { response ->
                 testContext.verify {
@@ -69,6 +70,35 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
                     assertThat(result.payload?.name).isEqualTo("Ауториум")
                     assertThat(result.payload?.minHumidity).isEqualTo(200)
                     assertThat(result.payload?.checkInterval).isEqualTo(60)
+                    assertThat(result.payload?.wateringDuration).isEqualTo(2)
+                    testContext.completeNow()
+                }
+            })
+    }
+
+    @Test
+    @Timeout(value = 120, timeUnit = TimeUnit.SECONDS)
+    fun saveNewPot(vertx: Vertx, testContext: VertxTestContext) {
+        val dto = PotDto(
+            code = "TEST",
+            name = "test",
+            minHumidity = 400,
+            checkInterval = 10,
+            wateringDuration = 2
+        )
+
+        val client = WebClient.create(vertx)
+
+        client.post(port, "localhost", EndPoint.POT_SAVE.path)
+            .`as`(BodyCodec.jsonObject())
+            .sendJson(dto, testContext.succeeding { response ->
+                testContext.verify {
+                    val result = mapper.readValue<Response<PotDto>>(response.body().encode(), potType)
+                    assertNotNull(result.payload?.id)
+                    assertThat(result.payload?.code).isEqualTo("TEST")
+                    assertThat(result.payload?.name).isEqualTo("test")
+                    assertThat(result.payload?.minHumidity).isEqualTo(400)
+                    assertThat(result.payload?.checkInterval).isEqualTo(10)
                     assertThat(result.payload?.wateringDuration).isEqualTo(2)
                     testContext.completeNow()
                 }

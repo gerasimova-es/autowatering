@@ -66,7 +66,9 @@ class Application : AbstractVerticle() {
         ).apply {
             router.routeTo(EndPoint.POT_LIST) { list() }
                 .routeTo(EndPoint.POT_INFO) { context -> info(context.request().getParam("code")) }
-                .routeTo(EndPoint.POT_SAVE) { context -> save(context.bodyAsJson.convert()) }
+                .routeTo(EndPoint.POT_SAVE) { context ->
+                    context.request().bodyHandler { body -> save(body.toJsonObject().convert()) }
+                }
                 .routeTo(EndPoint.POT_STATE_SAVE) { context -> saveState(context.bodyAsJson.convert()) }
                 .routeTo(EndPoint.POT_STATISTIC) { context ->
                     statistic(
@@ -111,7 +113,8 @@ fun Router.routeTo(
     endpoint: EndPoint,
     handler: (RoutingContext) -> Any
 ): Router {
-    route(endpoint.path).handler { context ->
+    route(endpoint.method, endpoint.path).handler { context ->
+        Application.LOGGER.info("request body = ${context.body}")
         context.response()
             .putHeader("content-type", endpoint.content)
             .setStatusCode(200)

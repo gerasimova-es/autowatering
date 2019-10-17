@@ -15,6 +15,7 @@ import java.time.ZonedDateTime
 
 //@RestController
 //@RequestMapping("/pot")
+//todo request validation
 class PotController(
     private val potService: PotService,
     private val potStateService: PotStateService,

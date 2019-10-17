@@ -9,7 +9,7 @@ object PotConverter : RequestConverter<PotDto, Pot>(
     {
         Pot(
             id = it.id,
-            code = it.code,
+            code = it.code!!,
             name = it.name,
             minHumidity = it.minHumidity,
             checkInterval = it.checkInterval,

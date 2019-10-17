@@ -67,7 +67,7 @@ fun <T : Table> T.save(
 ) =
     InsertOrUpdate<Number>(this, duplicated = *duplicated)
         .apply {
-            
+
             execute(TransactionManager.current())
         }
 
