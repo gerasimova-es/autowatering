@@ -1,7 +1,8 @@
 {
   "port": 8080,
   "board": {
-    "url": "http://192.168.1.33:80",
+    //"url": "http://192.168.1.33:80",
+    "url": "https://548a6e6d-5594-4197-8651-def2d2abc792.mock.pstmn.io",
     "timeout": 5
   },
   "database": {

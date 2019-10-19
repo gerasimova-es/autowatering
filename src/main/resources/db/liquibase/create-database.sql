@@ -11,20 +11,23 @@ create table pot (
         watering_duration integer not null,
         primary key (id)
 );
+
 create table pot_state (
-       id serial,
+        id serial,
         date date not null,
         humidity decimal not null,
         pot_id bigint not null,
         primary key (id)
 );
+
 create table tank_state (
-       id serial,
+        id serial,
         date date not null,
         filled decimal not null,
         code varchar(255) not null,
         volume decimal not null,
         primary key (id)
 );
+
 create index POT_STATE_DATE on pot_state(date, pot_id);
 create index TANK_STATE_DATE on tank_state(date);

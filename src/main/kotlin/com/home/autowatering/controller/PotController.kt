@@ -11,53 +11,52 @@ import com.home.autowatering.model.business.filter.PotStateFilter
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
 import com.home.autowatering.service.interfaces.WateringSystemService
+import org.apache.commons.lang.Validate
 import java.time.ZonedDateTime
 
-//@RestController
-//@RequestMapping("/pot")
-//todo request validation
 class PotController(
     private val potService: PotService,
     private val potStateService: PotStateService,
     private val wateringSystemService: WateringSystemService
 ) : AbstractController() {
 
-    //    @GetMapping("/list")
-    fun list(): Response<List<PotDto>> {
-        val found = potService.findAll()
-            .map { pot ->
-                pot.apply {
-                    this.humidity = potStateService.last(this)?.humidity
+    fun list(): Response<List<PotDto>> =
+        execute {
+            val found = potService.findAll()
+                .map { pot ->
+                    pot.apply {
+                        humidity = potStateService.last(this)?.humidity
+                    }
                 }
-            }
-        return PotConverter.response(found)
-    }
-
-    //    @GetMapping("/info")
-    fun info(
-//    @RequestParam(value = "code")
-        potCode: String
-    ): Response<PotDto> {
-        val pot = potService.find(PotFilter(code = potCode))
-            .singleOrNull() ?: throw PotNotFoundException(potCode)
-        val state = potStateService.last(pot)
-        return PotConverter.response(pot, state)
-    }
-
-    //    @PostMapping("/save")
-    fun save(
-//    @RequestBody
-        request: PotDto
-    ): Response<PotDto> {
-        val saved = potService.find(PotFilter(id = request.id, code = request.code))
-            .singleOrNull()
-        val pot = if (saved == null) PotConverter.fromDto(request)
-        else potService.merge(PotConverter.fromDto(request), saved)
-        return with(potService.save(pot)) {
-            wateringSystemService.refresh(pot)
-            PotConverter.response(pot)
+            PotConverter.response(found)
         }
-    }
+
+    fun info(potCode: String): Response<PotDto> =
+        execute {
+            val pot = potService.find(PotFilter(code = potCode))
+                .singleOrNull() ?: throw PotNotFoundException(potCode)
+            val state = potStateService.last(pot)
+            PotConverter.response(pot, state)
+        }
+
+    fun save(request: PotDto): Response<PotDto> =
+        execute {
+            Validate.noNullElements(
+                arrayOf(
+                    request.code, request.name, request.wateringDuration,
+                    request.checkInterval, request.minHumidity
+                )
+            )
+            val saved = potService.find(
+                PotFilter(id = request.id, code = request.code)
+            ).singleOrNull()
+            val pot = if (saved == null) PotConverter.fromDto(request)
+            else potService.merge(PotConverter.fromDto(request), saved)
+            with(potService.save(pot)) {
+                wateringSystemService.refresh(pot)
+                PotConverter.response(pot)
+            }
+        }
 
     //    @GetMapping("/statistic/{pot}")
     fun statistic(
@@ -85,11 +84,11 @@ class PotController(
     fun saveState(
 //    @RequestBody
         request: PotStateDto
-    ): Response<PotStateDto> {
-        val state = PotStateConverter.fromDto(request)
-        return PotStateConverter.response(
-            potStateService.save(state)
-        )
-    }
-
+    ): Response<PotStateDto> =
+        execute {
+            val state = PotStateConverter.fromDto(request)
+            PotStateConverter.response(
+                potStateService.save(state)
+            )
+        }
 }

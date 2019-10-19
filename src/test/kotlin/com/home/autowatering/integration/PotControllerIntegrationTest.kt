@@ -42,14 +42,22 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
             .send(testContext.succeeding { response ->
                 testContext.verify {
                     val result = mapper.readValue<Response<List<PotDto>>>(response.body().encode(), potListType)
-                    assertThat(result.payload).hasSize(1)
-                    assertThat(result.payload).hasOnlyOneElementSatisfying { element ->
-                        assertThat(element.id).isNotNull()
-                        assertThat(element.code).isEqualTo("AUTHORIUM")
-                        assertThat(element.name).isEqualTo("Ауториум")
-                        assertThat(element.minHumidity).isEqualTo(200)
-                        assertThat(element.checkInterval).isEqualTo(60)
-                        assertThat(element.wateringDuration).isEqualTo(2)
+                    assertThat(result.payload).hasSize(2)
+                    result.payload?.get(0).also { element ->
+                        assertThat(element?.id).isNotNull()
+                        assertThat(element?.code).isEqualTo("AUTHORIUM")
+                        assertThat(element?.name).isEqualTo("Ауториум")
+                        assertThat(element?.minHumidity).isEqualTo(200)
+                        assertThat(element?.checkInterval).isEqualTo(60)
+                        assertThat(element?.wateringDuration).isEqualTo(2)
+                    }
+                    result.payload?.get(1).also { element ->
+                        assertThat(element?.id).isNotNull()
+                        assertThat(element?.code).isEqualTo("ORCHID")
+                        assertThat(element?.name).isEqualTo("Орхидея")
+                        assertThat(element?.minHumidity).isEqualTo(250)
+                        assertThat(element?.checkInterval).isEqualTo(120)
+                        assertThat(element?.wateringDuration).isEqualTo(1)
                     }
                     testContext.completeNow()
                 }

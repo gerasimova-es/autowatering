@@ -10,12 +10,15 @@ abstract class AbstractController {
         val LOGGER: Logger = LoggerFactory.getLogger(AbstractController::class.java)
     }
 
-    //    @ExceptionHandler
-    protected fun <R> response(exc: Exception): Response<R> {
-        LOGGER.error("request executing error", exc)
-        return Response(
-            ResponseStatus.ERROR,
-            if (exc.message == null) exc.javaClass.name else exc.message!!
-        )
-    }
+    protected fun <R> execute(block: () -> Response<R>): Response<R> =
+        try {
+            block.invoke()
+        } catch (exc: Exception) {
+            LOGGER.error("request executing error", exc)
+            Response(
+                ResponseStatus.ERROR,
+                if (exc.message == null) exc.javaClass.name else exc.message!!
+            )
+        }
+
 }

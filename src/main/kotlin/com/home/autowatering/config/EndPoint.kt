@@ -4,12 +4,11 @@ import io.vertx.core.http.HttpMethod
 
 enum class EndPoint(
     val path: String,
-    val method: HttpMethod,
-    val content: String
+    val method: HttpMethod
 ) {
-    POT_LIST("/pot/list", HttpMethod.GET, "application/json"),
-    POT_INFO("/pot/info", HttpMethod.GET, "application/json"),
-    POT_SAVE("/pot/save", HttpMethod.POST, "application/json"),
-    POT_STATISTIC("/statistic/:pot/", HttpMethod.GET, "application/json"),
-    POT_STATE_SAVE("/state/save", HttpMethod.POST, "application/json")
+    POT_LIST("/pot/list", HttpMethod.GET),
+    POT_INFO("/pot/info", HttpMethod.GET),
+    POT_SAVE("/pot/save", HttpMethod.POST),
+    POT_STATISTIC("/statistic/:pot/", HttpMethod.GET),
+    POT_STATE_SAVE("/state/save", HttpMethod.POST)
 }
