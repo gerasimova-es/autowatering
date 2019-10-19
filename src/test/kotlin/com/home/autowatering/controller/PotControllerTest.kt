@@ -2,7 +2,7 @@ package com.home.autowatering.controller
 
 import com.home.autowatering.controller.dto.PotDto
 import com.home.autowatering.controller.dto.PotStateDto
-import com.home.autowatering.controller.dto.response.ResponseStatus
+import com.home.autowatering.controller.dto.response.StatusType
 import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
@@ -13,7 +13,6 @@ import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.fail
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -37,7 +36,7 @@ class PotControllerTest {
 
         val response = controller.list()
 
-        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.status).isEqualTo(StatusType.SUCCESS)
         assertThat(response.message).isEqualTo("message was handled successfully")
         assertThat(response.payload).isNotNull
         assertThat(response.payload).hasSize(0)
@@ -65,7 +64,7 @@ class PotControllerTest {
 
         val response = controller.list()
 
-        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.status).isEqualTo(StatusType.SUCCESS)
         assertThat(response.message).isEqualTo("message was handled successfully")
         assertThat(response.payload).isNotNull
         assertThat(response.payload).hasSize(2)
@@ -78,25 +77,19 @@ class PotControllerTest {
     @Test
     fun getNothing() {
         whenever(potService.find(any())).thenReturn(arrayListOf())
-        try {
-            val response = controller.info("pot")
-            fail("expected PotNotFoundException")
-        } catch (exc: PotNotFoundException) {
-            verify(potService, times(1)).find(any())
-            verifyNoMoreInteractions(potService)
-        }
+        val response = controller.info("pot")
+        assertThat(response.status).isEqualTo(StatusType.POT_NOT_FOUND)
+        verify(potService, times(1)).find(any())
+        verifyNoMoreInteractions(potService)
     }
 
     @Test
     fun getException() {
         whenever(potService.find(any())).thenThrow(IllegalArgumentException())
-        try {
-            val response = controller.info("pot")
-            fail("expected IllegalArgumentException")
-        } catch (exc: IllegalArgumentException) {
-            verify(potService, times(1)).find(any())
-            verifyNoMoreInteractions(potService)
-        }
+        val response = controller.info("pot")
+        assertThat(response.status).isEqualTo(StatusType.INTERNAL_ERROR)
+        verify(potService, times(1)).find(any())
+        verifyNoMoreInteractions(potService)
     }
 
     @Test
@@ -110,7 +103,7 @@ class PotControllerTest {
 
         val response = controller.info("pot")
 
-        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.status).isEqualTo(StatusType.SUCCESS)
         assertThat(response.message).isEqualTo("message was handled successfully")
         assertThat(response.payload).isNotNull
         assertThat(response.payload).isInstanceOf(PotDto::class.java)
@@ -142,7 +135,7 @@ class PotControllerTest {
 
         val response = controller.info("pot")
 
-        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.status).isEqualTo(StatusType.SUCCESS)
         assertThat(response.message).isEqualTo("message was handled successfully")
         assertThat(response.payload).isNotNull
         assertThat(response.payload).isInstanceOf(PotDto::class.java)
@@ -158,24 +151,30 @@ class PotControllerTest {
     }
 
 
-//    @Test
+    @Test
     fun savedNewPot() {
         val pot = PotDto(
             code = "pot",
-            name = "pot"
+            name = "pot",
+            wateringDuration = 1,
+            checkInterval = 1,
+            minHumidity = 100
         )
         whenever(potService.find(any())).thenReturn(arrayListOf())
         whenever(potService.save(any())).thenReturn(
             Pot(
                 id = 1,
                 code = "pot",
-                name = "desc"
+                name = "desc",
+                wateringDuration = 1,
+                checkInterval = 1,
+                minHumidity = 100
             )
         )
 
         val response = controller.save(pot)
 
-        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.status).isEqualTo(StatusType.SUCCESS)
         assertThat(response.message).isEqualTo("message was handled successfully")
         assertThat(response.payload).isNotNull
         assertThat(response.payload).isInstanceOf(PotDto::class.java)
@@ -188,7 +187,7 @@ class PotControllerTest {
         verifyNoMoreInteractions(potService)
     }
 
-//    @Test
+    @Test
     fun savedExistedPot() {
         whenever(potService.find(any())).thenReturn(
             arrayListOf(
@@ -217,11 +216,14 @@ class PotControllerTest {
         val response = controller.save(
             PotDto(
                 code = "pot",
-                name = "pot"
+                name = "pot",
+                minHumidity = 1,
+                checkInterval = 1,
+                wateringDuration = 1
             )
         )
 
-        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.status).isEqualTo(StatusType.SUCCESS)
         assertThat(response.message).isEqualTo("message was handled successfully")
         assertThat(response.payload).isNotNull
         assertThat(response.payload).isInstanceOf(PotDto::class.java)
@@ -238,14 +240,11 @@ class PotControllerTest {
     @Test
     fun findStateNotExistedPot() {
         whenever(potService.find(any())).thenReturn(arrayListOf())
-        try {
-            controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
-            fail("expected PotNotFoundException")
-        } catch (ignored: PotNotFoundException) {
-            verify(potService, times(1)).find(any())
-            verifyNoMoreInteractions(potService)
-            verifyZeroInteractions(potStateService)
-        }
+        val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
+        assertThat(response.status).isEqualTo(StatusType.POT_NOT_FOUND)
+        verify(potService, times(1)).find(any())
+        verifyNoMoreInteractions(potService)
+        verifyZeroInteractions(potStateService)
     }
 
     @Test
@@ -259,13 +258,10 @@ class PotControllerTest {
             )
         )
         whenever(potStateService.find(any())).thenThrow(IllegalArgumentException("test"))
-        try {
-            controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
-            fail("expected IllegalArgumentException")
-        } catch (ignored: IllegalArgumentException) {
-            verify(potStateService, times(1)).find(any())
-            verifyNoMoreInteractions(potStateService)
-        }
+        val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
+        assertThat(response.status).isEqualTo(StatusType.INTERNAL_ERROR)
+        verify(potStateService, times(1)).find(any())
+        verifyNoMoreInteractions(potStateService)
     }
 
     @Test
@@ -281,6 +277,8 @@ class PotControllerTest {
         whenever(potStateService.find(any())).thenReturn(arrayListOf())
 
         val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
+
+        assertThat(response.status).isEqualTo(StatusType.SUCCESS)
 
         verify(potService, times(1)).find(any())
         verifyNoMoreInteractions(potService)
@@ -312,7 +310,7 @@ class PotControllerTest {
         val response = controller.statistic("pot", dateFrom, ZonedDateTime.now())
 
         assertThat(response).isNotNull
-        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.status).isEqualTo(StatusType.SUCCESS)
         assertThat(response.message).isEqualTo("message was handled successfully")
         assertThat(response.payload).isNotNull
         assertThat(response.payload).isInstanceOf(ArrayList::class.java)
@@ -356,7 +354,7 @@ class PotControllerTest {
         val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
 
         assertThat(response).isNotNull
-        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.status).isEqualTo(StatusType.SUCCESS)
         assertThat(response.payload).isNotNull
         assertThat(response.payload).hasSize(2)
         assertThat(response.payload).hasOnlyElementsOfType(PotStateDto::class.java)
@@ -372,21 +370,23 @@ class PotControllerTest {
     @Test
     fun saveStateNotExistedPot() {
         whenever(potStateService.save(any())).thenThrow(PotNotFoundException(1))
-        try {
-            val response = controller.saveState(
-                PotStateDto(
-                    potCode = "pot",
-                    date = ZonedDateTime.now(),
-                    humidity = 10,
-                    watering = false
-                )
+
+        val response = controller.saveState(
+            PotStateDto(
+                potCode = "pot",
+                date = ZonedDateTime.now(),
+                humidity = 10,
+                watering = false
             )
-            fail("expected PotNotFoundException")
-        } catch (ignored: PotNotFoundException) {
-            verify(potStateService, times(1)).save(any())
-            verifyNoMoreInteractions(potStateService)
-        }
+        )
+        assertThat(response.status).isEqualTo(StatusType.POT_NOT_FOUND)
+        assertThat(response.message).isNotNull()
+        assertThat(response.payload).isNull()
+
+        verify(potStateService, times(1)).save(any())
+        verifyNoMoreInteractions(potStateService)
     }
+
 
     @Test
     fun saveState() {
@@ -409,7 +409,7 @@ class PotControllerTest {
         )
 
         assertThat(response).isNotNull
-        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.status).isEqualTo(StatusType.SUCCESS)
         assertThat(response.message).isEqualTo("message was handled successfully")
         assertThat(response.payload).isNotNull
         assertThat(response.payload?.id).isEqualTo(state.id)

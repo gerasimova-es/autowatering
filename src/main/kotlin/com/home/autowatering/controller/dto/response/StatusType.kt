@@ -1,6 +1,7 @@
 package com.home.autowatering.controller.dto.response
 
-enum class ResponseStatus {
+enum class StatusType {
     SUCCESS,
-    ERROR
+    POT_NOT_FOUND,
+    INTERNAL_ERROR
 }

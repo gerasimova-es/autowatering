@@ -55,7 +55,7 @@ class PotController(
             else potService.merge(PotConverter.fromDto(request), saved)
             with(potService.save(pot)) {
                 wateringSystemService.refresh(pot)
-                PotConverter.response(pot)
+                PotConverter.response(this)
             }
         }
 
@@ -69,9 +69,7 @@ class PotController(
             )
         }
 
-    //    @GetMapping("/statistic/{pot}")
     fun statistic(
-//        @PathVariable(value = "pot")
         potCode: String,
 //        @RequestParam(
 //            value = "dateFrom",
@@ -83,13 +81,13 @@ class PotController(
 //            required = false
 //        ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         dateTo: ZonedDateTime?
-    ): Response<List<PotStateDto>> {
-        val pot = potService.find(PotFilter(code = potCode))
-            .singleOrNull() ?: throw PotNotFoundException(potCode)
-        return PotStateConverter.response(
-            potStateService.find(PotStateFilter(pot, dateFrom, dateTo))
-        )
-    }
-
+    ): Response<List<PotStateDto>> =
+        execute {
+            val pot = potService.find(PotFilter(code = potCode))
+                .singleOrNull() ?: throw PotNotFoundException(potCode)
+            PotStateConverter.response(
+                potStateService.find(PotStateFilter(pot, dateFrom, dateTo))
+            )
+        }
 
 }

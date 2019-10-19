@@ -1,3 +1,7 @@
 package com.home.autowatering.exception
 
-class DatabaseNotStartedException : RuntimeException()
+import com.home.autowatering.controller.dto.response.StatusType
+
+class DatabaseNotStartedException : AutowateringException(
+    StatusType.INTERNAL_ERROR, "database not started"
+)

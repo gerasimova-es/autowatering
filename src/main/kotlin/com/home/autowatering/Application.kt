@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory
 
 
 class Application : AbstractVerticle() {
-    private var database: DatabaseConnector? = null
+    var database: DatabaseConnector? = null
 
     companion object {
         val LOGGER: Logger = LoggerFactory.getLogger(Application::class.java)
@@ -44,7 +44,7 @@ class Application : AbstractVerticle() {
         configurer(vertx).getConfig { json ->
             val config = json.result()
                 .convert<Config>()
-                .apply { LOGGER.info("config = $this") }
+                .also { LOGGER.info("config = $this") }
 
             vertx.executeBlocking<Any>({ blocking ->
                 prepareDatabase(config.database!!)
@@ -75,6 +75,7 @@ class Application : AbstractVerticle() {
     }
 
     private fun stopDatabase() {
+        //todo not stop correctly
         database?.close()
     }
 
@@ -97,7 +98,7 @@ class Application : AbstractVerticle() {
                 list().run { context.response(this) }
 
             }.routeTo(EndPoint.POT_INFO) { context ->
-                info(context.request().getParam("code"))
+                info(context.request().getParam("pot"))
                     .run { context.response(this) }
 
             }.routeTo(EndPoint.POT_SAVE) { context ->
@@ -113,7 +114,7 @@ class Application : AbstractVerticle() {
 
             }.routeTo(EndPoint.POT_STATISTIC) { context ->
                 statistic(
-                    context.request().getParam("potCode"),
+                    context.request().getParam("pot"),
                     context.request().getParam("dateFrom").ISODate(),
                     context.request().getParam("dateTo").ISODate()
                 ).run { context.response(this) }
@@ -154,7 +155,8 @@ fun Router.routeTo(
     endpoint: EndPoint,
     handler: (RoutingContext) -> Any
 ): Router {
-    route(endpoint.method, endpoint.path).handler { context -> handler.invoke(context) }
+    route(endpoint.method, endpoint.path)
+        .handler { context -> handler.invoke(context) }
     return this
 }
 

@@ -1,7 +1,7 @@
 package com.home.autowatering.controller
 
 import com.home.autowatering.controller.dto.TankStateDto
-import com.home.autowatering.controller.dto.response.ResponseStatus
+import com.home.autowatering.controller.dto.response.StatusType
 import com.home.autowatering.model.business.TankState
 import com.home.autowatering.service.interfaces.TankStateService
 import com.nhaarman.mockitokotlin2.any
@@ -48,7 +48,7 @@ class TankStateControllerTest {
         )
         assertThat(response).isNotNull
 
-        assertThat(response.status).isEqualTo(ResponseStatus.SUCCESS)
+        assertThat(response.status).isEqualTo(StatusType.SUCCESS)
         assertThat(response.payload?.name).isEqualTo(state.name)
         assertThat(response.payload?.date).isEqualTo(state.date)
         assertThat(response.payload?.volume).isEqualTo(state.volume)

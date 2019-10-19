@@ -9,6 +9,6 @@ enum class EndPoint(
     POT_LIST("/pot/list", HttpMethod.GET),
     POT_INFO("/pot/info", HttpMethod.GET),
     POT_SAVE("/pot/save", HttpMethod.POST),
-    POT_STATISTIC("/statistic/:pot/", HttpMethod.GET),
-    POT_STATE_SAVE("/state/save", HttpMethod.POST)
+    POT_STATISTIC("/pot/statistic/:pot", HttpMethod.GET),
+    POT_STATE_SAVE("/pot/state/save", HttpMethod.POST)
 }

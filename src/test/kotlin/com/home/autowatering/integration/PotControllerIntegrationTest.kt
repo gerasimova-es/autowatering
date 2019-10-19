@@ -4,7 +4,9 @@ import com.home.autowatering.config.EndPoint
 import com.home.autowatering.controller.dto.PotDto
 import com.home.autowatering.controller.dto.PotStateDto
 import com.home.autowatering.controller.dto.response.Response
-import com.home.autowatering.controller.dto.response.ResponseStatus
+import com.home.autowatering.controller.dto.response.StatusType
+import com.home.autowatering.util.mapper
+import com.home.autowatering.util.toJson
 import io.vertx.junit5.Timeout
 import io.vertx.junit5.VertxTestContext
 import io.vertx.reactivex.core.Vertx
@@ -45,7 +47,7 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
             .send(testContext.succeeding { response ->
                 testContext.verify {
                     val result = mapper.readValue<Response<List<PotDto>>>(response.body().encode(), potListType)
-                    assertThat(result.payload).hasSizeGreaterThan(2)
+                    assertThat(result.payload).hasSizeGreaterThanOrEqualTo(2)
                     result.payload?.get(0).also { element ->
                         assertThat(element?.id).isNotNull()
                         assertThat(element?.code).isEqualTo("AUTHORIUM")
@@ -102,7 +104,7 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
 
         client.post(port, "localhost", EndPoint.POT_SAVE.path)
             .`as`(BodyCodec.jsonObject())
-            .sendJson(dto, testContext.succeeding { response ->
+            .sendJsonObject(dto.toJson(), testContext.succeeding { response ->
                 testContext.verify {
                     val result = mapper.readValue<Response<PotDto>>(response.body().encode(), potType)
                     assertNotNull(result.payload?.id)
@@ -130,11 +132,46 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
 
         client.post(port, "localhost", EndPoint.POT_STATE_SAVE.path)
             .`as`(BodyCodec.jsonObject())
+            .sendJson(dto.toJson(), testContext.succeeding { response ->
+                testContext.verify {
+                    val result = mapper.readValue<Response<PotDto>>(response.body().encode(), potType)
+                    assertNotNull(result.payload?.id)
+                    assertThat(result.status).isSameAs(StatusType.SUCCESS)
+                    testContext.completeNow()
+                }
+            })
+    }
+
+    @Test
+    @Timeout(value = 120, timeUnit = TimeUnit.SECONDS)
+    fun getStatistic(vertx: Vertx, testContext: VertxTestContext) {
+        val dto = PotStateDto(
+            potCode = "AUTHORIUM",
+            humidity = 100,
+            watering = true,
+            date = ZonedDateTime.now()
+        )
+
+        val client = WebClient.create(vertx)
+
+        client.post(port, "localhost", EndPoint.POT_STATE_SAVE.path)
+            .`as`(BodyCodec.jsonObject())
             .sendJson(dto, testContext.succeeding { response ->
                 testContext.verify {
                     val result = mapper.readValue<Response<PotDto>>(response.body().encode(), potType)
                     assertNotNull(result.payload?.id)
-                    assertThat(result.status).isSameAs(ResponseStatus.SUCCESS)
+                    assertThat(result.status).isSameAs(StatusType.SUCCESS)
+                    testContext.completeNow()
+                }
+            })
+
+        client.get(port, "localhost", "/pot/statistic/AUTHORIUM?dateFrom=&dateTo=")
+            .`as`(BodyCodec.jsonObject())
+            .sendJson(dto, testContext.succeeding { response ->
+                testContext.verify {
+                    val result = mapper.readValue<Response<PotDto>>(response.body().encode(), potType)
+                    assertNotNull(result.payload?.id)
+                    assertThat(result.status).isSameAs(StatusType.SUCCESS)
                     testContext.completeNow()
                 }
             })

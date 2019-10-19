@@ -1,3 +1,7 @@
 package com.home.autowatering.exception
 
-class DatabaseAlreadyStartedException : RuntimeException()
+import com.home.autowatering.controller.dto.response.StatusType
+
+class DatabaseAlreadyStartedException : AutowateringException(
+    StatusType.INTERNAL_ERROR, "database already started"
+)

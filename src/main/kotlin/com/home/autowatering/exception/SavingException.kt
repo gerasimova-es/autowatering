@@ -1,3 +1,6 @@
 package com.home.autowatering.exception
 
-class SavingException(cause: Throwable) : RuntimeException(cause)
+import com.home.autowatering.controller.dto.response.StatusType
+
+class SavingException(cause: Throwable) :
+    AutowateringException(StatusType.INTERNAL_ERROR, cause.message)

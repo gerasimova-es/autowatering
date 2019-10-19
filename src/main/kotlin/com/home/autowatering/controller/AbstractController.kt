@@ -1,7 +1,8 @@
 package com.home.autowatering.controller
 
 import com.home.autowatering.controller.dto.response.Response
-import com.home.autowatering.controller.dto.response.ResponseStatus
+import com.home.autowatering.controller.dto.response.StatusType
+import com.home.autowatering.exception.AutowateringException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -13,10 +14,16 @@ abstract class AbstractController {
     protected fun <R> execute(block: () -> Response<R>): Response<R> =
         try {
             block.invoke()
-        } catch (exc: Exception) {
-            LOGGER.error("request executing error", exc)
+        } catch (exc: AutowateringException) {
+            LOGGER.info("internal error", exc)
             Response(
-                ResponseStatus.ERROR,
+                exc.status,
+                exc.message
+            )
+        } catch (exc: Exception) {
+            LOGGER.error("internal error", exc)
+            Response(
+                StatusType.INTERNAL_ERROR,
                 if (exc.message == null) exc.javaClass.name else exc.message!!
             )
         }
