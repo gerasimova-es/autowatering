@@ -116,7 +116,7 @@ class Application : AbstractVerticle() {
                     context.request().getParam("potCode"),
                     context.request().getParam("dateFrom").ISODate(),
                     context.request().getParam("dateTo").ISODate()
-                )
+                ).run { context.response(this) }
             }
         }
 

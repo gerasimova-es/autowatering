@@ -6,13 +6,13 @@ import java.time.ZonedDateTime
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class PotStateDto(
-    val id: Long? = null,
-    val potCode: String,
+    var id: Long? = null,
+    var potCode: String? = null,
     @field:JsonFormat(
         shape = JsonFormat.Shape.STRING,
         pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
     )
-    val date: ZonedDateTime = ZonedDateTime.now(),
-    val humidity: Int = 0,
-    val watering: Boolean? = false
+    var date: ZonedDateTime = ZonedDateTime.now(),
+    var humidity: Int = 0,
+    var watering: Boolean? = false
 )

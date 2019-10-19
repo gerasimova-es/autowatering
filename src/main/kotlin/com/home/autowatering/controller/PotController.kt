@@ -47,6 +47,7 @@ class PotController(
                     request.checkInterval, request.minHumidity
                 )
             )
+
             val saved = potService.find(
                 PotFilter(id = request.id, code = request.code)
             ).singleOrNull()
@@ -56,6 +57,16 @@ class PotController(
                 wateringSystemService.refresh(pot)
                 PotConverter.response(pot)
             }
+        }
+
+    fun saveState(
+        request: PotStateDto
+    ): Response<PotStateDto> =
+        execute {
+            val state = PotStateConverter.fromDto(request)
+            PotStateConverter.response(
+                potStateService.save(state)
+            )
         }
 
     //    @GetMapping("/statistic/{pot}")
@@ -80,15 +91,5 @@ class PotController(
         )
     }
 
-    //    @PostMapping("/state/save")
-    fun saveState(
-//    @RequestBody
-        request: PotStateDto
-    ): Response<PotStateDto> =
-        execute {
-            val state = PotStateConverter.fromDto(request)
-            PotStateConverter.response(
-                potStateService.save(state)
-            )
-        }
+
 }

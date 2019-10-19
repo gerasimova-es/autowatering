@@ -20,13 +20,6 @@ class WateringSystemServiceImpl(
                 pot.wateringDuration
             )
         )
-
-//        runBlocking {
-//            withTimeout(timeout) {
-//                launch(vertx.dispatcher()) {
-//                    wateringSystemDao.refresh(pot)
-//                }
-//            }
-//        }
+        wateringSystemDao.refresh(pot)
     }
 }

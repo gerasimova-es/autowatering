@@ -8,7 +8,7 @@ object PotStateConverter : RequestConverter<PotStateDto, PotState>(
     {
         PotState(
             id = it.id,
-            pot = Pot(code = it.potCode),
+            pot = Pot(code = it.potCode!!),
             date = it.date,
             humidity = it.humidity,
             watering = it.watering

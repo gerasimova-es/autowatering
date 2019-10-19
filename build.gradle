@@ -42,6 +42,7 @@ ext {
     kotlinVersion = '1.3.50'
     vertxVersion = '3.7.0'
     junitVersion = '5.4.0'
+    jacksonVersion = '2.10.0'
 }
 
 application {
@@ -77,6 +78,12 @@ dependencies {
     compile "io.vertx:vertx-jdbc-client:$vertxVersion"
 //    compile group: 'io.vertx', name: 'vertx-lang-kotlin-coroutines', version: '3.8.2'
 
+    //jackson
+    compile "com.fasterxml.jackson.module:jackson-module-parameter-names:$jacksonVersion"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion"
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion"
+
     //other
     compile('commons-lang:commons-lang:2.6')
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.25'
@@ -88,7 +95,7 @@ dependencies {
     testImplementation(group: 'com.nhaarman.mockitokotlin2', name: 'mockito-kotlin', version: '2.0.0')
     testImplementation("org.assertj:assertj-core:3.13.2")
     testImplementation("com.jayway.restassured:rest-assured:2.4.0")
-    testImplementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.10.0'
+
 }
 
 compileKotlin {
