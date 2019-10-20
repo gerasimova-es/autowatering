@@ -14,9 +14,10 @@ create table pot (
 
 create table pot_state (
         id serial,
+        pot_id bigint not null,
         date date not null,
         humidity decimal not null,
-        pot_id bigint not null,
+        watering boolean not null,
         primary key (id)
 );
 

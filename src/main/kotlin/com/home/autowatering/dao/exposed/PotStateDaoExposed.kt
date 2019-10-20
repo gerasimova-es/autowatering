@@ -1,24 +1,44 @@
-package com.home.autowatering.dao.jpa
+package com.home.autowatering.dao.exposed
 
 import com.home.autowatering.dao.interfaces.PotStateDao
+import com.home.autowatering.exception.PotNotFoundException
+import com.home.autowatering.exception.SavingException
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
 import com.home.autowatering.model.business.filter.PotStateFilter
-import java.time.ZonedDateTime
+import com.home.autowatering.model.database.PotStateTable
+import com.home.autowatering.model.database.PotTable
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 
 
-//@Repository
-class PotStateDaoJpa(
-//    private val dataSource: DataSource,
-//    private val potRepository: PotRepository,
-//    private val stateRepository: PotStateRepository
-) : PotStateDao {
+class PotStateDaoExposed : PotStateDao {
 
     override fun last(pot: Pot): PotState? {
-        return null
-//        val jpaPot = potRepository.findOneByCode(pot.code) ?: throw PotNotFoundException(pot.code)
-//        val state = stateRepository.findFirstByPotOrderByDateDesc(jpaPot)
+        transaction {
+            val foundPot = PotTable.select { PotTable.code eq pot.code }.singleOrNull()
+                ?: throw PotNotFoundException("pot not found by code = ${pot.code}")
+
+//            val state = PotStateTable
+//                .slice(PotStateTable.pot, , maxColumn)
+//                .select {
+//                PotStateTable.pot eq foundPot[PotTable.id]
+//            }.
+//
+//
+//                .selectAll()
+//                .groupBy(idColumn)
+//                .orderBy(maxColumn, SortOrder.DESC)
+
+            //        val state = stateRepository.findFirstByPotOrderByDateDesc(jpaPot)
 //        return if (state == null) null else JpaPotStateConverter.fromJpa(state)
+        }
+
+
+        return null
     }
 
     override fun find(filter: PotStateFilter): List<PotState> {
@@ -89,21 +109,29 @@ class PotStateDaoJpa(
 //        }
 //
 //        return filtered
-
     }
 
-    override fun save(state: PotState): PotState {
-        return PotState(pot = Pot(code = "1"), date = ZonedDateTime.now(), humidity = 1)
-//        try {
-//            val jpaPot = potRepository.findOneByCode(state.pot.code)
-//                ?: throw PotNotFoundException("pot not found by code = ${state.pot.code}")
-//            var jpaState = JpaPotStateConverter.fromEntity(state)
-//            jpaState.pot = jpaPot
-//            jpaState = stateRepository.save(jpaState)
-//            return JpaPotStateConverter.fromJpa(jpaState)
-//        } catch (exc: PersistenceException) {
-//            throw SavingException(exc)
-//        }
-    }
+    override fun save(state: PotState): PotState =
+        transaction {
+            kotlin.runCatching {
+                val foundPot = PotTable.select { PotTable.code eq state.pot.code }.singleOrNull()
+                    ?: throw PotNotFoundException("pot not found by code = ${state.pot.code}")
 
+                val id = PotStateTable.insert {
+                    it[date] = DateTime(
+                        state.date.toInstant().toEpochMilli(),
+                        DateTimeZone.forID(state.date.zone.id)
+                    )
+                    it[pot] = foundPot[PotTable.id]
+                    it[humidity] = state.humidity
+                    it[watering] = state.watering!!
+                }
+                state.id = id.generatedKey?.toLong()
+
+                //todo return converted from DB pot
+                state
+            }.onFailure {
+                throw SavingException(it)
+            }.getOrThrow()
+        }
 }

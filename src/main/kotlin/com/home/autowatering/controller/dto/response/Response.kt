@@ -1,5 +1,8 @@
 package com.home.autowatering.controller.dto.response
 
+import com.fasterxml.jackson.annotation.JsonInclude
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 open class Response<T> {
     var status: StatusType? = null
     var message: String? = null

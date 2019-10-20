@@ -6,6 +6,7 @@ enum class EndPoint(
     val path: String,
     val method: HttpMethod
 ) {
+    SIGN_UP("/signup", HttpMethod.POST),
     POT_LIST("/pot/list", HttpMethod.GET),
     POT_INFO("/pot/info", HttpMethod.GET),
     POT_SAVE("/pot/save", HttpMethod.POST),

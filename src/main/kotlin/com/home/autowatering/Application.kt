@@ -4,9 +4,10 @@ import com.home.autowatering.config.Config
 import com.home.autowatering.config.DatabaseConfig
 import com.home.autowatering.config.EndPoint
 import com.home.autowatering.controller.PotController
+import com.home.autowatering.controller.UserController
 import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.dao.exposed.PotDaoExposed
-import com.home.autowatering.dao.jpa.PotStateDaoJpa
+import com.home.autowatering.dao.exposed.PotStateDaoExposed
 import com.home.autowatering.dao.rest.WateringSystemRest
 import com.home.autowatering.database.DatabaseConnector
 import com.home.autowatering.database.connect
@@ -55,7 +56,6 @@ class Application : AbstractVerticle() {
         }
     }
 
-
     override fun stop(stopFuture: Future<Void>) {
         stopDatabase()
         stopFuture.complete()
@@ -83,9 +83,18 @@ class Application : AbstractVerticle() {
         val server = vertx.createHttpServer()
         val router = Router.router(vertx)
 
+        UserController().apply {
+            router.routeTo(EndPoint.SIGN_UP){ context ->
+                context.request().bodyHandler { body ->
+                    signup(body.toJsonObject().convert())
+                        .run { context.response(this) }
+                }
+            }
+        }
+
         PotController(
             PotServiceImpl(PotDaoExposed()),
-            PotStateServiceImpl(PotStateDaoJpa()),
+            PotStateServiceImpl(PotStateDaoExposed()),
             WateringSystemServiceImpl(
                 vertx,
                 WateringSystemRest(
