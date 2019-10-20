@@ -7,5 +7,6 @@ data class PotStateFilter(
     var pot: Pot,
     var from: ZonedDateTime? = null,
     var to: ZonedDateTime? = null,
+    var slice: SliceType? = null,
     var limit: Int? = null
 )

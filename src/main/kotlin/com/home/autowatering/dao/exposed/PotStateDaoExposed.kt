@@ -42,6 +42,7 @@ class PotStateDaoExposed : PotStateDao {
     }
 
     override fun find(filter: PotStateFilter): List<PotState> {
+        //todo use slice
         return arrayListOf()
 //        val pot = Tables.POT
 //        val state = Tables.POT_STATE

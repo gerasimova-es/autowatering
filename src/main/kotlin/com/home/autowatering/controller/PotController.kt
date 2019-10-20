@@ -8,13 +8,17 @@ import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.model.business.filter.PotStateFilter
+import com.home.autowatering.model.business.filter.SliceType
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
+import com.home.autowatering.service.interfaces.ValidationService
 import com.home.autowatering.service.interfaces.WateringSystemService
+import com.home.autowatering.validator.PeriodValidator
 import org.apache.commons.lang.Validate
 import java.time.ZonedDateTime
 
 class PotController(
+    private val validationService: ValidationService,
     private val potService: PotService,
     private val potStateService: PotStateService,
     private val wateringSystemService: WateringSystemService
@@ -70,13 +74,22 @@ class PotController(
     fun statistic(
         potCode: String,
         dateFrom: ZonedDateTime?,
-        dateTo: ZonedDateTime?
+        dateTo: ZonedDateTime?,
+        slice: SliceType? = SliceType.DAY
     ): Response<List<PotStateDto>> =
         execute {
+            validationService.validate(
+                PeriodValidator(dateFrom, dateTo, slice)
+                    .ifError { result ->
+                        throw IllegalArgumentException(result.message())
+                    }
+            )
             val pot = potService.find(PotFilter(code = potCode))
                 .singleOrNull() ?: throw PotNotFoundException(potCode)
             PotStateConverter.response(
-                potStateService.find(PotStateFilter(pot, dateFrom, dateTo))
+                potStateService.find(
+                    PotStateFilter(pot, dateFrom, dateTo, slice)
+                )
             )
         }
 

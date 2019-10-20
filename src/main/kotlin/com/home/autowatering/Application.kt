@@ -13,8 +13,10 @@ import com.home.autowatering.database.DatabaseConnector
 import com.home.autowatering.database.connect
 import com.home.autowatering.database.database
 import com.home.autowatering.database.fill
+import com.home.autowatering.model.business.filter.SliceType
 import com.home.autowatering.service.impl.PotServiceImpl
 import com.home.autowatering.service.impl.PotStateServiceImpl
+import com.home.autowatering.service.impl.ValidationServiceImpl
 import com.home.autowatering.service.impl.WateringSystemServiceImpl
 import com.home.autowatering.util.convert
 import com.home.autowatering.util.toISODate
@@ -84,7 +86,7 @@ class Application : AbstractVerticle() {
         val router = Router.router(vertx)
 
         UserController().apply {
-            router.routeTo(EndPoint.SIGN_UP){ context ->
+            router.routeTo(EndPoint.SIGN_UP) { context ->
                 context.request().bodyHandler { body ->
                     signup(body.toJsonObject().convert())
                         .run { context.response(this) }
@@ -93,6 +95,7 @@ class Application : AbstractVerticle() {
         }
 
         PotController(
+            ValidationServiceImpl(),
             PotServiceImpl(PotDaoExposed()),
             PotStateServiceImpl(PotStateDaoExposed()),
             WateringSystemServiceImpl(
@@ -107,7 +110,7 @@ class Application : AbstractVerticle() {
                 list().run { context.response(this) }
 
             }.routeTo(EndPoint.POT_INFO) { context ->
-                info(context.request().getParam("code"))
+                info(context.param("code"))
                     .run { context.response(this) }
 
             }.routeTo(EndPoint.POT_SAVE) { context ->
@@ -123,9 +126,10 @@ class Application : AbstractVerticle() {
 
             }.routeTo(EndPoint.POT_STATISTIC) { context ->
                 statistic(
-                    context.request().getParam("code"),
-                    context.request().getParam("dateFrom").toISODate(),
-                    context.request().getParam("dateTo").toISODate()
+                    context.param("code"),
+                    context.param("dateFrom").toISODate(),
+                    context.param("dateTo").toISODate(),
+                    context.param("slice")?.let { SliceType.valueOf(it) }
                 ).run { context.response(this) }
             }
         }
@@ -173,5 +177,8 @@ fun RoutingContext.response(dto: Response<*>? = null) {
     this.response()
         .putHeader("content-type", "application/json")
         .setStatusCode(200)
-        .end(dto?.let {dto.toJson().encode()})
+        .end(dto?.let { dto.toJson().encode() })
 }
+
+fun RoutingContext.param(name: String) =
+    this.request().getParam(name)

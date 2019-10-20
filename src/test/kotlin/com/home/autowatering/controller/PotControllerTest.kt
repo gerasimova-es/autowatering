@@ -8,6 +8,7 @@ import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
+import com.home.autowatering.service.interfaces.ValidationService
 import com.home.autowatering.service.interfaces.WateringSystemService
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
@@ -17,6 +18,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 class PotControllerTest {
+    private lateinit var validationService: ValidationService
     private lateinit var potService: PotService
     private lateinit var potStateService: PotStateService
     private lateinit var wateringSystemService: WateringSystemService
@@ -24,10 +26,14 @@ class PotControllerTest {
 
     @BeforeEach
     fun init() {
+        validationService = mock()
         potService = mock()
         potStateService = mock()
         wateringSystemService = mock()
-        controller = PotController(potService, potStateService, wateringSystemService)
+        controller = PotController(
+            validationService, potService,
+            potStateService, wateringSystemService
+        )
     }
 
     @Test

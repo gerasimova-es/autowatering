@@ -176,7 +176,7 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
         client.get(
             port,
             "localhost",
-            URLEncoder.encode("/pot/statistic?code=AUTHORIUM&dateFrom=${date.toISODate()}&dateTo=${date.toISODate()}")
+            URLEncoder.encode("/pot/statistic?code=AUTHORIUM&dateFrom=${date.toISODate()}&dateTo=${date.toISODate()}&slice=HOUR")
         ).`as`(BodyCodec.jsonObject())
             .send(testContext.succeeding { response ->
                 testContext.verify {
