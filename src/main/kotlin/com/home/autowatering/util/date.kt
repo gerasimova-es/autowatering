@@ -3,6 +3,12 @@ package com.home.autowatering.util
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-fun String.ISODate() =
+private val format = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+
+fun String.toISODate(): ZonedDateTime =
     ZonedDateTime.from(
-        DateTimeFormatter.ISO_DATE_TIME.parse(this))
+        format.parse(this)
+    )
+
+fun ZonedDateTime.toISODate(): String =
+    this.format(format)

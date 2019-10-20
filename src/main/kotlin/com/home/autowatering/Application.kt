@@ -15,8 +15,8 @@ import com.home.autowatering.database.fill
 import com.home.autowatering.service.impl.PotServiceImpl
 import com.home.autowatering.service.impl.PotStateServiceImpl
 import com.home.autowatering.service.impl.WateringSystemServiceImpl
-import com.home.autowatering.util.ISODate
 import com.home.autowatering.util.convert
+import com.home.autowatering.util.toISODate
 import com.home.autowatering.util.toJson
 import io.vertx.config.ConfigRetriever
 import io.vertx.config.ConfigRetriever.create
@@ -98,7 +98,7 @@ class Application : AbstractVerticle() {
                 list().run { context.response(this) }
 
             }.routeTo(EndPoint.POT_INFO) { context ->
-                info(context.request().getParam("pot"))
+                info(context.request().getParam("code"))
                     .run { context.response(this) }
 
             }.routeTo(EndPoint.POT_SAVE) { context ->
@@ -114,9 +114,9 @@ class Application : AbstractVerticle() {
 
             }.routeTo(EndPoint.POT_STATISTIC) { context ->
                 statistic(
-                    context.request().getParam("pot"),
-                    context.request().getParam("dateFrom").ISODate(),
-                    context.request().getParam("dateTo").ISODate()
+                    context.request().getParam("code"),
+                    context.request().getParam("dateFrom").toISODate(),
+                    context.request().getParam("dateTo").toISODate()
                 ).run { context.response(this) }
             }
         }

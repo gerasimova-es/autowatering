@@ -47,7 +47,6 @@ class PotController(
                     request.checkInterval, request.minHumidity
                 )
             )
-
             val saved = potService.find(
                 PotFilter(id = request.id, code = request.code)
             ).singleOrNull()
@@ -70,15 +69,7 @@ class PotController(
 
     fun statistic(
         potCode: String,
-//        @RequestParam(
-//            value = "dateFrom",
-//            required = false
-//        ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         dateFrom: ZonedDateTime?,
-//        @RequestParam(
-//            value = "dateTo",
-//            required = false
-//        ) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         dateTo: ZonedDateTime?
     ): Response<List<PotStateDto>> =
         execute {
