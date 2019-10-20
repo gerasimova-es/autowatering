@@ -64,9 +64,8 @@ class PotController(
     ): Response<PotStateDto> =
         execute {
             val state = PotStateConverter.fromDto(request)
-            PotStateConverter.response(
-                potStateService.save(state)
-            )
+            potStateService.save(state)
+            PotStateConverter.response()
         }
 
     fun statistic(

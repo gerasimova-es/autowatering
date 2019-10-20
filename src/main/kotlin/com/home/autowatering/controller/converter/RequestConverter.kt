@@ -44,6 +44,9 @@ open class RequestConverter<D, E>(
             .map { fromEntity(it) }
             .collect(Collectors.toList<D>())
 
+    fun response(): Response<D> =
+        Response()
+
     fun response(entity: E): Response<D> =
         Response(fromEntity(entity))
 

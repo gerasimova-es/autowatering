@@ -5,15 +5,16 @@ open class Response<T> {
     var message: String? = null
     var payload: T? = null
 
-    constructor()
-
-    constructor(payload: T) {
+    constructor(){
         this.status = StatusType.SUCCESS
         this.message = "message was handled successfully"
+    }
+
+    constructor(payload: T) : this(){
         this.payload = payload
     }
 
-    constructor(status: StatusType, message: String) {
+    constructor(status: StatusType, message: String?) {
         this.status = status
         this.message = message
     }

@@ -36,6 +36,12 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
             PotDto::class.java
         )
     }
+    private val potStateType = with(mapper) {
+        typeFactory.constructParametricType(
+            Response::class.java,
+            PotStateDto::class.java
+        )
+    }
 
     @Test
     @Timeout(value = 120, timeUnit = TimeUnit.SECONDS)
@@ -134,8 +140,7 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
             .`as`(BodyCodec.jsonObject())
             .sendJson(dto.toJson(), testContext.succeeding { response ->
                 testContext.verify {
-                    val result = mapper.readValue<Response<PotDto>>(response.body().encode(), potType)
-                    assertNotNull(result.payload?.id)
+                    val result = mapper.readValue<Response<PotStateDto>>(response.body().encode(), potStateType)
                     assertThat(result.status).isSameAs(StatusType.SUCCESS)
                     testContext.completeNow()
                 }
@@ -158,8 +163,7 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
             .`as`(BodyCodec.jsonObject())
             .sendJson(dto, testContext.succeeding { response ->
                 testContext.verify {
-                    val result = mapper.readValue<Response<PotDto>>(response.body().encode(), potType)
-                    assertNotNull(result.payload?.id)
+                    val result = mapper.readValue<Response<PotStateDto>>(response.body().encode(), potStateType)
                     assertThat(result.status).isSameAs(StatusType.SUCCESS)
                     testContext.completeNow()
                 }

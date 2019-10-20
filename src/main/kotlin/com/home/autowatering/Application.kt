@@ -17,6 +17,7 @@ import com.home.autowatering.service.impl.PotStateServiceImpl
 import com.home.autowatering.service.impl.WateringSystemServiceImpl
 import com.home.autowatering.util.ISODate
 import com.home.autowatering.util.convert
+import com.home.autowatering.util.toJson
 import io.vertx.config.ConfigRetriever
 import io.vertx.config.ConfigRetriever.create
 import io.vertx.config.ConfigRetrieverOptions
@@ -24,7 +25,6 @@ import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
 import io.vertx.core.Vertx
-import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
@@ -75,7 +75,7 @@ class Application : AbstractVerticle() {
     }
 
     private fun stopDatabase() {
-        //todo not stop correctly
+        //todo not stop correctly sometimes
         database?.close()
     }
 
@@ -160,9 +160,9 @@ fun Router.routeTo(
     return this
 }
 
-fun <T> RoutingContext.response(dto: Response<T>? = null) {
+fun RoutingContext.response(dto: Response<*>? = null) {
     this.response()
         .putHeader("content-type", "application/json")
         .setStatusCode(200)
-        .end(dto?.let { Json.encodePrettily(dto) })
+        .end(dto?.let {dto.toJson().encode()})
 }
