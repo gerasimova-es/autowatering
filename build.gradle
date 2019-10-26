@@ -76,7 +76,7 @@ dependencies {
     compile "io.vertx:vertx-web-client:$vertxVersion"
     compile "io.vertx:vertx-config:$vertxVersion"
     compile "io.vertx:vertx-jdbc-client:$vertxVersion"
-//    compile group: 'io.vertx', name: 'vertx-lang-kotlin-coroutines', version: '3.8.2'
+//    compile group: 'io.vertx', name: 'vertx-rx-java2', version: '3.8.3'
 
     //jackson
     compile "com.fasterxml.jackson.module:jackson-module-parameter-names:$jacksonVersion"

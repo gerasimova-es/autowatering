@@ -25,6 +25,7 @@ import io.vertx.config.ConfigRetriever.create
 import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.AbstractVerticle
+import io.vertx.core.AsyncResult
 import io.vertx.core.Future
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
@@ -105,8 +106,9 @@ class Application : AbstractVerticle() {
             )
         ).apply {
             router.routeTo(EndPoint.POT_LIST) { context ->
-                list().run { context.response(this) }
-
+                list().setHandler { result ->
+                    context.response(result)
+                }
             }.routeTo(EndPoint.POT_INFO) { context ->
                 info(context.param("code"))
                     .run { context.response(this) }
@@ -171,11 +173,19 @@ fun Router.routeTo(
     return this
 }
 
-fun RoutingContext.response(dto: Response<*>? = null) {
+fun <T> RoutingContext.response(result: AsyncResult<Response<T>>) {
+    //todo check AsyncResult not failed!
     this.response()
         .putHeader("content-type", "application/json")
         .setStatusCode(200)
-        .end(dto?.let { dto.toJson().encode() })
+        .end(result.let { result.result()?.toJson()?.encode() })
+}
+
+fun <T>  RoutingContext.response(result: Response<T>? = null) {
+    this.response()
+        .putHeader("content-type", "application/json")
+        .setStatusCode(200)
+        .end(result?.let { result.toJson().encode() })
 }
 
 fun RoutingContext.param(name: String) =

@@ -63,6 +63,7 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
                         assertThat(element?.minHumidity).isEqualTo(200)
                         assertThat(element?.checkInterval).isEqualTo(60)
                         assertThat(element?.wateringDuration).isEqualTo(2)
+                        assertThat(element?.humidity).isEqualTo(-1)
                     }
                     result.payload?.get(1).also { element ->
                         assertThat(element?.id).isNotNull()
@@ -71,6 +72,7 @@ class PotControllerIntegrationTest : BaseIntegrationTest() {
                         assertThat(element?.minHumidity).isEqualTo(250)
                         assertThat(element?.checkInterval).isEqualTo(120)
                         assertThat(element?.wateringDuration).isEqualTo(1)
+                        assertThat(element?.humidity).isEqualTo(-1)
                     }
                     testContext.completeNow()
                 }

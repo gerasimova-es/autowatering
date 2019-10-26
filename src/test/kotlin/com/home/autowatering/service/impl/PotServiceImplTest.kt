@@ -4,13 +4,7 @@ import com.home.autowatering.dao.interfaces.PotDao
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.filter.PotFilter
 import com.home.autowatering.service.interfaces.PotService
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,24 +20,24 @@ class PotServiceImplTest {
         service = PotServiceImpl(potDao)
     }
 
-    @Test
-    fun findAll() {
-        whenever(potDao.findAll()).thenReturn(
-            arrayListOf(
-                Pot(code = "pot1"),
-                Pot(code = "2")
-            )
-        )
-
-        val result = service.findAll()
-
-        assertThat(result).isNotNull
-        assertThat(result).hasSize(2)
-        //todo check pots
-
-        verify(potDao, times(1)).findAll()
-        verifyNoMoreInteractions(potDao)
-    }
+//    @Test
+//    fun findAll() {
+//        whenever(potDao.findAll()).thenReturn(
+//            arrayListOf(
+//                Pot(code = "pot1"),
+//                Pot(code = "2")
+//            )
+//        )
+//
+//        val result = service.findAll()
+//
+//        assertThat(result).isNotNull
+//        assertThat(result).hasSize(2)
+//        //todo check pots
+//
+//        verify(potDao, times(1)).findAll()
+//        verifyNoMoreInteractions(potDao)
+//    }
 
     @Test
     fun findById() {

@@ -1,6 +1,7 @@
 package com.home.autowatering.model.database.converter
 
 import com.home.autowatering.model.business.Pot
+import com.home.autowatering.model.database.PotStateTable
 import com.home.autowatering.model.database.PotTable.checkInterval
 import com.home.autowatering.model.database.PotTable.code
 import com.home.autowatering.model.database.PotTable.id
@@ -17,7 +18,9 @@ object PotConverter : Converter<ResultRow, Pot>(
             name = it[name],
             minHumidity = it[minHumidity],
             checkInterval = it[checkInterval],
-            wateringDuration = it[wateringDuration]
+            wateringDuration = it[wateringDuration],
+            //todo return humidity in every case
+            humidity = if(it.data.size > 6) it[PotStateTable.humidity] else null
         )
     },
     {
