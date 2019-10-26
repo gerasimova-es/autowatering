@@ -6,9 +6,9 @@ import com.home.autowatering.controller.dto.response.StatusType
 import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
+import com.home.autowatering.model.business.filter.SliceType
 import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
-import com.home.autowatering.service.interfaces.ValidationService
 import com.home.autowatering.service.interfaces.WateringSystemService
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
@@ -18,7 +18,6 @@ import java.time.ZonedDateTime
 import java.util.*
 
 class PotControllerTest {
-    private lateinit var validationService: ValidationService
     private lateinit var potService: PotService
     private lateinit var potStateService: PotStateService
     private lateinit var wateringSystemService: WateringSystemService
@@ -26,13 +25,11 @@ class PotControllerTest {
 
     @BeforeEach
     fun init() {
-        validationService = mock()
         potService = mock()
         potStateService = mock()
         wateringSystemService = mock()
         controller = PotController(
-            validationService, potService,
-            potStateService, wateringSystemService
+            potService, potStateService, wateringSystemService
         )
     }
 
@@ -244,9 +241,40 @@ class PotControllerTest {
     }
 
     @Test
+    fun findStateWhenWrongDates() {
+        whenever(potService.find(any())).thenReturn(arrayListOf())
+
+        val response = controller.statistic(
+            potCode = "pot",
+            dateFrom = ZonedDateTime.now(),
+            dateTo = ZonedDateTime.now().minusMonths(1)
+        )
+
+        assertThat(response.status).isEqualTo(StatusType.INCORRECT_PERIOD_DATES)
+        verifyZeroInteractions(potService)
+        verifyZeroInteractions(potStateService)
+    }
+
+    @Test
+    fun findStateWhenWrongSlice() {
+        whenever(potService.find(any())).thenReturn(arrayListOf())
+
+        val response = controller.statistic(
+            potCode = "pot",
+            dateFrom = ZonedDateTime.now(),
+            dateTo = ZonedDateTime.now().plusDays(6),
+            slice = SliceType.WEEK
+        )
+
+        assertThat(response.status).isEqualTo(StatusType.INCORRECT_PERIOD_DATES)
+        verifyZeroInteractions(potService)
+        verifyZeroInteractions(potStateService)
+    }
+
+    @Test
     fun findStateNotExistedPot() {
         whenever(potService.find(any())).thenReturn(arrayListOf())
-        val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
+        val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now().plusHours(1))
         assertThat(response.status).isEqualTo(StatusType.POT_NOT_FOUND)
         verify(potService, times(1)).find(any())
         verifyNoMoreInteractions(potService)
@@ -264,7 +292,10 @@ class PotControllerTest {
             )
         )
         whenever(potStateService.find(any())).thenThrow(IllegalArgumentException("test"))
-        val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
+        val response = controller.statistic(
+            potCode = "pot",
+            dateFrom = ZonedDateTime.now(),
+            dateTo = ZonedDateTime.now().plusHours(1))
         assertThat(response.status).isEqualTo(StatusType.INTERNAL_ERROR)
         verify(potStateService, times(1)).find(any())
         verifyNoMoreInteractions(potStateService)
@@ -282,7 +313,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenReturn(arrayListOf())
 
-        val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
+        val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now().plusHours(1))
 
         assertThat(response.status).isEqualTo(StatusType.SUCCESS)
 
@@ -313,7 +344,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenReturn(arrayListOf(state))
 
-        val response = controller.statistic("pot", dateFrom, ZonedDateTime.now())
+        val response = controller.statistic("pot", dateFrom, ZonedDateTime.now().plusHours(1))
 
         assertThat(response).isNotNull
         assertThat(response.status).isEqualTo(StatusType.SUCCESS)
@@ -357,7 +388,7 @@ class PotControllerTest {
         )
         whenever(potStateService.find(any())).thenReturn(arrayListOf(state1, state2))
 
-        val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now())
+        val response = controller.statistic("pot", ZonedDateTime.now(), ZonedDateTime.now().plusHours(1))
 
         assertThat(response).isNotNull
         assertThat(response.status).isEqualTo(StatusType.SUCCESS)
@@ -417,11 +448,7 @@ class PotControllerTest {
         assertThat(response).isNotNull
         assertThat(response.status).isEqualTo(StatusType.SUCCESS)
         assertThat(response.message).isEqualTo("message was handled successfully")
-        assertThat(response.payload).isNotNull
-        assertThat(response.payload?.id).isEqualTo(state.id)
-        assertThat(response.payload?.date).isEqualTo(state.date)
-        assertThat(response.payload?.humidity).isEqualTo(state.humidity)
-
+        assertThat(response.payload).isNull()
 
         verify(potStateService, times(1)).save(any())
         verifyNoMoreInteractions(potStateService)

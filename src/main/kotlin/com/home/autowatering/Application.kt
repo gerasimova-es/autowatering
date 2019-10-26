@@ -16,7 +16,6 @@ import com.home.autowatering.database.fill
 import com.home.autowatering.model.business.filter.SliceType
 import com.home.autowatering.service.impl.PotServiceImpl
 import com.home.autowatering.service.impl.PotStateServiceImpl
-import com.home.autowatering.service.impl.ValidationServiceImpl
 import com.home.autowatering.service.impl.WateringSystemServiceImpl
 import com.home.autowatering.util.convert
 import com.home.autowatering.util.toISODate
@@ -95,7 +94,6 @@ class Application : AbstractVerticle() {
         }
 
         PotController(
-            ValidationServiceImpl(),
             PotServiceImpl(PotDaoExposed()),
             PotStateServiceImpl(PotStateDaoExposed()),
             WateringSystemServiceImpl(
@@ -129,7 +127,7 @@ class Application : AbstractVerticle() {
                     context.param("code"),
                     context.param("dateFrom").toISODate(),
                     context.param("dateTo").toISODate(),
-                    context.param("slice")?.let { SliceType.valueOf(it) }
+                    context.param("slice").let { SliceType.valueOf(it) }
                 ).run { context.response(this) }
             }
         }

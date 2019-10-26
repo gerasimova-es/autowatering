@@ -15,7 +15,7 @@ abstract class AbstractController {
         try {
             block.invoke()
         } catch (exc: AutowateringException) {
-            LOGGER.info("error", exc)
+            LOGGER.debug("error", exc)
             Response(
                 exc.status,
                 exc.message
