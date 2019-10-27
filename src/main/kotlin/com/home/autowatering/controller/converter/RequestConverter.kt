@@ -1,6 +1,7 @@
 package com.home.autowatering.controller.converter
 
 import com.home.autowatering.controller.dto.response.Response
+import com.home.autowatering.controller.dto.response.StatusType
 import java.util.stream.Collectors
 
 /**
@@ -53,4 +54,9 @@ open class RequestConverter<D, E>(
     fun response(entities: List<E>): Response<List<D>> =
         Response(fromEntities(entities))
 
+    fun <D> response(exc: Throwable) : Response<D> =
+        Response(
+            StatusType.INTERNAL_ERROR,
+            if (exc.message == null) exc.javaClass.name else exc.message!!
+        )
 }

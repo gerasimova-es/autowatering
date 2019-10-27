@@ -11,18 +11,18 @@ class PotServiceImpl(
 ) : PotService {
 
     override fun findAll(): Future<List<Pot>> =
-        Future.future<List<Pot>>().apply {
-            complete(potDao.findAll())
+        Future.future<List<Pot>> {future ->
+            future.complete(potDao.findAll())
         }
 
     override fun find(filter: PotFilter): Future<List<Pot>> =
-        Future.future<List<Pot>>().apply {
+        Future.future<List<Pot>> { future ->
             val pot: Pot? = when {
                 filter.id != null -> potDao.findById(filter.id!!)
                 filter.code != null -> potDao.findByCode(filter.code!!)
                 else -> throw IllegalArgumentException("filter parameters are empty")
             }
-            complete(if (pot == null) arrayListOf() else arrayListOf(pot))
+            future.complete(if (pot == null) arrayListOf() else arrayListOf(pot))
         }
 
     override fun merge(source: Pot, target: Pot): Pot {
@@ -34,7 +34,8 @@ class PotServiceImpl(
         )
     }
 
-    override fun save(pot: Pot): Pot {
-        return potDao.save(pot)
-    }
+    override fun save(pot: Pot): Future<Pot> =
+        Future.future<Pot> {future ->
+            future.complete(potDao.save(pot))
+        }
 }

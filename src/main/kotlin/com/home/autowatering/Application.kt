@@ -31,7 +31,6 @@ import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
-import io.vertx.ext.web.client.WebClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -98,9 +97,7 @@ class Application : AbstractVerticle() {
             PotServiceImpl(PotDaoExposed()),
             PotStateServiceImpl(PotStateDaoExposed()),
             WateringSystemServiceImpl(
-                vertx,
                 WateringSystemRest(
-                    client = WebClient.create(vertx),
                     board = config.board!!
                 )
             )
@@ -174,7 +171,6 @@ fun Router.routeTo(
 }
 
 fun <T> RoutingContext.response(result: AsyncResult<Response<T>>) {
-    //todo check AsyncResult not failed!
     this.response()
         .putHeader("content-type", "application/json")
         .setStatusCode(200)

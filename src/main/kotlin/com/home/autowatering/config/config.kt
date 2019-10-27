@@ -7,8 +7,8 @@ data class Config(
 )
 
 data class BoardConfig(
-    val url: String? = null,
-    val timeout: Long? = null
+    val url: String,
+    val timeout: Long
 )
 
 data class DatabaseConfig(

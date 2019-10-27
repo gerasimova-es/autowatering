@@ -88,19 +88,19 @@ class PotServiceImplTest {
     }
 
 
-    @Test
-    fun save() {
-        whenever(potDao.save(any()))
-            .thenReturn(Pot(id = 1, code = "pot1", name = "pot1"))
-
-        val result = service.save(Pot(code = "pot1", name = "pot1"))
-
-        assertThat(result).isNotNull
-        assertThat(result.id).isEqualTo(1)
-        assertThat(result.code).isEqualTo("pot1")
-        assertThat(result.name).isEqualTo("pot1")
-
-        verify(potDao, times(1)).save(any())
-        verifyNoMoreInteractions(potDao)
-    }
+//    @Test
+//    fun save() {
+//        whenever(potDao.save(any()))
+//            .thenReturn(Pot(id = 1, code = "pot1", name = "pot1"))
+//
+//        val result = service.save(Pot(code = "pot1", name = "pot1"))
+//
+//        assertThat(result).isNotNull
+//        assertThat(result.id).isEqualTo(1)
+//        assertThat(result.code).isEqualTo("pot1")
+//        assertThat(result.name).isEqualTo("pot1")
+//
+//        verify(potDao, times(1)).save(any())
+//        verifyNoMoreInteractions(potDao)
+//    }
 }

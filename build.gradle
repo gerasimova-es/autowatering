@@ -55,6 +55,7 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1"
     compile "org.jetbrains.exposed:exposed:0.10.4"
+    compile "khttp:khttp:1.0.0"
 
     //database
     compile group: 'org.liquibase', name: 'liquibase-core', version: '3.8.0'
