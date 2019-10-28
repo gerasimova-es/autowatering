@@ -6,13 +6,15 @@ import com.home.autowatering.config.EndPoint
 import com.home.autowatering.controller.PotController
 import com.home.autowatering.controller.UserController
 import com.home.autowatering.controller.dto.response.Response
+import com.home.autowatering.controller.dto.response.StatusType
 import com.home.autowatering.dao.exposed.PotDaoExposed
 import com.home.autowatering.dao.exposed.PotStateDaoExposed
-import com.home.autowatering.dao.rest.WateringSystemRest
+import com.home.autowatering.dao.rest.BoardSettingsRest
 import com.home.autowatering.database.DatabaseConnector
 import com.home.autowatering.database.connect
 import com.home.autowatering.database.database
 import com.home.autowatering.database.fill
+import com.home.autowatering.exception.AutowateringException
 import com.home.autowatering.model.business.filter.SliceType
 import com.home.autowatering.service.impl.PotServiceImpl
 import com.home.autowatering.service.impl.PotStateServiceImpl
@@ -97,7 +99,7 @@ class Application : AbstractVerticle() {
             PotServiceImpl(PotDaoExposed()),
             PotStateServiceImpl(PotStateDaoExposed()),
             WateringSystemServiceImpl(
-                WateringSystemRest(
+                BoardSettingsRest(
                     board = config.board!!
                 )
             )
@@ -107,6 +109,7 @@ class Application : AbstractVerticle() {
                     context.response(result)
                 }
             }.routeTo(EndPoint.POT_INFO) { context ->
+                LOGGER.info("got info request for pot {}", context.param("code"))
                 info(context.param("code"))
                     .run { context.response(this) }
 
@@ -126,7 +129,7 @@ class Application : AbstractVerticle() {
                     context.param("code"),
                     context.param("dateFrom").toISODate(),
                     context.param("dateTo").toISODate(),
-                    context.param("slice").let { SliceType.valueOf(it) }
+                    context.param("slice")?.let { SliceType.valueOf(it) } ?: SliceType.MINUTE //todo delete minute
                 ).run { context.response(this) }
             }
         }
@@ -161,6 +164,9 @@ fun configurer(vertx: Vertx): ConfigRetriever =
             )
     )
 
+fun RoutingContext.param(name: String) =
+    this.request().getParam(name)
+
 fun Router.routeTo(
     endpoint: EndPoint,
     handler: (RoutingContext) -> Any
@@ -171,18 +177,28 @@ fun Router.routeTo(
 }
 
 fun <T> RoutingContext.response(result: AsyncResult<Response<T>>) {
+    val response : Response<T> = when {
+        result.failed() ->
+            when (val error = result.cause()) {
+                is AutowateringException -> {
+                    Application.LOGGER.debug("error", error)
+                    Response(error.status, error.message)
+                }
+                else -> {
+                    Application.LOGGER.error("internal error", error)
+                    Response(
+                        StatusType.INTERNAL_ERROR,
+                        if (error.message == null) error.javaClass.name else error.message!!
+                    )
+                }
+            }
+        else ->
+            result.result()
+    }
+
     this.response()
         .putHeader("content-type", "application/json")
         .setStatusCode(200)
-        .end(result.let { result.result()?.toJson()?.encode() })
+        .end(result.let { response.toJson().encode() })
 }
 
-fun <T>  RoutingContext.response(result: Response<T>? = null) {
-    this.response()
-        .putHeader("content-type", "application/json")
-        .setStatusCode(200)
-        .end(result?.let { result.toJson().encode() })
-}
-
-fun RoutingContext.param(name: String) =
-    this.request().getParam(name)

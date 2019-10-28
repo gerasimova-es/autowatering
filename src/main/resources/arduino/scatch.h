@@ -111,11 +111,13 @@ void handleLoadSettings() {
     if(timeExpired()){
       authorium.lastCheckTime = 0;
     }
+    server.send(200, "application/json", "{ \"status\": \"SUCCESS\", \"message\": \"message was handled successfully\"}");
   } else {
     Serial.println("The system doesn't know pot with name " + String(pot.code));
+      server.send(500, "application/json", "{}");
   }
 
-  server.send(200, "application/json", "{ \"status\": \"SUCCESS\", \"message\": \"message was handled successfully\"}");
+
   Serial.println("--------------------");
 }
 
@@ -169,7 +171,7 @@ String sendPostRequest(String service, String body){
    if(httpCode > 0){
       result = http.getString();
    } else {
-         Serial.println("error response status: " + String(httpCode));
+      Serial.println("error response status: " + String(httpCode));
       result = "error";
    }
    http.end();

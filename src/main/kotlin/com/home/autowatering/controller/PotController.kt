@@ -33,7 +33,7 @@ class PotController(
                 future<Response<List<PotDto>>> { future ->
                     future.complete(PotConverter.response(pots))
                 }
-            }.handleFailure()
+            }
 
     fun info(potCode: String): Future<Response<PotDto>> =
         potService.find(PotFilter(code = potCode))
@@ -43,7 +43,7 @@ class PotController(
                     val state = potStateService.last(pot)
                     future.complete(PotConverter.response(pot, state))
                 }
-            }.handleFailure()
+            }
 
     fun save(request: PotDto): Future<Response<PotDto>> =
         //todo use pot validator
@@ -64,7 +64,7 @@ class PotController(
             future<Response<PotDto>> { future ->
                 future.complete(PotConverter.response(pot))
             }
-        }//.handleFailure()
+        }
 
     fun saveState(
         request: PotStateDto
@@ -77,7 +77,7 @@ class PotController(
             future<Response<PotStateDto>> { future ->
                 future.complete(PotStateConverter.response())
             }
-        }//.handleFailure()
+        }
 
     fun statistic(
         potCode: String,
@@ -103,5 +103,5 @@ class PotController(
                     )
                 )
             }
-        }.handleFailure()
+        }
 }

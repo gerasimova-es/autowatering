@@ -14,6 +14,7 @@ import org.jetbrains.exposed.sql.update
 class PotDaoExposed : PotDao {
     companion object {
         //todo try use jooq
+        //todo replace max(id) with max(date)
         val LIST = """select 
                         |pot.id, 
                         |pot.code, 
@@ -25,19 +26,16 @@ class PotDaoExposed : PotDao {
                     |from 
                         |Pot pot left join
                         |(
-                            |select s1.* 
-                            |from
-                                |(
-                                    |select * 
-                                    |from pot_state
-                                |) s1,
+                            |select s1.*
+                            |from 
+                                |pot_state s1, 
                                 |(                    
-                                    |select pot_id, max(date) date
+                                    |select pot_id, max(id) max_id
                                     |from pot_state
                                     |group by pot_id
                                 |) s2
                             |where s1.pot_id = s2.pot_id
-                                |and s1.date = s2.date
+                                |and s1.id = s2.max_id
                         |) st
                     |on pot.id = st.pot_id 
                     |order by pot.id""".trimMargin()
