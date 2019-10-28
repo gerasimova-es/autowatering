@@ -15,7 +15,7 @@ create table pot (
 create table pot_state (
         id serial,
         pot_id bigint not null,
-        date date not null,
+        date timestamptz not null,
         humidity decimal not null,
         watering boolean not null,
         primary key (id)
@@ -23,7 +23,7 @@ create table pot_state (
 
 create table tank_state (
         id serial,
-        date date not null,
+        date timestamptz not null,
         filled decimal not null,
         code varchar(255) not null,
         volume decimal not null,

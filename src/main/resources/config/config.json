@@ -1,5 +1,6 @@
 {
   "port": 8080,
+  "root": "/autowatering",
   "board": {
     "url": "http://192.168.1.33:80",
     "timeout": 5
@@ -7,9 +8,6 @@
   "database": {
     "mode": "EMBEDDED",
     "fill": true,
-    "pool": {
-      "size": 1
-    },
     "datasource": {
       "driver": "org.postgresql.Driver",
       "url": "jdbc:postgresql://localhost:8081/postgres",

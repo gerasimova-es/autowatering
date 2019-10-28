@@ -36,6 +36,7 @@ import io.vertx.ext.web.RoutingContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+const val CONFIG_PATH = "/config/config.json"
 
 class Application : AbstractVerticle() {
     var database: DatabaseConnector? = null
@@ -51,7 +52,7 @@ class Application : AbstractVerticle() {
                 .also { LOGGER.info("config = $this") }
 
             vertx.executeBlocking<Any>({ blocking ->
-                prepareDatabase(config.database!!)
+                prepareDatabase(config.database)
                 blocking.complete()
             }, {
                 startHttpServer(vertx, future, config)
@@ -78,7 +79,7 @@ class Application : AbstractVerticle() {
     }
 
     private fun stopDatabase() {
-        //todo not stop correctly sometimes
+        //todo fix - not stop correctly sometimes
         database?.close()
     }
 
@@ -87,7 +88,7 @@ class Application : AbstractVerticle() {
         val router = Router.router(vertx)
 
         UserController().apply {
-            router.routeTo(EndPoint.SIGN_UP) { context ->
+            router.routeTo(config.root, EndPoint.SIGN_UP) { context ->
                 context.request().bodyHandler { body ->
                     signup(body.toJsonObject().convert())
                         .run { context.response(this) }
@@ -100,44 +101,43 @@ class Application : AbstractVerticle() {
             PotStateServiceImpl(PotStateDaoExposed()),
             WateringSystemServiceImpl(
                 BoardSettingsRest(
-                    board = config.board!!
+                    board = config.board
                 )
             )
         ).apply {
-            router.routeTo(EndPoint.POT_LIST) { context ->
+            router.routeTo(config.root, EndPoint.POT_LIST) { context ->
                 list().setHandler { result ->
                     context.response(result)
                 }
-            }.routeTo(EndPoint.POT_INFO) { context ->
-                LOGGER.info("got info request for pot {}", context.param("code"))
+            }.routeTo(config.root, EndPoint.POT_INFO) { context ->
                 info(context.param("code"))
                     .run { context.response(this) }
 
-            }.routeTo(EndPoint.POT_SAVE) { context ->
+            }.routeTo(config.root, EndPoint.POT_SAVE) { context ->
                 context.request().bodyHandler { body ->
                     save(body.toJsonObject().convert())
                         .run { context.response(this) }
                 }
-            }.routeTo(EndPoint.POT_STATE_SAVE) { context ->
+            }.routeTo(config.root, EndPoint.POT_STATE_SAVE) { context ->
                 context.request().bodyHandler { body ->
                     saveState(body.toJsonObject().convert())
                         .run { context.response(this) }
                 }
 
-            }.routeTo(EndPoint.POT_STATISTIC) { context ->
+            }.routeTo(config.root, EndPoint.POT_STATISTIC) { context ->
                 statistic(
                     context.param("code"),
                     context.param("dateFrom").toISODate(),
                     context.param("dateTo").toISODate(),
-                    context.param("slice")?.let { SliceType.valueOf(it) } ?: SliceType.MINUTE //todo delete minute
+                    context.param("slice")?.let { SliceType.valueOf(it) }
                 ).run { context.response(this) }
             }
         }
 
         server.requestHandler(router)
-            .listen(config.port!!) { result ->
+            .listen(config.port) { result ->
                 if (result.succeeded()) {
-                    LOGGER.info("Created a server on port ${config.port!!}")
+                    LOGGER.info("Created a server on port ${config.port}")
                     future.complete()
                 } else {
                     LOGGER.error("Unable to create server: \n" + result.cause().message)
@@ -156,9 +156,7 @@ fun configurer(vertx: Vertx): ConfigRetriever =
                     .setFormat("json")
                     .setConfig(
                         JsonObject().put(
-                            "path",
-                            //todo classpath
-                            "C:\\work\\repo\\autowatering\\src\\main\\resources\\config\\config.json"
+                            "path", Application::class.java.getResource(CONFIG_PATH).path
                         )
                     )
             )
@@ -168,24 +166,26 @@ fun RoutingContext.param(name: String) =
     this.request().getParam(name)
 
 fun Router.routeTo(
+    root: String,
     endpoint: EndPoint,
     handler: (RoutingContext) -> Any
 ): Router {
-    route(endpoint.method, endpoint.path)
+    route(endpoint.method, root + endpoint.path)
         .handler { context -> handler.invoke(context) }
+    //todo add request logging?
     return this
 }
 
 fun <T> RoutingContext.response(result: AsyncResult<Response<T>>) {
-    val response : Response<T> = when {
+    val response: Response<T> = when {
         result.failed() ->
             when (val error = result.cause()) {
                 is AutowateringException -> {
-                    Application.LOGGER.debug("error", error)
+                    Application.LOGGER.debug("error: ", error)
                     Response(error.status, error.message)
                 }
                 else -> {
-                    Application.LOGGER.error("internal error", error)
+                    Application.LOGGER.error("internal error:", error)
                     Response(
                         StatusType.INTERNAL_ERROR,
                         if (error.message == null) error.javaClass.name else error.message!!

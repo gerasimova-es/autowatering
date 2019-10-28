@@ -7,6 +7,7 @@ import com.home.autowatering.controller.dto.PotStateDto
 import com.home.autowatering.controller.dto.response.Response
 import com.home.autowatering.exception.IncorrectPeriodException
 import com.home.autowatering.exception.PotNotFoundException
+import com.home.autowatering.exception.PotValidateException
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
 import com.home.autowatering.model.business.filter.PotFilter
@@ -16,6 +17,7 @@ import com.home.autowatering.service.interfaces.PotService
 import com.home.autowatering.service.interfaces.PotStateService
 import com.home.autowatering.service.interfaces.WateringSystemService
 import com.home.autowatering.validator.PeriodValidator
+import com.home.autowatering.validator.PotRequestValidator
 import com.home.autowatering.validator.onError
 import io.vertx.core.Future
 import io.vertx.core.Future.future
@@ -46,10 +48,13 @@ class PotController(
             }
 
     fun save(request: PotDto): Future<Response<PotDto>> =
-        //todo use pot validator
-        potService.find(
-            PotFilter(id = request.id, code = request.code)
-        ).compose<Pot> { pots ->
+       future<Void>{ future ->
+           PotRequestValidator(request).validate()
+               .onError { result -> throw PotValidateException(result.message) }
+           future.complete()
+       }.compose {
+           potService.find(PotFilter(id = request.id, code = request.code))
+       }.compose<Pot> { pots ->
             future<Pot> { future ->
                 val saved = pots.singleOrNull()
                 val pot = if (saved == null) PotConverter.fromDto(request)
@@ -69,7 +74,6 @@ class PotController(
     fun saveState(
         request: PotStateDto
     ): Future<Response<PotStateDto>> =
-        //todo use execute
         future<PotState> { future ->
             val state = PotStateConverter.fromDto(request)
             future.complete(potStateService.save(state))
@@ -83,13 +87,12 @@ class PotController(
         potCode: String,
         dateFrom: ZonedDateTime?,
         dateTo: ZonedDateTime?,
-        slice: SliceType = SliceType.MINUTE
+        slice: SliceType?
     ): Future<Response<List<PotStateDto>>> =
-        //todo use execute, check failing{}
-        future<Void> {
+        future<Void> { future ->
             PeriodValidator(dateFrom, dateTo, slice).validate()
                 .onError { result -> throw IncorrectPeriodException(result.message) }
-            it.complete()
+            future.complete()
         }.compose<List<Pot>> {
             potService.find(PotFilter(code = potCode))
         }.compose<Response<List<PotStateDto>>> { pots ->
@@ -98,7 +101,7 @@ class PotController(
                 future.complete(
                     PotStateConverter.response(
                         potStateService.find(
-                            PotStateFilter(pot, dateFrom, dateTo, slice)
+                            PotStateFilter(pot, dateFrom, dateTo, slice ?: SliceType.MINUTE)
                         )
                     )
                 )
