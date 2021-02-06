@@ -12,14 +12,17 @@ ESP8266WebServer server(80);
 const char* url = "http://192.168.1.34:8080/autowatering";
 
 //pins
-#define GROUND_HUMIDITY_SENSOR A0
-//todo define AIR_CONDITIONS_SENSOR A1
-#define GROUND_HUMIDITY_ELECTRICITY D2
+//#define GROUND_HUMIDITY_SENSOR A0
+#define AIR_CONDITIONS_SENSOR A0
+//#define GROUND_HUMIDITY_ELECTRICITY D2
 #define WHISTLE D3
 #define PUMP D4
 //todo #define HUMIDIFIER D5
 //todo #define LIGHTING D6
 #define FLOAT D7
+
+//initialize
+DHT dht(AIR_CONDITIONS_SENSOR, DHT11);
 
 //----------------SETTINGS--------------
 //settings for watering process
@@ -109,13 +112,14 @@ struct State state();
 //--------------APPLICATION-----------------
 void setup(){
   Serial.begin(115200);
+  dht.begin();
 
   //at first turn off pump
   pinMode(PUMP, OUTPUT);
   digitalWrite(PUMP, HIGH);
 
   //set mode for digital pins
-  pinMode(HUMIDITY_ELECTRICITY, OUTPUT);
+  //pinMode(HUMIDITY_ELECTRICITY, OUTPUT);
   pinMode(FLOAT, INPUT);
   pinMode(WHISTLE, OUTPUT);
 
@@ -149,9 +153,8 @@ void loop(){
   }
 
   if(needCheckAir()){
-    int currentHumidity = getAirInfo();
-    int currentTemperature = getAirInfo();
-    saveAirState(currentHumidity, currentTemperature)
+    AirState currentState = getAirState();
+    saveAirState(currentState.humidity, currentState.temperature)
     Serial.println("--------------------");
     if(needVaporizeOn()){
       vaporizeOn();
@@ -344,17 +347,24 @@ boolean getTankerIsFull(){
 
 int getGroundHumidity(){
   Serial.println("turning humidity sensor on...");
-  digitalWrite(GROUND_HUMIDITY_ELECTRICITY, LOW);
-  delay(1000);
-  int humidity = map(analogRead(HUMIDITY_SENSOR), 1023, 0, 0, 1023);
-  Serial.println("turning humidity sensor off...");
-  digitalWrite(GROUND_HUMIDITY_ELECTRICITY, HIGH);
+  //todo return when need
+//  digitalWrite(GROUND_HUMIDITY_ELECTRICITY, LOW);
+//  delay(1000);
+//  int humidity = map(analogRead(GROUND_HUMIDITY_SENSOR), 1023, 0, 0, 1023);
+//  Serial.println("turning humidity sensor off...");
+//  digitalWrite(GROUND_HUMIDITY_ELECTRICITY, HIGH);
   Serial.println("humidity sensor turned off");
   return humidity;
 }
 
-int getTemperatureAndHumidity(){
-  //todo
+AirState getAirState(){
+  float humidity = dht.readHumidity();
+  float temperature = dht.readTemperature();
+  if (isnan(humidity) || isnan(temperature)) {
+    Serial.println("error during reading air humidity and temperature");
+    return AirState(-1, -1);
+  }
+  return AirState(humidity, temperature);
 }
 
 void watering(){
