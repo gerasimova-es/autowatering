@@ -1,0 +1,23 @@
+{
+  "air": {
+    "humidity": 50,
+    "temp": 20,
+    "date": 123456678
+  },
+  "ground": {
+    "humidity": 100,
+    "date": 123456678
+  },
+  "tanker": {
+    "full": false,
+    "date": 123456678
+  },
+  "light": {
+    "status": false,
+    "date": 123456678
+  },
+  "vaporizer": {
+    "status": false,
+    "date": 123456678
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "watering": {
+    "enabled": false,
+    "minHumidity": 200,
+    "interval": 30,
+    "duration": 2
+  },
+  "vaporize": {
+    "enabled": false,
+    "minHumidity": 50,
+    "interval": 30
+  },
+  "lighting": {
+    "enabled": false
+  },
+  "whistling": {
+    "enabled": false,
+    "duration": 2
+  }
+}
