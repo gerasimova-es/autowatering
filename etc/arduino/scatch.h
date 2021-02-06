@@ -320,7 +320,7 @@ String get(String serviceUrl){
 
 struct Settings deserializeSettings(String settings){
   StaticJsonDocument<384> doc;
-  deserializeSettings(doc, settings);
+  deserializeJson(doc, settings);
 
   struct Settings tmp;
   JsonObject watering = doc["watering"];
@@ -368,8 +368,9 @@ String serializeState(){
   vaporizer["status"] = state.vaporizer.status;
   vaporizer["date"] = state.vaporizer.date;
 
-  //todo output?
+  String output;
   serializeJson(doc, output);
+  return output;
 }
 
 //-----------SENSOR FUNCTIONS--------------
@@ -390,7 +391,7 @@ int getGroundHumidity(){
   return 0;
 }
 
-AirState getAirState(){
+struct AirState getAirState(){
   struct AirState airState;
   airState.humidity = dht.readHumidity();
   if (isnan(airState.humidity)){
