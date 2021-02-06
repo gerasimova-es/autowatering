@@ -2,6 +2,7 @@
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
 #include <ArduinoJson.h>
+#include <DHT.h>
 
 //WiFi
 const char* ssid = "kate";
@@ -30,7 +31,7 @@ struct WateringSettings {
   bool enabled;
   int minHumidity;
   int interval;   //in milliseconds
-  int duration; //in seconds
+  int duration; //in milliseconds
   WateringSettings(): enabled(true),
     minHumidity(200),
     interval(60*60000),
@@ -44,33 +45,33 @@ struct VaporizeSettings {
   VaporizeSettings(): enabled(true),
     minHumidity(50),
     interval(3*60000) {}
-}
+};
 //settings for lighting
 struct LightingSettings {
   bool enabled;
   //todo startTime;
   //todo stopType;
   LightingSettings(): enabled(true){}
-}
+};
 //settings for whistling
 struct WhistleSettings {
   bool enabled;
   int duration; //in milliseconds
   WhistleSettings(): enabled(true),
       duration(200) {}
-}
+};
 //all settings
 struct Settings {
   struct WateringSettings watering;
   struct VaporizeSettings vaporize;
   struct LightingSettings lighting;
-  struct WhistleSettings whistle;
-  Settings(): watering(WateringSettings())
+  struct WhistleSettings whistling;
+  Settings(): watering(WateringSettings()),
     vaporize(VaporizeSettings()),
     lighting(LightingSettings()),
-    whistle(WhistleSettings()){}
-}
-struct Settings settings();
+    whistling(WhistleSettings()){}
+};
+struct Settings settings;
 
 //---------------STATE-----------------
 //last checked air state
@@ -78,36 +79,36 @@ struct AirState {
   int humidity;
   int temperature;
   unsigned long date;
-}
+};
 //last checked tanker state
 struct TankerState {
   bool isFull;
   unsigned long date;
-}
+};
 //last checked ground state
 struct GroundState {
   int humidity;
   unsigned long date;
-}
+};
 //last checked lighting state
 struct LightingState {
   bool status;
   unsigned long date;
-}
+};
 //last checked vaporize state
-struct VaporizeState {
+struct VaporizerState {
   bool status;
   unsigned long date;
-}
+};
 //all state
 struct State {
   struct AirState air;
   struct TankerState tanker;
   struct GroundState ground;
   struct LightingState lighting;
-  struct VaporizeState vaporize;
-}
-struct State state();
+  struct VaporizerState vaporizer;
+};
+struct State state;
 
 //--------------APPLICATION-----------------
 void setup(){
@@ -138,13 +139,13 @@ void loop(){
   server.handleClient();
 
   if(needCheckTanker()){
-    boolean tankIsFull = getTankIsFull();
-    saveTankerState(tankIsFull);
+    boolean tankerIsFull = getTankerIsFull();
+    saveTankerState(tankerIsFull);
     Serial.println("--------------------");
   }
 
   if(needCheckGround()){
-    int currentHumidity = getHumidity();
+    int currentHumidity = getGroundHumidity();
     saveGroundState(currentHumidity);
     Serial.println("--------------------");
     if(needWatering()){
@@ -154,8 +155,9 @@ void loop(){
   }
 
   if(needCheckAir()){
-    AirState currentState = getAirState();
-    saveAirState(currentState.humidity, currentState.temperature)
+    struct AirState currentState;
+    currentState = getAirState();
+    saveAirState(currentState.humidity, currentState.temperature);
     Serial.println("--------------------");
     if(needVaporizeOn()){
       vaporizeOn();
@@ -208,9 +210,8 @@ void loadSettings(){
    if(result == "error"){
       Serial.println("loading setting error. Use default values.");
    } else {
-      String payload = getPayload(result);
-      Serial.println("parsing json: " + String(payload));
-      settings = parseSettingsJson(payload);
+      Serial.println("parsing json: " + String(result));
+      settings = deserializeSettings(result);
       Serial.println("settings are loaded successfully");
    }
 }
@@ -251,17 +252,17 @@ bool needCheckTanker(){
   return true;
 }
 bool needCheckGround(){
-  return state.ground.date == 0 || millis() - state.ground.date > settings.ground.interval;
+  return state.ground.date == 0 || millis() - state.ground.date > settings.watering.interval;
 }
 bool needCheckAir(){
-  return state.vaporize.date == 0 || millis() - state.vaporize.date > settings.vaporize.interval;
+  return state.vaporizer.date == 0 || millis() - state.vaporizer.date > settings.vaporize.interval;
 }
 //check required actions
 bool needWhistling(){
-  return settings.whistle.enabled && !state.tanker.isFull;
+  return settings.whistling.enabled && !state.tanker.isFull;
 }
 bool needWatering(){
-  return settings.watering.enabled && tanker.isFull
+  return settings.watering.enabled && state.tanker.isFull
     && (state.ground.date == 0 || millis() - state.ground.date > settings.watering.interval)
     && state.ground.humidity < settings.watering.minHumidity;
 }
@@ -270,14 +271,14 @@ bool needLightingOn(){
   //todo and check time has come
 }
 bool needLightingOff(){
-  return !settings.light.enabled || state.lighting.status;
+  return !settings.lighting.enabled || state.lighting.status;
   //todo and check time has come
 }
 bool needVaporizeOn(){
-  return settings.vaporize.enabled && state.air.humidity < settings.vaporize.minHumidity
+  return settings.vaporize.enabled && state.air.humidity < settings.vaporize.minHumidity;
 }
 bool needVaporizeOff(){
-  return !settings.vaporize.enabled || state.air.humidity > settings.vaporize.minHumidity
+  return !settings.vaporize.enabled || state.air.humidity > settings.vaporize.minHumidity;
 }
 
 //------------SAVING STATE--------------
@@ -286,11 +287,11 @@ void saveGroundState(int humidity){
   state.ground.humidity = humidity;
 }
 void saveTankerState(bool isFull){
-  state.tanker.date = mills();
+  state.tanker.date = millis();
   state.tanker.isFull = isFull;
 }
 void saveAirState(int humidity, int temperature){
-  state.air.date = mills();
+  state.air.date = millis();
   state.air.humidity = humidity;
   state.air.temperature = temperature;
 }
@@ -319,14 +320,16 @@ String get(String serviceUrl){
 
 struct Settings deserializeSettings(String settings){
   StaticJsonDocument<384> doc;
-  deserializeJson(doc, payload);
+  deserializeSettings(doc, settings);
 
   struct Settings tmp;
   JsonObject watering = doc["watering"];
   tmp.watering.enabled = watering["enabled"]; // false
   tmp.watering.minHumidity = watering["minHumidity"]; // 200
   tmp.watering.interval = watering["interval"]; // 30
+  tmp.watering.interval = tmp.watering.interval * 60000;
   tmp.watering.duration = watering["duration"]; // 2
+  tmp.watering.duration = tmp.watering.duration * 1000;
 
   JsonObject vaporize = doc["vaporize"];
   tmp.watering.enabled = vaporize["enabled"]; // false
@@ -365,6 +368,7 @@ String serializeState(){
   vaporizer["status"] = state.vaporizer.status;
   vaporizer["date"] = state.vaporizer.date;
 
+  //todo output?
   serializeJson(doc, output);
 }
 
@@ -382,23 +386,34 @@ int getGroundHumidity(){
 //  Serial.println("turning humidity sensor off...");
 //  digitalWrite(GROUND_HUMIDITY_ELECTRICITY, HIGH);
   Serial.println("humidity sensor turned off");
-  return humidity;
+  //todo return humidity
+  return 0;
 }
 
 AirState getAirState(){
-  float humidity = dht.readHumidity();
-  float temperature = dht.readTemperature();
-  if (isnan(humidity) || isnan(temperature)) {
-    Serial.println("error during reading air humidity and temperature");
-    return AirState(-1, -1);
+  struct AirState airState;
+  airState.humidity = dht.readHumidity();
+  if (isnan(airState.humidity)){
+    Serial.println("error during reading air humidity");
+    airState.humidity = -1;
+  } else {
+    airState.humidity = airState.humidity * 100;
   }
-  return AirState(humidity, temperature);
+
+  airState.temperature = dht.readTemperature();
+  if (isnan(airState.temperature)) {
+    Serial.println("error during reading air humidity and temperature");
+    airState.temperature = -1;
+  } else {
+    airState.humidity = airState.humidity * 100;
+  }
+  return airState;
 }
 
 void watering(){
   Serial.println("turning pump on...");
   digitalWrite(PUMP, LOW);
-  delay(settings.ground.duration);
+  delay(settings.watering.duration);
   Serial.println("turning pump off...");
   digitalWrite(PUMP, HIGH);
   Serial.println("pump is turned of");
@@ -406,7 +421,7 @@ void watering(){
 
 void whistling(){
   digitalWrite(WHISTLE, HIGH);
-  delay(setting.whistle.duration);
+  delay(settings.whistling.duration);
   digitalWrite(WHISTLE, LOW);
 }
 
@@ -424,12 +439,12 @@ void lightingOff(){
 
 void vaporizeOn(){
   Serial.println("turning vaporize on...");
-  digitalWrite(VAPORIZER, HIGH)
+  digitalWrite(VAPORIZER, HIGH);
   Serial.println("vaporize is turned on");
 }
 
 void vaporizeOff(){
   Serial.println("turning vaporize off...");
-  digitalWrite(VAPORIZER, LOW)
+  digitalWrite(VAPORIZER, LOW);
   Serial.println("vaporize is turned off");
 }
