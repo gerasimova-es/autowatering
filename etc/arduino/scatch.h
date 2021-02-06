@@ -7,23 +7,35 @@
 //WiFi
 const char* ssid = "kate";
 const char* password = "kate_023";
+
+//arduino web-server on 80 port:
 ESP8266WebServer server(80);
 
-//server
+//autowatering web-server url
 const char* serverUrl = "http://192.168.1.34:8080/autowatering";
 
 //pins
-//#define GROUND_HUMIDITY_SENSOR A0
-#define AIR_CONDITIONS_SENSOR A0
-//#define GROUND_HUMIDITY_ELECTRICITY D2
-#define PUMP D3
+#define GROUND_HUMIDITY_SENSOR A0
+#define PUMP D2
+#define AIR_SENSOR D3
 #define WHISTLE D4
 #define VAPORIZER D5
 #define LIGHTING D6
 #define FLOAT D7
+#define GROUND_HUMIDITY_ELECTRICITY D8
 
-//initialize
-DHT dht(AIR_CONDITIONS_SENSOR, DHT11);
+//initialize sensor
+DHT dht(AIR_SENSOR, DHT11);
+
+//inverter relay sign
+#define RELAY_INVERTED true
+#if defined(RELAY_INVERTED)
+#define RELAY_OPEN LOW
+#define RELAY_CLOSE HIGH
+#else
+#define RELAY_OPEN HIGH
+#define RELAY_CLOSE LOW
+#endif
 
 //----------------SETTINGS--------------
 //settings for watering process
@@ -78,6 +90,7 @@ struct Settings settings;
 struct AirState {
   int humidity;
   int temperature;
+  bool needWater;
   unsigned long date;
 };
 //last checked tanker state
@@ -88,6 +101,7 @@ struct TankerState {
 //last checked ground state
 struct GroundState {
   int humidity;
+  bool needWater;
   unsigned long date;
 };
 //last checked lighting state
@@ -115,15 +129,15 @@ void setup(){
   Serial.begin(115200);
   dht.begin();
 
-  //at first turn off pump
   pinMode(PUMP, OUTPUT);
-  digitalWrite(PUMP, HIGH);
-
   pinMode(WHISTLE, OUTPUT);
   pinMode(VAPORIZER, OUTPUT);
   pinMode(LIGHTING, OUTPUT);
-  //pinMode(HUMIDITY_ELECTRICITY, OUTPUT);
+  pinMode(GROUND_HUMIDITY_ELECTRICITY, OUTPUT);
   pinMode(FLOAT, INPUT);
+
+  //inverted relay
+  digitalWrite(PUMP, RELAY_CLOSE);
 
   wifiConnect();
   Serial.println("--------------------");
@@ -145,19 +159,22 @@ void loop(){
   }
 
   if(needCheckGround()){
-    int currentHumidity = getGroundHumidity();
-    saveGroundState(currentHumidity);
+    int humidity = getGroundHumidity();
     Serial.println("--------------------");
-    if(needWatering()){
+    bool needWater = needWatering();
+    Serial.println("--------------------");
+    if(needWater){
       watering();
       Serial.println("--------------------");
     }
+    saveGroundState(humidity, needWatering);
+    Serial.println("--------------------");
   }
 
   if(needCheckAir()){
-    struct AirState currentState;
-    currentState = getAirState();
-    saveAirState(currentState.humidity, currentState.temperature);
+    float humidity = getAirHumidity();
+    float temperature = getAirTemperature();
+    saveAirState(humidity, temperature);
     Serial.println("--------------------");
     if(needVaporizeOn()){
       vaporizeOn();
@@ -219,7 +236,6 @@ void loadSettings(){
 //-----------------REQUEST HANDLERS--------------------
 void handleChangeSettings() {
   Serial.println("changing setting request received. Handling...");
-
   if (server.hasArg("plain") == false){
      server.send(400, "text/plain", "body is empty");
      return;
@@ -262,16 +278,22 @@ bool needWhistling(){
   return settings.whistling.enabled && !state.tanker.isFull;
 }
 bool needWatering(){
+  //Serial.println("settings.watering.enabled=" + String(settings.watering.enabled));
+  //Serial.println("settings.watering.interval=" + String(settings.watering.interval));
+  //Serial.println("settings.watering.minHumidity=" + String(settings.watering.minHumidity));
+  //Serial.println("state.ground.date=" + String(state.ground.date));
+  //Serial.println("state.ground.humidity=" + String(state.ground.humidity));
+  //Serial.println("-----------------------");
   return settings.watering.enabled && state.tanker.isFull
     && (state.ground.date == 0 || millis() - state.ground.date > settings.watering.interval)
-    && state.ground.humidity < settings.watering.minHumidity;
+    && (state.ground.humidity < settings.watering.minHumidity);
 }
 bool needLightingOn(){
   return settings.lighting.enabled && !state.lighting.status;
   //todo and check time has come
 }
 bool needLightingOff(){
-  return !settings.lighting.enabled || state.lighting.status;
+  return !settings.lighting.enabled && state.lighting.status;
   //todo and check time has come
 }
 bool needVaporizeOn(){
@@ -282,9 +304,10 @@ bool needVaporizeOff(){
 }
 
 //------------SAVING STATE--------------
-void saveGroundState(int humidity){
+void saveGroundState(int humidity, bool needWatering){
   state.ground.date = millis();
   state.ground.humidity = humidity;
+  state.ground.needWater = needWatering;
 }
 void saveTankerState(bool isFull){
   state.tanker.date = millis();
@@ -350,10 +373,12 @@ String serializeState(){
   JsonObject air = doc.createNestedObject("air");
   air["humidity"] = state.air.humidity;
   air["temp"] = state.air.temperature;
+  air["needWater"] = state.air.needWater;
   air["date"] = state.air.date;
 
   JsonObject ground = doc.createNestedObject("ground");
   ground["humidity"] = state.ground.humidity;
+  ground["needWater"] = state.ground.needWater;
   ground["date"] = state.ground.date;
 
   JsonObject tanker = doc.createNestedObject("tanker");
@@ -375,55 +400,65 @@ String serializeState(){
 
 //-----------SENSOR FUNCTIONS--------------
 boolean getTankerIsFull(){
-  return !digitalRead(FLOAT);
+  Serial.println("getting tanker state...");
+  boolean tankerIsFull = !digitalRead(FLOAT);
+  Serial.println("SENSOR: tanker is null =" + String(tankerIsFull));
+  Serial.println("tanker state checked successfully");
+  return tankerIsFull;
 }
 
 int getGroundHumidity(){
-  Serial.println("turning humidity sensor on...");
-  //todo return when need
-//  digitalWrite(GROUND_HUMIDITY_ELECTRICITY, LOW);
-//  delay(1000);
-//  int humidity = map(analogRead(GROUND_HUMIDITY_SENSOR), 1023, 0, 0, 1023);
-//  Serial.println("turning humidity sensor off...");
-//  digitalWrite(GROUND_HUMIDITY_ELECTRICITY, HIGH);
-  Serial.println("humidity sensor turned off");
-  //todo return humidity
-  return 0;
+  Serial.println("getting ground state...");
+  digitalWrite(GROUND_HUMIDITY_ELECTRICITY, LOW);
+  delay(1000);
+  int humidity = map(analogRead(GROUND_HUMIDITY_SENSOR), 1023, 0, 0, 1023);
+  Serial.println("SENSOR: ground humidity=" + String(humidity));
+  digitalWrite(GROUND_HUMIDITY_ELECTRICITY, HIGH);
+  Serial.println("ground state checked successfully");
+  return humidity;
 }
 
-struct AirState getAirState(){
-  struct AirState airState;
-  airState.humidity = dht.readHumidity();
-  if (isnan(airState.humidity)){
-    Serial.println("error during reading air humidity");
-    airState.humidity = -1;
+float getAirHumidity(){
+  Serial.println("getting air humidity...");
+  float value =  dht.readHumidity();
+  if(isnan(value)){
+    Serial.println("SENSOR: error during reading air humidity");
+    value = -1;
   } else {
-    airState.humidity = airState.humidity * 100;
+    Serial.println("SENSOR: air humidity " + String(value) + " %");
   }
+  return value;
+}
 
-  airState.temperature = dht.readTemperature();
-  if (isnan(airState.temperature)) {
-    Serial.println("error during reading air humidity and temperature");
-    airState.temperature = -1;
+float getAirTemperature(){
+  Serial.println("getting air temperature...");
+  float value =  dht.readTemperature();
+  if(isnan(value)){
+    Serial.println("SENSOR: error during reading air temperature");
+    value = -1;
   } else {
-    airState.humidity = airState.humidity * 100;
+    Serial.println("SENSOR: air temperature " + String(value) + " C");
   }
-  return airState;
+  return value;
 }
 
 void watering(){
   Serial.println("turning pump on...");
-  digitalWrite(PUMP, LOW);
+  //inverted relay
+  digitalWrite(PUMP, RELAY_OPEN);
   delay(settings.watering.duration);
   Serial.println("turning pump off...");
-  digitalWrite(PUMP, HIGH);
+  //inverted relay
+  digitalWrite(PUMP, RELAY_CLOSE);
   Serial.println("pump is turned of");
 }
 
 void whistling(){
+  Serial.println("whistling...");
   digitalWrite(WHISTLE, HIGH);
   delay(settings.whistling.duration);
   digitalWrite(WHISTLE, LOW);
+  Serial.println("whistled...");
 }
 
 void lightingOn(){

@@ -2,10 +2,12 @@
   "air": {
     "humidity": 50,
     "temp": 20,
+    "needWater": true,
     "date": 123456678
   },
   "ground": {
     "humidity": 100,
+    "needWater": true,
     "date": 123456678
   },
   "tanker": {
