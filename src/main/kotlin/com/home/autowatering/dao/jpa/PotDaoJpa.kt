@@ -1,11 +1,11 @@
 package com.home.autowatering.dao.jpa
 
-import com.home.autowatering.dao.interfaces.PotDao
+import com.home.autowatering.dao.PotDao
 import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.model.business.Pot
-import com.home.autowatering.model.database.JpaPot
-import com.home.autowatering.model.database.converter.JpaPotConverter
-import com.home.autowatering.repository.PotRepository
+import com.home.autowatering.dao.entity.JpaPot
+import com.home.autowatering.dao.converter.JpaPotConverter
+import com.home.autowatering.dao.repository.PotRepository
 import org.springframework.stereotype.Repository
 import javax.transaction.Transactional
 

@@ -93,38 +93,3 @@ sourceSets {
     main.resources.srcDirs = ['src/main/resources']
 }
 
-
-//----------------------JOOQ-------------------------
-//jooq {
-//    version = '3.11.7' //replace with placeholer
-////    edition = 'OSS'
-//    sample(sourceSets.main) {
-//        jdbc {
-//            driver = 'org.sqlite.JDBC'
-//            url = 'jdbc:sqlite:C:\\work\\repo\\autowatering\\src\\main\\resources\\db\\autowatering.db'
-////            user = ''
-////            password = ''
-//        }
-//        generator {
-//            name = 'org.jooq.codegen.DefaultGenerator'
-//            strategy {
-//                name = 'org.jooq.codegen.DefaultGeneratorStrategy'
-//            }
-//            database {
-//                name = 'org.jooq.meta.sqlite.SQLiteDatabase'
-//            }
-//            generate {
-//                relations = true
-//                deprecated = false
-//                records = true
-//                immutablePojos = true
-//                fluentSetters = true
-//            }
-//            target {
-//                packageName = 'com.home.autowatering.entity'
-//                directory = 'src/main/kotlin/com/home/autowatering/entity'
-//            }
-//        }
-//    }
-//}
-

@@ -1,17 +1,17 @@
 package com.home.autowatering.dao.jpa
 
-import com.home.autowatering.dao.interfaces.PotStateDao
+import com.home.autowatering.dao.PotStateDao
 import com.home.autowatering.entity.jooq.Tables
 import com.home.autowatering.exception.PotNotFoundException
 import com.home.autowatering.exception.SavingException
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.PotState
 import com.home.autowatering.model.business.filter.PotStateFilter
-import com.home.autowatering.model.database.JpaPot
-import com.home.autowatering.model.database.JpaPotState
-import com.home.autowatering.model.database.converter.JpaPotStateConverter
-import com.home.autowatering.repository.PotRepository
-import com.home.autowatering.repository.PotStateRepository
+import com.home.autowatering.dao.entity.JpaPot
+import com.home.autowatering.dao.entity.JpaPotState
+import com.home.autowatering.dao.converter.JpaPotStateConverter
+import com.home.autowatering.dao.repository.PotRepository
+import com.home.autowatering.dao.repository.PotStateRepository
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.trueCondition
@@ -54,7 +54,7 @@ class PotStateDaoJpa(
         }
 
         val data =
-            DSL.using(dataSource, SQLDialect.SQLITE) //todo use database manager
+            DSL.using(dataSource, SQLDialect.SQLITE) //todo use entity manager
                 .select(
                     pot.ID,
                     pot.CODE,

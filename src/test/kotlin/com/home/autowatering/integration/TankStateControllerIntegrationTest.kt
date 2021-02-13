@@ -1,8 +1,7 @@
 package com.home.autowatering.integration
 
-import com.home.autowatering.controller.dto.TankStateDto
-import com.home.autowatering.controller.dto.response.Response
-import com.home.autowatering.controller.dto.response.ResponseStatus
+import com.home.autowatering.api.dto.response.Response
+import com.home.autowatering.api.dto.response.ResponseStatus
 import org.assertj.core.api.Assertions
 import org.junit.Ignore
 import org.junit.Test

@@ -1,14 +1,15 @@
 package com.home.autowatering.service.impl
 
-import com.home.autowatering.dao.interfaces.PotDao
-import com.home.autowatering.dao.interfaces.WateringSystemDao
+import com.home.autowatering.dao.PotDao
+import com.home.autowatering.dao.WateringSystemDao
 import com.home.autowatering.model.business.Pot
 import com.home.autowatering.model.business.filter.PotFilter
-import com.home.autowatering.service.interfaces.PotService
+import com.home.autowatering.service.PotService
 import org.springframework.stereotype.Service
 
 @Service
-class PotServiceImpl(val potDao: PotDao, val wateringSystemDao: WateringSystemDao) : PotService {
+class PotServiceImpl(val potDao: PotDao, val wateringSystemDao: WateringSystemDao) :
+    PotService {
 
     override fun findAll(): List<Pot> =
         potDao.findAll()

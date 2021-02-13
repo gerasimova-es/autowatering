@@ -1,15 +1,16 @@
 package com.home.autowatering.service.impl
 
-import com.home.autowatering.dao.interfaces.WateringSystemDao
+import com.home.autowatering.dao.WateringSystemDao
 import com.home.autowatering.model.business.Pot
-import com.home.autowatering.service.interfaces.WateringSystemService
+import com.home.autowatering.service.WateringSystemService
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.apache.commons.lang3.Validate
 import org.springframework.stereotype.Service
 
 @Service
-class WateringSystemServiceImpl(val wateringSystemDao: WateringSystemDao) : WateringSystemService {
+class WateringSystemServiceImpl(val wateringSystemDao: WateringSystemDao) :
+    WateringSystemService {
     override fun refresh(pot: Pot) {
         Validate.noNullElements(
             arrayOf(
