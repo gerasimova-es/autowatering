@@ -3,23 +3,23 @@
     "humidity": 50,
     "temp": 20,
     "needWater": true,
-    "date": 123456678
+    "date": "21.01.2020T10:11:22"
   },
   "ground": {
     "humidity": 100,
     "needWater": true,
-    "date": 123456678
+    "date": "21.01.2020T10:11:22"
   },
   "tanker": {
     "full": false,
-    "date": 123456678
+    "date": "21.01.2020T10:11:22"
   },
   "light": {
     "status": false,
-    "date": 123456678
+    "date": "21.01.2020T10:11:22"
   },
   "vaporizer": {
     "status": false,
-    "date": 123456678
+    "date": "21.01.2020T10:11:22"
   }
 }

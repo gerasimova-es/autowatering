@@ -1,8 +1,14 @@
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 #include <ESP8266HTTPClient.h>
 #include <ESP8266WebServer.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
+#include <ThreeWire.h>
+#include <RtcDateTime.h>
+#include <RtcDS1302.h>
 
 //WiFi
 const char* ssid = "kate";
@@ -26,6 +32,13 @@ const char* serverUrl = "http://192.168.1.34:8080/autowatering";
 
 //initialize sensor
 DHT dht(AIR_SENSOR, DHT11);
+
+//work with datetime
+#define countof(a) (sizeof(a) / sizeof(a[0]))
+ThreeWire myWire(D9,D8,D10); // IO, SCLK, CE
+RtcDS1302<ThreeWire> Rtc(myWire);
+RtcDateTime now;
+unsigned long lastCheckTime;
 
 //inverter relay sign
 #define RELAY_INVERTED true
@@ -56,13 +69,13 @@ struct VaporizeSettings {
   int interval; //in milliseconds
   VaporizeSettings(): enabled(true),
     minHumidity(50),
-    interval(3*60000) {}
+    interval(5*60000) {}
 };
 //settings for lighting
 struct LightingSettings {
   bool enabled;
-  //todo startTime;
-  //todo stopType;
+  RtcDateTime startTime;
+  RtcDateTime stopTime;
   LightingSettings(): enabled(true){}
 };
 //settings for whistling
@@ -91,28 +104,33 @@ struct AirState {
   int humidity;
   int temperature;
   bool needWater;
-  unsigned long date;
+  unsigned long lastCheck;
+  RtcDateTime date;
 };
 //last checked tanker state
 struct TankerState {
   bool isFull;
-  unsigned long date;
+  unsigned long lastCheck;
+  RtcDateTime date;
 };
 //last checked ground state
 struct GroundState {
   int humidity;
   bool needWater;
-  unsigned long date;
+  unsigned long lastCheck;
+  RtcDateTime date;
 };
 //last checked lighting state
 struct LightingState {
-  bool status;
-  unsigned long date;
+  bool turnedOn;
+  unsigned long lastCheck;
+  RtcDateTime date;
 };
 //last checked vaporize state
 struct VaporizerState {
-  bool status;
-  unsigned long date;
+  bool turnedOn;
+  unsigned long lastCheck;
+  RtcDateTime date;
 };
 //all state
 struct State {
@@ -136,13 +154,18 @@ void setup(){
   pinMode(GROUND_HUMIDITY_ELECTRICITY, OUTPUT);
   pinMode(FLOAT, INPUT);
 
-  //inverted relay
   digitalWrite(PUMP, RELAY_CLOSE);
 
   wifiConnect();
   Serial.println("--------------------");
 
+  initOTA();
+  Serial.println("--------------------");
+
   wifiServerStart();
+  Serial.println("--------------------");
+
+  initDateTime();
   Serial.println("--------------------");
 
   loadSettings();
@@ -150,6 +173,7 @@ void setup(){
 }
 
 void loop(){
+  ArduinoOTA.handle();
   server.handleClient();
 
   if(needCheckTanker()){
@@ -179,8 +203,12 @@ void loop(){
     if(needVaporizeOn()){
       vaporizeOn();
       Serial.println("--------------------");
+      saveVaporizerState(true);
+      Serial.println("--------------------");
     } else if(needVaporizeOff()){
       vaporizeOff();
+      Serial.println("--------------------");
+      saveVaporizerState(false);
       Serial.println("--------------------");
     }
   }
@@ -202,13 +230,16 @@ void loop(){
 
 //--------------WIFI--------------------
 void wifiConnect(){
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial.println("connecting to wifi...");
+  Serial.println("WIFI: connecting to wifi...");
   while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("waiting for connection...");
+    delay(5000);
+    ESP.restart();
+    Serial.println("WIFI: waiting for connection...");
+
   }
-  Serial.println("connected to wifi");
+  Serial.println("WIFI: connected to wifi");
 }
 
 void wifiServerStart(){
@@ -217,7 +248,39 @@ void wifiServerStart(){
   server.on("/settings/change", handleChangeSettings);
   server.on("/state/info", handleGetState);
   server.begin();
-  Serial.println("server listening started");
+  Serial.println("WIFI: server listening started");
+}
+
+//------------------OTA-----------------------------
+void initOTA(){
+  // Port defaults to 8266
+  // ArduinoOTA.setPort(8266);
+
+  // Hostname defaults to esp8266-[ChipID]
+  // ArduinoOTA.setHostname("myesp8266");
+
+  // No authentication by default
+  // ArduinoOTA.setPassword((const char *)"123");
+
+  ArduinoOTA.onStart([]() {
+    Serial.println("OTA: Start");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("OTA: End");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("OTA: Progress: %u%%\n", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+  ArduinoOTA.begin();
+  Serial.println("OTA: Ready");
 }
 
 //------------------INIT SETTINGS-------------------
@@ -268,10 +331,10 @@ bool needCheckTanker(){
   return true;
 }
 bool needCheckGround(){
-  return state.ground.date == 0 || millis() - state.ground.date > settings.watering.interval;
+  return state.ground.lastCheck == 0 || millis() - state.ground.lastCheck > settings.watering.interval;
 }
 bool needCheckAir(){
-  return state.vaporizer.date == 0 || millis() - state.vaporizer.date > settings.vaporize.interval;
+  return state.vaporizer.lastCheck == 0 || millis() - state.vaporizer.lastCheck > settings.vaporize.interval;
 }
 //check required actions
 bool needWhistling(){
@@ -286,17 +349,16 @@ bool needWatering(){
   //Serial.println("state.ground.humidity=" + String(state.ground.humidity));
 
   //Serial.println("-----------------------");
+
   return settings.watering.enabled && state.tanker.isFull
-    && (state.ground.date == 0 || millis() - state.ground.date > settings.watering.interval)
+    && (state.ground.lastCheck == 0 || millis() - state.ground.lastCheck > settings.watering.interval)
     && (state.ground.humidity < settings.watering.minHumidity);
 }
 bool needLightingOn(){
-  return settings.lighting.enabled && !state.lighting.status;
-  //todo and check time has come
+  return !state.lighting.turnedOn && (settings.lighting.enabled && getDateTime() > settings.lighting.startTime && getDateTime() < settings.lighting.stopTime);
 }
 bool needLightingOff(){
-  return !settings.lighting.enabled && state.lighting.status;
-  //todo and check time has come
+  return state.lighting.turnedOn && (!settings.lighting.enabled || getDateTime() < settings.lighting.startTime || getDateTime() > settings.lighting.stopTime);
 }
 bool needVaporizeOn(){
   return settings.vaporize.enabled && state.air.humidity < settings.vaporize.minHumidity;
@@ -307,18 +369,29 @@ bool needVaporizeOff(){
 
 //------------SAVING STATE--------------
 void saveGroundState(int humidity, bool needWatering){
-  state.ground.date = millis();
+  state.ground.lastCheck = millis();
+  state.ground.date = getDateTime();
   state.ground.humidity = humidity;
   state.ground.needWater = needWatering;
 }
 void saveTankerState(bool isFull){
-  state.tanker.date = millis();
+  state.tanker.lastCheck = millis();
+  state.tanker.date = getDateTime();
   state.tanker.isFull = isFull;
 }
 void saveAirState(int humidity, int temperature){
-  state.air.date = millis();
+  state.air.lastCheck = millis();
+  state.air.date = getDateTime();
   state.air.humidity = humidity;
   state.air.temperature = temperature;
+}
+void saveLightingState(bool lightingStatus){
+  state.lighting.turnedOn = lightingStatus;
+  state.lighting.date = getDateTime();
+}
+void saveVaporizerState(bool vaporizerStatus){
+  state.vaporizer.turnedOn = vaporizerStatus;
+  state.vaporizer.date = getDateTime();
 }
 
 //-----------UTILITY FUNCTIONS----------
@@ -344,7 +417,7 @@ String get(String serviceUrl){
 }
 
 struct Settings deserializeSettings(String settings){
-  StaticJsonDocument<384> doc;
+  StaticJsonDocument<256> doc;
   deserializeJson(doc, settings);
 
   struct Settings tmp;
@@ -376,35 +449,39 @@ String serializeState(){
   air["humidity"] = state.air.humidity;
   air["temp"] = state.air.temperature;
   air["needWater"] = state.air.needWater;
-  air["date"] = state.air.date;
+  air["date"] = prettyDateTime(state.air.date);
 
   JsonObject ground = doc.createNestedObject("ground");
   ground["humidity"] = state.ground.humidity;
   ground["needWater"] = state.ground.needWater;
-  ground["date"] = state.ground.date;
+  ground["date"] = prettyDateTime(state.ground.date);
 
   JsonObject tanker = doc.createNestedObject("tanker");
   tanker["full"] = state.tanker.isFull;
-  tanker["date"] = state.tanker.date;
+  tanker["date"] = prettyDateTime(state.tanker.date);
 
   JsonObject light = doc.createNestedObject("light");
-  light["status"] = state.lighting.status;
-  light["date"] = state.lighting.date;
+  light["status"] = state.lighting.turnedOn;
+  light["date"] = prettyDateTime(state.lighting.date);
 
   JsonObject vaporizer = doc.createNestedObject("vaporizer");
-  vaporizer["status"] = state.vaporizer.status;
-  vaporizer["date"] = state.vaporizer.date;
+  vaporizer["status"] = state.vaporizer.turnedOn;
+  vaporizer["date"] = prettyDateTime(state.vaporizer.date);
 
   String output;
   serializeJson(doc, output);
   return output;
 }
 
+String prettyDateTime(const RtcDateTime& dt){
+  return String(dt.Day()) + "." + String(dt.Month()) + "." + String(dt.Year()) + "T" + String(dt.Hour()) + ":" + String(dt.Minute()) + ":" + String(dt.Second());
+}
+
 //-----------SENSOR FUNCTIONS--------------
 boolean getTankerIsFull(){
   Serial.println("getting tanker state...");
   boolean tankerIsFull = !digitalRead(FLOAT);
-  Serial.println("SENSOR: tanker is null =" + String(tankerIsFull));
+  Serial.println("SENSOR: tanker is full =" + String(tankerIsFull));
   Serial.println("tanker state checked successfully");
   return tankerIsFull;
 }
@@ -446,11 +523,11 @@ float getAirTemperature(){
 
 void watering(){
   Serial.println("turning pump on...");
-  //inverted relay
   digitalWrite(PUMP, RELAY_OPEN);
+
   delay(settings.watering.duration);
   Serial.println("turning pump off...");
-  //inverted relay
+
   digitalWrite(PUMP, RELAY_CLOSE);
   Serial.println("pump is turned of");
 }
@@ -485,4 +562,52 @@ void vaporizeOff(){
   Serial.println("turning vaporize off...");
   digitalWrite(VAPORIZER, LOW);
   Serial.println("vaporize is turned off");
+}
+
+RtcDateTime getDateTime(){
+  if(millis() - lastCheckTime > 1000){
+     now = Rtc.GetDateTime();
+     lastCheckTime = millis();
+     if (!now.IsValid()){
+       Serial.println("SENSOR: RTC CHECK: lost confidence in the DateTime!");
+     }
+  }
+  return now;
+}
+
+void initDateTime(){
+  Serial.print("SENSOR: RTC compiled: ");
+  Serial.print(__DATE__);
+  Serial.println(__TIME__);
+
+  Rtc.Begin();
+
+  RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
+  Serial.println(prettyDateTime(compiled));
+
+  if (!Rtc.IsDateTimeValid()){
+    Serial.println("SENSOR: RTC INIT: lost confidence in the DateTime!");
+    Rtc.SetDateTime(compiled);
+  }
+
+  if (Rtc.GetIsWriteProtected()){
+    Serial.println("SENSOR: RTC was write protected, enabling writing now");
+    Rtc.SetIsWriteProtected(false);
+  }
+
+  if (!Rtc.GetIsRunning()){
+    Serial.println("RTC was not actively running, starting now");
+    Rtc.SetIsRunning(true);
+  }
+
+  RtcDateTime now = Rtc.GetDateTime();
+  if (now < compiled){
+    Serial.println("SENSOR: RTC is older than compile time! (updating DateTime)");
+    Rtc.SetDateTime(compiled);
+  } else if (now > compiled) {
+    Serial.println("SENSOR: RTC is newer than compile time. (this is expected)");
+  } else if (now == compiled) {
+    Serial.println("SENSOR: RTC is the same as compile time! (not expected but all is fine)");
+  }
+  lastCheckTime = millis();
 }
