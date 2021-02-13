@@ -281,8 +281,10 @@ bool needWatering(){
   //Serial.println("settings.watering.enabled=" + String(settings.watering.enabled));
   //Serial.println("settings.watering.interval=" + String(settings.watering.interval));
   //Serial.println("settings.watering.minHumidity=" + String(settings.watering.minHumidity));
+
   //Serial.println("state.ground.date=" + String(state.ground.date));
   //Serial.println("state.ground.humidity=" + String(state.ground.humidity));
+
   //Serial.println("-----------------------");
   return settings.watering.enabled && state.tanker.isFull
     && (state.ground.date == 0 || millis() - state.ground.date > settings.watering.interval)
