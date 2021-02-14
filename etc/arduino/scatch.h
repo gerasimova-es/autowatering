@@ -74,11 +74,15 @@ struct VaporizeSettings {
 //settings for lighting
 struct LightingSettings {
   bool enabled;
-  int startTime; //hour of day
-  int stopTime; //hour of day
+  int startTimeHour; //hour of day
+  int startTimeMinute;
+  int stopTimeHour; //hour of day
+  int stopTimeMinute;
   LightingSettings(): enabled(true),
-  startTime(7),
-  stopTime(23){}
+  startTimeHour(7),
+  startTimeMinute(30),
+  stopTimeHour(22),
+  stopTimeMinute(55){}
 };
 //settings for whistling
 struct WhistleSettings {
@@ -156,6 +160,7 @@ void setup(){
   pinMode(FLOAT, INPUT);
 
   digitalWrite(PUMP, RELAY_CLOSE);
+  digitalWrite(LIGHTING, RELAY_CLOSE);
 
   dht.begin();
 
@@ -409,38 +414,45 @@ bool needWatering(){
     && (state.ground.humidity < settings.watering.minHumidity);
 }
 bool needLightingOn(){
-  Serial.println("need lighting on");
+  Serial.println("need lighting on calculation:");
   Serial.println("settings.lighting.enabled=" + String(settings.lighting.enabled));
   Serial.println("state.lighting.turnedOn=" + String(state.lighting.turnedOn));
 
-  Serial.println("settings.lighting.startTime=" + String(settings.lighting.startTime));
-  Serial.println("settings.lighting.stopTime=" + String(settings.lighting.stopTime));
+  Serial.println("settings.lighting.startTime=" + String(settings.lighting.startTimeHour) + ":" + String(settings.lighting.startTimeMinute));
+  Serial.println("settings.lighting.stopTime=" + String(settings.lighting.stopTimeHour) + ":" + String(settings.lighting.stopTimeMinute));
   Serial.println("getDateTime().Hour()=" + String(getDateTime().Hour()));
+  Serial.println("getDateTime().Minute()=" + String(getDateTime().Minute()));
   Serial.println("-----------------------");
 
   bool turnOn = !state.lighting.turnedOn &&
     (settings.lighting.enabled &&
-     getDateTime().Hour() > settings.lighting.startTime &&
-     getDateTime().Hour() < settings.lighting.stopTime);
+     greaterOrEqual(getDateTime().Hour(), getDateTime().Minute(), settings.lighting.startTimeHour, settings.lighting.startTimeMinute) &&
+     greater(settings.lighting.stopTimeHour, settings.lighting.stopTimeMinute, getDateTime().Hour(), getDateTime().Minute()));
+
   Serial.println("lighting.turnOn = " + String(turnOn));
+  Serial.println("-----------------------");
   return turnOn;
 }
 bool needLightingOff(){
-  /*
-  Serial.println("need lighting off");
+
+  Serial.println("need lighting off calculation:");
   Serial.println("settings.lighting.enabled=" + String(settings.lighting.enabled));
   Serial.println("state.lighting.turnedOn=" + String(state.lighting.turnedOn));
 
-  Serial.println("settings.lighting.startTime=" + String(settings.lighting.startTime));
-  Serial.println("settings.lighting.stopTime=" + String(settings.lighting.stopTime));
+  Serial.println("settings.lighting.startTime=" + String(settings.lighting.startTimeHour) + ":" + String(settings.lighting.startTimeMinute));
+  Serial.println("settings.lighting.stopTime=" + String(settings.lighting.stopTimeHour) + ":" + String(settings.lighting.stopTimeMinute));
   Serial.println("getDateTime().Hour()=" + String(getDateTime().Hour()));
+  Serial.println("getDateTime().Minute()=" + String(getDateTime().Minute()));
   Serial.println("-----------------------");
-  */
 
-  return state.lighting.turnedOn &&
+  bool turnOff = state.lighting.turnedOn &&
     (!settings.lighting.enabled ||
-      getDateTime().Hour() < settings.lighting.startTime ||
-      getDateTime().Hour() > settings.lighting.stopTime);
+      greater(settings.lighting.startTimeHour, settings.lighting.startTimeMinute,   getDateTime().Hour(), getDateTime().Minute()) ||
+      greaterOrEqual(getDateTime().Hour(), getDateTime().Minute(), settings.lighting.stopTimeHour, settings.lighting.stopTimeMinute));
+
+  Serial.println("lighting.turnOff = " + String(turnOff));
+  Serial.println("-----------------------");
+  return turnOff;
 }
 bool needVaporizeOn(){
   return settings.vaporize.enabled && state.air.humidity < settings.vaporize.minHumidity;
@@ -479,6 +491,13 @@ void saveVaporizerState(bool vaporizerStatus){
 }
 
 //-----------UTILITY FUNCTIONS----------
+bool greaterOrEqual(int hour1, int minute1, int hour2, int minute2){
+   return hour1 > hour2 || hour1 == hour2 && minute1 >= minute2;
+}
+bool greater(int hour1, int minute1, int hour2, int minute2){
+   return hour1 > hour2 || hour1 == hour2 && minute1 > minute2;
+}
+
 String get(String serviceUrl){
    if (WiFi.status() != WL_CONNECTED) {
       Serial.println("WiFi connection error");
@@ -519,8 +538,10 @@ struct Settings deserializeSettings(String settings){
   tmp.watering.interval = vaporize["interval"]; // 30
 
   tmp.lighting.enabled = doc["lighting"]["enabled"]; // false
-  tmp.lighting.startTime = doc["lighting"]["startTime"]; //7
-  tmp.lighting.stopTime = doc["lighting"]["stopTime"]; //23
+  tmp.lighting.startTimeHour = doc["lighting"]["startTimeHour"]; //7
+  tmp.lighting.startTimeMinute = doc["lighting"]["startTimeMinute"]; //0
+  tmp.lighting.stopTimeHour = doc["lighting"]["stopTimeHour"]; //23
+  tmp.lighting.stopTimeMinute = doc["lighting"]["stopTimeMinute"]; //30
 
   tmp.whistling.enabled = doc["whistling"]["enabled"]; // false
   tmp.whistling.duration = doc["whistling"]["duration"]; // 2

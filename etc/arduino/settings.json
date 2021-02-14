@@ -12,8 +12,10 @@
   },
   "lighting": {
     "enabled": false,
-    "startTime": 7,
-    "stopTime": 23
+    "startTimeHour": 7,
+    "startTimeMinute": 0,
+    "stopTimeHour": 23,
+    "stopTimeMinute": 0
   },
   "whistling": {
     "enabled": false,
