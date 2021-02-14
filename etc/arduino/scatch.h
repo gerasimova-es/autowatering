@@ -41,13 +41,23 @@ RtcDateTime now;
 unsigned long lastCheckTime;
 
 //inverter relay sign
-#define RELAY_INVERTED true
-#if defined(RELAY_INVERTED)
-#define RELAY_OPEN LOW
-#define RELAY_CLOSE HIGH
+#define PUMP_RELAY_INVERTED true
+#define LIGHT_RELAY_INVERTED false
+
+#if defined(PUMP_RELAY_INVERTED)
+ #define PUMP_RELAY_OPEN LOW
+ #define PUMP_RELAY_CLOSE HIGH
 #else
-#define RELAY_OPEN HIGH
-#define RELAY_CLOSE LOW
+ #define PUMP_RELAY_OPEN HIGH
+ #define PUMP_RELAY_CLOSE LOW
+#endif
+
+#if defined(LIGHT_RELAY_INVERTED)
+ #define LIGHT_RELAY_OPEN LOW
+ #define LIGHT_RELAY_CLOSE HIGH
+#else
+ #define LIGHT_RELAY_OPEN HIGH
+ #define LIGHT_RELAY_CLOSE LOW
 #endif
 
 //----------------SETTINGS--------------
@@ -79,10 +89,10 @@ struct LightingSettings {
   int stopTimeHour; //hour of day
   int stopTimeMinute;
   LightingSettings(): enabled(true),
-  startTimeHour(7),
-  startTimeMinute(30),
-  stopTimeHour(22),
-  stopTimeMinute(55){}
+  startTimeHour(23),
+  startTimeMinute(14),
+  stopTimeHour(23),
+  stopTimeMinute(15){}
 };
 //settings for whistling
 struct WhistleSettings {
@@ -159,8 +169,8 @@ void setup(){
   pinMode(GROUND_HUMIDITY_ELECTRICITY, OUTPUT);
   pinMode(FLOAT, INPUT);
 
-  digitalWrite(PUMP, RELAY_CLOSE);
-  digitalWrite(LIGHTING, RELAY_CLOSE);
+  digitalWrite(PUMP, PUMP_RELAY_CLOSE);
+  digitalWrite(LIGHTING, PUMP_RELAY_CLOSE);
 
   dht.begin();
 
@@ -632,12 +642,12 @@ float getAirTemperature(){
 
 void watering(){
   //Serial.println("turning pump on...");
-  digitalWrite(PUMP, RELAY_OPEN);
+  digitalWrite(PUMP, PUMP_RELAY_OPEN);
 
   delay(settings.watering.duration);
   //Serial.println("turning pump off...");
 
-  digitalWrite(PUMP, RELAY_CLOSE);
+  digitalWrite(PUMP, PUMP_RELAY_CLOSE);
   //Serial.println("pump is turned of");
 }
 
@@ -651,13 +661,13 @@ void whistling(){
 
 void lightingOn(){
   Serial.println("turning lighting on...");
-  digitalWrite(LIGHTING, HIGH);
+  digitalWrite(LIGHTING, LIGHT_RELAY_OPEN);
   Serial.println("lighting is turned on");
 }
 
 void lightingOff(){
   Serial.println("turning lighting off...");
-  digitalWrite(LIGHTING, LOW);
+  digitalWrite(LIGHTING, LIGHT_RELAY_CLOSE);
   Serial.println("lighting is turned off");
 }
 
