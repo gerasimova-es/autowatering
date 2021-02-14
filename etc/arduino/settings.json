@@ -11,7 +11,9 @@
     "interval": 30
   },
   "lighting": {
-    "enabled": false
+    "enabled": false,
+    "startTime": 7,
+    "stopTime": 23
   },
   "whistling": {
     "enabled": false,
