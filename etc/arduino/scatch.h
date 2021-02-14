@@ -22,10 +22,10 @@ const char* serverUrl = "http://192.168.1.34:8080/autowatering";
 
 //pins
 #define GROUND_HUMIDITY_SENSOR A0
-#define PUMP D2
+#define VAPORIZER D2
 #define AIR_SENSOR D3
 #define WHISTLE D4
-#define VAPORIZER D5
+#define PUMP D5
 #define LIGHTING D6
 #define FLOAT D7
 #define GROUND_HUMIDITY_ELECTRICITY D8
@@ -41,24 +41,14 @@ RtcDateTime now;
 unsigned long lastCheckTime;
 
 //inverter relay sign
-#define PUMP_RELAY_INVERTED true
-#define LIGHT_RELAY_INVERTED false
+#define PUMP_RELAY_OPEN HIGH
+#define PUMP_RELAY_CLOSE LOW
 
-#if defined(PUMP_RELAY_INVERTED)
- #define PUMP_RELAY_OPEN LOW
- #define PUMP_RELAY_CLOSE HIGH
-#else
- #define PUMP_RELAY_OPEN HIGH
- #define PUMP_RELAY_CLOSE LOW
-#endif
+#define LIGHT_RELAY_OPEN LOW
+#define LIGHT_RELAY_CLOSE HIGH
 
-#if defined(LIGHT_RELAY_INVERTED)
- #define LIGHT_RELAY_OPEN LOW
- #define LIGHT_RELAY_CLOSE HIGH
-#else
- #define LIGHT_RELAY_OPEN HIGH
- #define LIGHT_RELAY_CLOSE LOW
-#endif
+#define VAPORIZE_RELAY_OPEN LOW
+#define VAPORIZE_RELAY_CLOSE HIGH
 
 //----------------SETTINGS--------------
 //settings for watering process
@@ -170,7 +160,8 @@ void setup(){
   pinMode(FLOAT, INPUT);
 
   digitalWrite(PUMP, PUMP_RELAY_CLOSE);
-  digitalWrite(LIGHTING, PUMP_RELAY_CLOSE);
+  digitalWrite(LIGHTING, LIGHT_RELAY_CLOSE);
+  digitalWrite(VAPORIZER, VAPORIZE_RELAY_CLOSE);
 
   dht.begin();
 
@@ -308,62 +299,62 @@ void loop(){
   if(needCheckTanker()){
     boolean tankerIsFull = getTankerIsFull();
     saveTankerState(tankerIsFull);
-    Serial.println("--------------------");
+    //Serial.println("--------------------");
   }
 
   if(needCheckGround()){
     int humidity = getGroundHumidity();
-    Serial.println("--------------------");
+    //Serial.println("--------------------");
     bool needWater = needWatering();
-    Serial.println("--------------------");
+    //Serial.println("--------------------");
     if(needWater){
       watering();
-      Serial.println("--------------------");
+      //Serial.println("--------------------");
     }
     saveGroundState(humidity, needWatering);
-    Serial.println("--------------------");
+    //Serial.println("--------------------");
   }
 
   if(needCheckAir()){
     float humidity = getAirHumidity();
     float temperature = getAirTemperature();
     saveAirState(humidity, temperature);
-    Serial.println("--------------------");
+    //Serial.println("--------------------");
     if(needVaporizeOn()){
       vaporizeOn();
-      Serial.println("--------------------");
+      //Serial.println("--------------------");
       saveVaporizerState(true);
-      Serial.println("--------------------");
+      //Serial.println("--------------------");
     } else if(needVaporizeOff()){
       vaporizeOff();
-      Serial.println("--------------------");
+      //Serial.println("--------------------");
       saveVaporizerState(false);
-      Serial.println("--------------------");
+      //Serial.println("--------------------");
     }
   }
 
   if(needWhistling()){
     whistling();
-    Serial.println("--------------------");
+    //Serial.println("--------------------");
   }
 
   if(needLightingOn()){
     lightingOn();
-    Serial.println("--------------------");
+    //Serial.println("--------------------");
     saveLightingState(true);
-    Serial.println("--------------------");
+    //Serial.println("--------------------");
   } else if(needLightingOff()){
     lightingOff();
-    Serial.println("--------------------");
+    //Serial.println("--------------------");
     saveLightingState(false);
-    Serial.println("--------------------");
+   // Serial.println("--------------------");
   }
   delay(5000);
 }
 
 //-----------------REQUEST HANDLERS--------------------
 void handleChangeSettings() {
-  Serial.println("changing setting request received. Handling...");
+  //Serial.println("changing setting request received. Handling...");
   if (server.hasArg("plain") == false){
      server.send(400, "text/plain", "body is empty");
      return;
@@ -371,12 +362,12 @@ void handleChangeSettings() {
   settings = deserializeSettings(server.arg("plain"));
   server.send(200, "text/plain", "ok");
 
-  Serial.println("request handled successfully");
-  Serial.println("--------------------");
+  //Serial.println("request handled successfully");
+  //Serial.println("--------------------");
 }
 
 void handleGetState(){
-  Serial.println("getting state info request received. Handling...");
+  //Serial.println("getting state info request received. Handling...");
 
   if (server.hasArg("plain") == false){
       server.send(400, "text/plain", "body is empty");
@@ -385,8 +376,8 @@ void handleGetState(){
   String state = serializeState();
   server.send(200, "text/plain", state);
 
-  Serial.println("request handled successfully");
-  Serial.println("--------------------");
+  //Serial.println("request handled successfully");
+  //Serial.println("--------------------");
 }
 
 //--------------CHECKERS-----------------
@@ -424,6 +415,7 @@ bool needWatering(){
     && (state.ground.humidity < settings.watering.minHumidity);
 }
 bool needLightingOn(){
+  /*
   Serial.println("need lighting on calculation:");
   Serial.println("settings.lighting.enabled=" + String(settings.lighting.enabled));
   Serial.println("state.lighting.turnedOn=" + String(state.lighting.turnedOn));
@@ -433,18 +425,19 @@ bool needLightingOn(){
   Serial.println("getDateTime().Hour()=" + String(getDateTime().Hour()));
   Serial.println("getDateTime().Minute()=" + String(getDateTime().Minute()));
   Serial.println("-----------------------");
-
+  */
   bool turnOn = !state.lighting.turnedOn &&
     (settings.lighting.enabled &&
      greaterOrEqual(getDateTime().Hour(), getDateTime().Minute(), settings.lighting.startTimeHour, settings.lighting.startTimeMinute) &&
      greater(settings.lighting.stopTimeHour, settings.lighting.stopTimeMinute, getDateTime().Hour(), getDateTime().Minute()));
-
+  /*
   Serial.println("lighting.turnOn = " + String(turnOn));
   Serial.println("-----------------------");
+  */
   return turnOn;
 }
 bool needLightingOff(){
-
+  /*
   Serial.println("need lighting off calculation:");
   Serial.println("settings.lighting.enabled=" + String(settings.lighting.enabled));
   Serial.println("state.lighting.turnedOn=" + String(state.lighting.turnedOn));
@@ -454,21 +447,38 @@ bool needLightingOff(){
   Serial.println("getDateTime().Hour()=" + String(getDateTime().Hour()));
   Serial.println("getDateTime().Minute()=" + String(getDateTime().Minute()));
   Serial.println("-----------------------");
-
+  */
   bool turnOff = state.lighting.turnedOn &&
     (!settings.lighting.enabled ||
       greater(settings.lighting.startTimeHour, settings.lighting.startTimeMinute,   getDateTime().Hour(), getDateTime().Minute()) ||
       greaterOrEqual(getDateTime().Hour(), getDateTime().Minute(), settings.lighting.stopTimeHour, settings.lighting.stopTimeMinute));
-
+  /*
   Serial.println("lighting.turnOff = " + String(turnOff));
   Serial.println("-----------------------");
+  */
   return turnOff;
 }
 bool needVaporizeOn(){
-  return settings.vaporize.enabled && state.air.humidity < settings.vaporize.minHumidity;
+  /*Serial.println("need vaporize on calculation:");
+  Serial.println("settings.vaporize.enabled=" + String(settings.vaporize.enabled));
+  Serial.println("settings.vaporize.minHumidity:" + String(settings.vaporize.minHumidity));
+  Serial.println("state.air.humidity:" + String(state.air.humidity));
+  Serial.println("-----------------------");*/
+  bool vaporizeOn = settings.vaporize.enabled && state.air.humidity < settings.vaporize.minHumidity;
+  /*Serial.println("vaporize.turnOn = " + String(vaporizeOn));
+  Serial.println("-----------------------");*/
+  return vaporizeOn;
 }
 bool needVaporizeOff(){
-  return !settings.vaporize.enabled || state.air.humidity > settings.vaporize.minHumidity;
+  /*Serial.println("need vaporize on calculation:");
+  Serial.println("settings.vaporize.enabled=" + String(settings.vaporize.enabled));
+  Serial.println("settings.vaporize.minHumidity:" + String(settings.vaporize.minHumidity));
+  Serial.println("state.air.humidity:" + String(state.air.humidity));
+  Serial.println("-----------------------");*/
+  bool vaporizeOff = !settings.vaporize.enabled || state.air.humidity > settings.vaporize.minHumidity;
+  /*Serial.println("vaporize.turnOff = " + String(vaporizeOff));
+  Serial.println("-----------------------");*/
+  return vaporizeOff;
 }
 
 //------------SAVING STATE--------------
@@ -490,10 +500,10 @@ void saveAirState(int humidity, int temperature){
   state.air.temperature = temperature;
 }
 void saveLightingState(bool lightingStatus){
-  Serial.println("saving lighting state");
+  //Serial.println("saving lighting state");
   state.lighting.turnedOn = lightingStatus;
   state.lighting.date = getDateTime();
-  Serial.println("state.lighting.turnedOn=" + String(state.lighting.turnedOn));
+  //Serial.println("state.lighting.turnedOn=" + String(state.lighting.turnedOn));
 }
 void saveVaporizerState(bool vaporizerStatus){
   state.vaporizer.turnedOn = vaporizerStatus;
@@ -643,10 +653,7 @@ float getAirTemperature(){
 void watering(){
   //Serial.println("turning pump on...");
   digitalWrite(PUMP, PUMP_RELAY_OPEN);
-
   delay(settings.watering.duration);
-  //Serial.println("turning pump off...");
-
   digitalWrite(PUMP, PUMP_RELAY_CLOSE);
   //Serial.println("pump is turned of");
 }
@@ -660,27 +667,27 @@ void whistling(){
 }
 
 void lightingOn(){
-  Serial.println("turning lighting on...");
+  //Serial.println("turning lighting on...");
   digitalWrite(LIGHTING, LIGHT_RELAY_OPEN);
-  Serial.println("lighting is turned on");
+  //Serial.println("lighting is turned on");
 }
 
 void lightingOff(){
-  Serial.println("turning lighting off...");
+  //Serial.println("turning lighting off...");
   digitalWrite(LIGHTING, LIGHT_RELAY_CLOSE);
-  Serial.println("lighting is turned off");
+  //Serial.println("lighting is turned off");
 }
 
 void vaporizeOn(){
-  //Serial.println("turning vaporize on...");
-  digitalWrite(VAPORIZER, HIGH);
-  //Serial.println("vaporize is turned on");
+  Serial.println("turning vaporize on...");
+  digitalWrite(VAPORIZER, VAPORIZE_RELAY_OPEN);
+  Serial.println("vaporize is turned on");
 }
 
 void vaporizeOff(){
-  //Serial.println("turning vaporize off...");
-  digitalWrite(VAPORIZER, LOW);
-  //Serial.println("vaporize is turned off");
+  Serial.println("turning vaporize off...");
+  digitalWrite(VAPORIZER, VAPORIZE_RELAY_CLOSE);
+  Serial.println("vaporize is turned off");
 }
 
 RtcDateTime getDateTime(){
