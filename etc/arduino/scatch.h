@@ -9,6 +9,8 @@
 #include <ThreeWire.h>
 #include <RtcDateTime.h>
 #include <RtcDS1302.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
 //WiFi
 const char* ssid = "kate";
@@ -32,6 +34,7 @@ const char* serverUrl = "http://192.168.1.34:8080/autowatering";
 
 //initialize sensor
 DHT dht(AIR_SENSOR, DHT11);
+LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7);
 
 //work with datetime
 #define countof(a) (sizeof(a) / sizeof(a[0]))
@@ -74,22 +77,30 @@ struct VaporizeSettings {
 //settings for lighting
 struct LightingSettings {
   bool enabled;
-  int startTimeHour; //hour of day
-  int startTimeMinute;
-  int stopTimeHour; //hour of day
-  int stopTimeMinute;
+  int startHour; //hour of day
+  int startMinute;
+  int stopHour; //hour of day
+  int stopMinute;
   LightingSettings(): enabled(true),
-  startTimeHour(23),
-  startTimeMinute(14),
-  stopTimeHour(23),
-  stopTimeMinute(15){}
+    startHour(8),
+    startMinute(30),
+    stopHour(23),
+    stopMinute(30){}
 };
 //settings for whistling
 struct WhistleSettings {
   bool enabled;
   int duration; //in milliseconds
+  int startHour; //hour of day
+  int startMinute;
+  int stopHour; //hour of day
+  int stopMinute;
   WhistleSettings(): enabled(true),
-      duration(200) {}
+    duration(200),
+    startHour(10),
+    startMinute(0),
+    stopHour(22),
+    stopMinute(47){}
 };
 //all settings
 struct Settings {
@@ -165,6 +176,7 @@ void setup(){
 
   dht.begin();
 
+  initLcd();
   wifiConnect();
   initOTA();
   wifiServerStart();
@@ -172,25 +184,33 @@ void setup(){
   loadSettings();
 }
 
+//-----------------lcd---------------------
+void initLcd(){
+  lcd.begin(16,2); // for 16 x 2 LCD module
+  lcd.setBacklightPin(3, POSITIVE);
+  lcd.setBacklight(HIGH);
+
+  lcd.home();  // go home
+  lcd.print("Initializing...");
+  Serial.println("lcd initialized");
+}
+
 //--------------wifi--------------------
 void wifiConnect(){
-  Serial.println("WIFI: connection to wifi");
   WiFi.mode(WIFI_STA);
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
   WiFi.begin(ssid, password);
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    Serial.println("WIFI: Connection Failed! Rebooting...");
     delay(5000);
     ESP.restart();
   }
-  Serial.println("WIFI: connected to wifi");
 }
 
 void wifiServerStart(){
   server.on("/settings/change", handleChangeSettings);
   server.on("/state/info", handleGetState);
   server.begin();
-  Serial.println("WIFI: server listening started");
+  Serial.println("WEB SERVER: server listening started");
 }
 
 //------------------ota-----------------------------
@@ -212,31 +232,31 @@ void initOTA(){
       type = "filesystem";
     }
     // NOTE: if updating FS this would be the place to unmount FS using FS.end()
-    Serial.println("Start updating " + type);
+    Serial.println("OTA: Start updating " + type);
   });
   ArduinoOTA.onEnd([]() {
     Serial.println("\nEnd");
   });
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+    Serial.printf("OTA: Progress: %u%%\r", (progress / (total / 100)));
   });
   ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
+    Serial.printf("OTA: Error[%u]: ", error);
     if (error == OTA_AUTH_ERROR) {
-      Serial.println("Auth Failed");
+      Serial.println("OTA: Auth Failed");
     } else if (error == OTA_BEGIN_ERROR) {
-      Serial.println("Begin Failed");
+      Serial.println("OTA: Begin Failed");
     } else if (error == OTA_CONNECT_ERROR) {
-      Serial.println("Connect Failed");
+      Serial.println("OTA: Connect Failed");
     } else if (error == OTA_RECEIVE_ERROR) {
-      Serial.println("Receive Failed");
+      Serial.println("OTA: Receive Failed");
     } else if (error == OTA_END_ERROR) {
       Serial.println("End Failed");
     }
   });
   ArduinoOTA.begin();
-  Serial.println("Ready");
-  Serial.print("IP address: ");
+  Serial.println("OTA: Ready");
+  Serial.print("WIFI: IP address: ");
   Serial.println(WiFi.localIP());
 }
 
@@ -245,7 +265,7 @@ void loadSettings(){
    Serial.println("loading settings...");
    String result = get("/autowatering/settings/info");
    if(result == "error"){
-      Serial.println("loading setting error. Use default values.");
+      Serial.println("loading setting error. Using default values.");
    } else {
       Serial.println("parsing json: " + String(result));
       settings = deserializeSettings(result);
@@ -275,7 +295,7 @@ void initDateTime(){
   }
 
   if (!Rtc.GetIsRunning()){
-    Serial.println("RTC was not actively running, starting now");
+    Serial.println("SENSOR: RTC was not actively running, starting now");
     Rtc.SetIsRunning(true);
   }
 
@@ -293,6 +313,7 @@ void initDateTime(){
 
 //------------------LOOP-------------------
 void loop(){
+
   ArduinoOTA.handle();
   server.handleClient();
 
@@ -349,7 +370,7 @@ void loop(){
     saveLightingState(false);
    // Serial.println("--------------------");
   }
-  delay(5000);
+  delay(2000);
 }
 
 //-----------------REQUEST HANDLERS--------------------
@@ -387,14 +408,19 @@ bool needCheckTanker(){
   return true;
 }
 bool needCheckGround(){
-  return state.ground.lastCheck == 0 || millis() - state.ground.lastCheck > settings.watering.interval;
+  return state.ground.lastCheck == 0 ||
+    millis() - state.ground.lastCheck > settings.watering.interval;
 }
 bool needCheckAir(){
-  return state.vaporizer.lastCheck == 0 || millis() - state.vaporizer.lastCheck > settings.vaporize.interval;
+  return state.vaporizer.lastCheck == 0 ||
+     millis() - state.vaporizer.lastCheck > settings.vaporize.interval;
 }
 //check required actions
 bool needWhistling(){
-  return settings.whistling.enabled && !state.tanker.isFull;
+  return settings.whistling.enabled &&
+     greaterOrEqual(getDateTime().Hour(), getDateTime().Minute(), settings.whistling.startHour, settings.whistling.startMinute) &&
+     greater(settings.whistling.stopHour, settings.whistling.stopMinute, getDateTime().Hour(), getDateTime().Minute()) &&
+     !state.tanker.isFull;
 }
 bool needWatering(){
   /*
@@ -420,16 +446,16 @@ bool needLightingOn(){
   Serial.println("settings.lighting.enabled=" + String(settings.lighting.enabled));
   Serial.println("state.lighting.turnedOn=" + String(state.lighting.turnedOn));
 
-  Serial.println("settings.lighting.startTime=" + String(settings.lighting.startTimeHour) + ":" + String(settings.lighting.startTimeMinute));
-  Serial.println("settings.lighting.stopTime=" + String(settings.lighting.stopTimeHour) + ":" + String(settings.lighting.stopTimeMinute));
+  Serial.println("settings.lighting.startTime=" + String(settings.lighting.startTime) + ":" + String(settings.lighting.startMinute));
+  Serial.println("settings.lighting.stopTime=" + String(settings.lighting.stopHour) + ":" + String(settings.lighting.stopMinute));
   Serial.println("getDateTime().Hour()=" + String(getDateTime().Hour()));
   Serial.println("getDateTime().Minute()=" + String(getDateTime().Minute()));
   Serial.println("-----------------------");
   */
   bool turnOn = !state.lighting.turnedOn &&
     (settings.lighting.enabled &&
-     greaterOrEqual(getDateTime().Hour(), getDateTime().Minute(), settings.lighting.startTimeHour, settings.lighting.startTimeMinute) &&
-     greater(settings.lighting.stopTimeHour, settings.lighting.stopTimeMinute, getDateTime().Hour(), getDateTime().Minute()));
+     greaterOrEqual(getDateTime().Hour(), getDateTime().Minute(), settings.lighting.startHour, settings.lighting.startMinute) &&
+     greater(settings.lighting.stopHour, settings.lighting.stopMinute, getDateTime().Hour(), getDateTime().Minute()));
   /*
   Serial.println("lighting.turnOn = " + String(turnOn));
   Serial.println("-----------------------");
@@ -442,16 +468,16 @@ bool needLightingOff(){
   Serial.println("settings.lighting.enabled=" + String(settings.lighting.enabled));
   Serial.println("state.lighting.turnedOn=" + String(state.lighting.turnedOn));
 
-  Serial.println("settings.lighting.startTime=" + String(settings.lighting.startTimeHour) + ":" + String(settings.lighting.startTimeMinute));
-  Serial.println("settings.lighting.stopTime=" + String(settings.lighting.stopTimeHour) + ":" + String(settings.lighting.stopTimeMinute));
+  Serial.println("settings.lighting.startTime=" + String(settings.lighting.startTime) + ":" + String(settings.lighting.startMinute));
+  Serial.println("settings.lighting.stopTime=" + String(settings.lighting.stopHour) + ":" + String(settings.lighting.stopMinute));
   Serial.println("getDateTime().Hour()=" + String(getDateTime().Hour()));
   Serial.println("getDateTime().Minute()=" + String(getDateTime().Minute()));
   Serial.println("-----------------------");
   */
   bool turnOff = state.lighting.turnedOn &&
     (!settings.lighting.enabled ||
-      greater(settings.lighting.startTimeHour, settings.lighting.startTimeMinute,   getDateTime().Hour(), getDateTime().Minute()) ||
-      greaterOrEqual(getDateTime().Hour(), getDateTime().Minute(), settings.lighting.stopTimeHour, settings.lighting.stopTimeMinute));
+      greater(settings.lighting.startHour, settings.lighting.startMinute,   getDateTime().Hour(), getDateTime().Minute()) ||
+      greaterOrEqual(getDateTime().Hour(), getDateTime().Minute(), settings.lighting.stopHour, settings.lighting.stopMinute));
   /*
   Serial.println("lighting.turnOff = " + String(turnOff));
   Serial.println("-----------------------");
@@ -464,7 +490,7 @@ bool needVaporizeOn(){
   Serial.println("settings.vaporize.minHumidity:" + String(settings.vaporize.minHumidity));
   Serial.println("state.air.humidity:" + String(state.air.humidity));
   Serial.println("-----------------------");*/
-  bool vaporizeOn = settings.vaporize.enabled && state.air.humidity < settings.vaporize.minHumidity;
+  bool vaporizeOn = !state.vaporizer.turnedOn && settings.vaporize.enabled && state.air.humidity < settings.vaporize.minHumidity;
   /*Serial.println("vaporize.turnOn = " + String(vaporizeOn));
   Serial.println("-----------------------");*/
   return vaporizeOn;
@@ -475,7 +501,7 @@ bool needVaporizeOff(){
   Serial.println("settings.vaporize.minHumidity:" + String(settings.vaporize.minHumidity));
   Serial.println("state.air.humidity:" + String(state.air.humidity));
   Serial.println("-----------------------");*/
-  bool vaporizeOff = !settings.vaporize.enabled || state.air.humidity > settings.vaporize.minHumidity;
+  bool vaporizeOff = state.vaporizer.turnedOn && (!settings.vaporize.enabled || state.air.humidity > settings.vaporize.minHumidity);
   /*Serial.println("vaporize.turnOff = " + String(vaporizeOff));
   Serial.println("-----------------------");*/
   return vaporizeOff;
@@ -540,7 +566,7 @@ String get(String serviceUrl){
 }
 
 struct Settings deserializeSettings(String settings){
-  StaticJsonDocument<256> doc;
+  StaticJsonDocument<512> doc;
   deserializeJson(doc, settings);
 
   struct Settings tmp;
@@ -558,19 +584,23 @@ struct Settings deserializeSettings(String settings){
   tmp.watering.interval = vaporize["interval"]; // 30
 
   tmp.lighting.enabled = doc["lighting"]["enabled"]; // false
-  tmp.lighting.startTimeHour = doc["lighting"]["startTimeHour"]; //7
-  tmp.lighting.startTimeMinute = doc["lighting"]["startTimeMinute"]; //0
-  tmp.lighting.stopTimeHour = doc["lighting"]["stopTimeHour"]; //23
-  tmp.lighting.stopTimeMinute = doc["lighting"]["stopTimeMinute"]; //30
+  tmp.lighting.startHour = doc["lighting"]["startHour"]; //7
+  tmp.lighting.startMinute = doc["lighting"]["startMinute"]; //0
+  tmp.lighting.stopHour = doc["lighting"]["stopHour"]; //23
+  tmp.lighting.stopMinute = doc["lighting"]["stopMinute"]; //30
 
   tmp.whistling.enabled = doc["whistling"]["enabled"]; // false
   tmp.whistling.duration = doc["whistling"]["duration"]; // 2
+  tmp.whistling.startHour = doc["whistling"]["startHour"]; //7
+  tmp.whistling.startMinute = doc["whistling"]["startMinute"]; //0
+  tmp.whistling.stopHour = doc["whistling"]["stopHour"]; //23
+  tmp.whistling.stopMinute = doc["whistling"]["stopMinute"]; //30
 
   return tmp;
 }
 
 String serializeState(){
-  StaticJsonDocument<256> doc;
+  StaticJsonDocument<512> doc;
 
   JsonObject air = doc.createNestedObject("air");
   air["humidity"] = state.air.humidity;
@@ -679,15 +709,15 @@ void lightingOff(){
 }
 
 void vaporizeOn(){
-  Serial.println("turning vaporize on...");
+  //Serial.println("turning vaporize on...");
   digitalWrite(VAPORIZER, VAPORIZE_RELAY_OPEN);
-  Serial.println("vaporize is turned on");
+  //Serial.println("vaporize is turned on");
 }
 
 void vaporizeOff(){
-  Serial.println("turning vaporize off...");
+ // Serial.println("turning vaporize off...");
   digitalWrite(VAPORIZER, VAPORIZE_RELAY_CLOSE);
-  Serial.println("vaporize is turned off");
+ // Serial.println("vaporize is turned off");
 }
 
 RtcDateTime getDateTime(){
@@ -699,4 +729,10 @@ RtcDateTime getDateTime(){
      }
   }
   return now;
+}
+
+void lcdPrint(String message){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print(message);
 }
