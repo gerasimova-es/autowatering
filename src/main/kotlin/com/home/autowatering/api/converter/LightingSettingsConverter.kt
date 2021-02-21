@@ -1,6 +1,6 @@
 package com.home.autowatering.api.converter
 
-import com.home.autowatering.api.dto.LightingSettingsDto
+import com.home.autowatering.api.dto.settings.LightingSettingsDto
 import com.home.autowatering.model.LightingSettings
 import java.time.LocalTime
 

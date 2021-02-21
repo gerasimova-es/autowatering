@@ -1,6 +1,6 @@
 package com.home.autowatering.api.converter
 
-import com.home.autowatering.api.dto.VaporizeSettingsDto
+import com.home.autowatering.api.dto.settings.VaporizeSettingsDto
 import com.home.autowatering.model.VaporizeSettings
 
 object VaporizeSettingsConverter : RequestConverter<VaporizeSettingsDto, VaporizeSettings>(

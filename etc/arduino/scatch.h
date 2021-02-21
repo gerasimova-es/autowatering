@@ -388,17 +388,17 @@ void handleChangeSettings() {
 }
 
 void handleGetState(){
-  //Serial.println("getting state info request received. Handling...");
+  Serial.println("getting state info request received. Handling...");
 
-  if (server.hasArg("plain") == false){
-      server.send(400, "text/plain", "body is empty");
-      return;
-  }
+  //if (server.hasArg("plain") == false){
+  //    server.send(400, "text/plain", "body is empty");
+  //    return;
+  //}
   String state = serializeState();
-  server.send(200, "text/plain", state);
+  server.send(200, "application/json;charset=UTF-8", state);
 
-  //Serial.println("request handled successfully");
-  //Serial.println("--------------------");
+  Serial.println("request handled successfully");
+  Serial.println("--------------------");
 }
 
 //--------------CHECKERS-----------------
@@ -631,7 +631,7 @@ String serializeState(){
 }
 
 String prettyDateTime(const RtcDateTime& dt){
-  return String(dt.Day()) + "." + String(dt.Month()) + "." + String(dt.Year()) + "T" + String(dt.Hour()) + ":" + String(dt.Minute()) + ":" + String(dt.Second());
+  return String(dt.Day()) + "-" + String(dt.Month()) + "-" + String(dt.Year()) + "T" + String(dt.Hour()) + ":" + String(dt.Minute()) + ":" + String(dt.Second());
 }
 
 //-----------SENSOR FUNCTIONS--------------

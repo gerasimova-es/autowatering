@@ -4,7 +4,7 @@ import com.home.autowatering.api.converter.LightingSettingsConverter
 import com.home.autowatering.api.converter.VaporizeSettingsConverter
 import com.home.autowatering.api.converter.WateringSettingsConverter
 import com.home.autowatering.api.converter.WhistlingSettingsConverter
-import com.home.autowatering.api.dto.SettingsDto
+import com.home.autowatering.api.dto.settings.DeviceSettingsDto
 import com.home.autowatering.service.LightingService
 import com.home.autowatering.service.VaporizeService
 import com.home.autowatering.service.WateringService
@@ -23,8 +23,8 @@ class SettingsController(
 ) : AbstractController() {
 
     @GetMapping("/info")
-    fun info(): SettingsDto {
-        return SettingsDto(
+    fun info(): DeviceSettingsDto {
+        return DeviceSettingsDto(
             WateringSettingsConverter.fromEntity(wateringService.getSettings()),
             VaporizeSettingsConverter.fromEntity(vaporizeService.getSettings()),
             LightingSettingsConverter.fromEntity(lightingService.getSettings()),

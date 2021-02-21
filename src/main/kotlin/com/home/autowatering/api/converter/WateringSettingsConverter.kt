@@ -1,6 +1,6 @@
 package com.home.autowatering.api.converter
 
-import com.home.autowatering.api.dto.WateringSettingsDto
+import com.home.autowatering.api.dto.settings.WateringSettingsDto
 import com.home.autowatering.model.WateringSettings
 
 object WateringSettingsConverter : RequestConverter<WateringSettingsDto, WateringSettings>(

@@ -1,4 +1,4 @@
-package com.home.autowatering.api.dto
+package com.home.autowatering.api.dto.settings
 
 import com.fasterxml.jackson.annotation.JsonInclude
 

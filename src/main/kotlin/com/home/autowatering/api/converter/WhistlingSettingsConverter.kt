@@ -1,6 +1,6 @@
 package com.home.autowatering.api.converter
 
-import com.home.autowatering.api.dto.WhistlingSettingsDto
+import com.home.autowatering.api.dto.settings.WhistlingSettingsDto
 import com.home.autowatering.model.WhistlingSettings
 import java.time.LocalTime
 
