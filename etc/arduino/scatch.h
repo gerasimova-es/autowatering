@@ -263,7 +263,7 @@ void initOTA(){
 //------------------settings-------------------
 void loadSettings(){
    Serial.println("loading settings...");
-   String result = get("/autowatering/settings/info");
+   String result = getRequest("/settings/info");
    if(result == "error"){
       Serial.println("loading setting error. Using default values.");
    } else {
@@ -544,7 +544,7 @@ bool greater(int hour1, int minute1, int hour2, int minute2){
    return hour1 > hour2 || hour1 == hour2 && minute1 > minute2;
 }
 
-String get(String serviceUrl){
+String getRequest(String serviceUrl){
    if (WiFi.status() != WL_CONNECTED) {
       Serial.println("WiFi connection error");
       return "error";

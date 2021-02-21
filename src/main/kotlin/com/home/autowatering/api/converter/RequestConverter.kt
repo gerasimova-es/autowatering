@@ -1,6 +1,5 @@
 package com.home.autowatering.api.converter
 
-import com.home.autowatering.api.dto.response.Response
 import java.util.stream.Collectors
 
 /**
@@ -43,11 +42,5 @@ open class RequestConverter<D, E>(
         entities.stream()
             .map { fromEntity(it) }
             .collect(Collectors.toList<D>())
-
-    fun response(entity: E): Response<D> =
-        Response(fromEntity(entity))
-
-    fun response(entities: List<E>): Response<List<D>> =
-        Response(fromEntities(entities))
 
 }
