@@ -208,6 +208,7 @@ void wifiConnect(){
 void wifiServerStart(){
   server.on("/settings/change", handleChangeSettings);
   server.on("/state/info", handleGetState);
+  server.on("/watering/force", handleForceWatering);
   server.begin();
   Serial.println("WEB SERVER: server listening started");
 }
@@ -389,12 +390,18 @@ void handleChangeSettings() {
 void handleGetState(){
   //Serial.println("getting state info request received. Handling...");
 
-  //if (server.hasArg("plain") == false){
-  //    server.send(400, "text/plain", "body is empty");
-  //    return;
-  //}
   String state = serializeState();
   server.send(200, "application/json;charset=UTF-8", state);
+
+  //Serial.println("request handled successfully");
+  //Serial.println("--------------------");
+}
+
+void handleForceWatering(){
+  //Serial.println("watering request received. Handling...");
+
+  watering();
+  server.send(200, "text/plain", "ok");
 
   //Serial.println("request handled successfully");
   //Serial.println("--------------------");

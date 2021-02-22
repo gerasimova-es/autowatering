@@ -16,4 +16,6 @@ interface DeviceInvoker {
         whistling: Whistling,
         vaporizer: Vaporizer
     )
+
+    fun watering()
 }

@@ -26,9 +26,9 @@ import org.springframework.web.client.RestTemplate
 class DeviceRest : DeviceInvoker {
 
     companion object {
-
         const val REFRESH_SETTINGS = "/settings/change"
         const val GET_STATE = "/state/info"
+        const val WATERING = "/watering/force"
     }
 
     @Value("\${autowatering.board.url}")
@@ -73,6 +73,18 @@ class DeviceRest : DeviceInvoker {
 
         if (response.statusCode != HttpStatus.OK) {
             throw RuntimeException("could not refresh settings: " + response.statusCodeValue)
+        }
+    }
+
+    override fun watering() {
+        val response = RestTemplate().exchange(
+            url + WATERING,
+            HttpMethod.GET,
+            null,
+            object : ParameterizedTypeReference<String>() {}
+        )
+        if (response.statusCode != HttpStatus.OK) {
+            throw RuntimeException("could force watering: " + response.statusCodeValue)
         }
     }
 }
