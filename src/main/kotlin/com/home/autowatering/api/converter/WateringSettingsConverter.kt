@@ -1,11 +1,11 @@
 package com.home.autowatering.api.converter
 
 import com.home.autowatering.api.dto.settings.WateringSettingsDto
-import com.home.autowatering.model.WateringSettings
+import com.home.autowatering.model.settings.Watering
 
-object WateringSettingsConverter : RequestConverter<WateringSettingsDto, WateringSettings>(
+object WateringSettingsConverter : RequestConverter<WateringSettingsDto, Watering>(
     {
-        WateringSettings(
+        Watering(
             it.enabled,
             it.minHumidity,
             it.interval,
@@ -16,7 +16,7 @@ object WateringSettingsConverter : RequestConverter<WateringSettingsDto, Waterin
         WateringSettingsDto(
             it.enabled,
             it.minHumidity,
-            it.interval,
+            it.checkInterval,
             it.duration
         )
     }

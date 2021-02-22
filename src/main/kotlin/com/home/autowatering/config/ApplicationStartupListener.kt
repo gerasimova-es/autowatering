@@ -1,19 +1,17 @@
 package com.home.autowatering.config
 
-import com.home.autowatering.dao.jpa.entity.JpaLightingSettings
-import com.home.autowatering.dao.repository.LightingSettingsRepository
-import org.springframework.stereotype.Component
+import com.home.autowatering.dao.jpa.entity.JpaLighting
+import com.home.autowatering.dao.repository.LightingRepository
 import java.time.LocalTime
-import javax.annotation.PostConstruct
 
 //@Component
-class ApplicationStartupListener(private var lightingSettingsRepository: LightingSettingsRepository) {
+class ApplicationStartupListener(private var lightingRepository: LightingRepository) {
 
 //    @PostConstruct
     fun init() {
         println("loading lighting settings...")
-        lightingSettingsRepository.save(
-            JpaLightingSettings(
+        lightingRepository.save(
+            JpaLighting(
                 100,
                 true,
                 LocalTime.of(8, 0),

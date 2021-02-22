@@ -10,6 +10,7 @@ import com.home.autowatering.service.VaporizeService
 import com.home.autowatering.service.WateringService
 import com.home.autowatering.service.WhistleService
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 

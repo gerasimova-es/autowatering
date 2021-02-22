@@ -1,12 +1,12 @@
 package com.home.autowatering.api.converter
 
 import com.home.autowatering.api.dto.settings.LightingSettingsDto
-import com.home.autowatering.model.LightingSettings
+import com.home.autowatering.model.settings.Lighting
 import java.time.LocalTime
 
-object LightingSettingsConverter : RequestConverter<LightingSettingsDto, LightingSettings>(
+object LightingSettingsConverter : RequestConverter<LightingSettingsDto, Lighting>(
     {
-        LightingSettings(
+        Lighting(
             it.enabled,
             LocalTime.of(it.startHour, it.startMinute),
             LocalTime.of(it.stopHour, it.stopMinute)

@@ -1,13 +1,13 @@
 package com.home.autowatering.config
 
-import com.home.autowatering.dao.repository.LightingSettingsRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.event.EventListener
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.filter.CommonsRequestLoggingFilter
 
 
 @Configuration
+@EnableScheduling
 class ApplicationConfig {
 
     @Bean

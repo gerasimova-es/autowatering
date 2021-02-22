@@ -1,11 +1,11 @@
 package com.home.autowatering.service
 
-import com.home.autowatering.dao.WateringSettingsDao
-import com.home.autowatering.model.WateringSettings
+import com.home.autowatering.dao.WateringDao
+import com.home.autowatering.model.settings.Watering
 import org.springframework.stereotype.Service
 
 @Service
-class WateringService(private var wateringSettingsDao: WateringSettingsDao) {
+class WateringService(private var wateringSettingsDao: WateringDao) {
 
-    fun getSettings(): WateringSettings = wateringSettingsDao.get()
+    fun getSettings(): Watering = wateringSettingsDao.get()
 }

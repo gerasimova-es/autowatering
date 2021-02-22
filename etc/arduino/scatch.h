@@ -10,7 +10,7 @@
 #include <RtcDateTime.h>
 #include <RtcDS1302.h>
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+//#include <LiquidCrystal_I2C.h>
 
 //WiFi
 const char* ssid = "kate";
@@ -18,6 +18,7 @@ const char* password = "kate_023";
 
 //arduino web-server on 80 port:
 ESP8266WebServer server(80);
+const char* hostName = "board-8266";
 
 //autowatering web-server url
 const char* serverUrl = "http://192.168.1.34:8080/autowatering";
@@ -34,7 +35,7 @@ const char* serverUrl = "http://192.168.1.34:8080/autowatering";
 
 //initialize sensor
 DHT dht(AIR_SENSOR, DHT11);
-LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7);
+//LiquidCrystal_I2C lcd(0x27,2,1,0,4,5,6,7);
 
 //work with datetime
 #define countof(a) (sizeof(a) / sizeof(a[0]))
@@ -120,7 +121,6 @@ struct Settings settings;
 struct AirState {
   int humidity;
   int temperature;
-  bool needWater;
   unsigned long lastCheck;
   RtcDateTime date;
 };
@@ -133,7 +133,6 @@ struct TankerState {
 //last checked ground state
 struct GroundState {
   int humidity;
-  bool needWater;
   unsigned long lastCheck;
   RtcDateTime date;
 };
@@ -176,7 +175,7 @@ void setup(){
 
   dht.begin();
 
-  initLcd();
+  //initLcd();
   wifiConnect();
   initOTA();
   wifiServerStart();
@@ -185,7 +184,7 @@ void setup(){
 }
 
 //-----------------lcd---------------------
-void initLcd(){
+/*void initLcd(){
   lcd.begin(16,2); // for 16 x 2 LCD module
   lcd.setBacklightPin(3, POSITIVE);
   lcd.setBacklight(HIGH);
@@ -193,7 +192,7 @@ void initLcd(){
   lcd.home();  // go home
   lcd.print("Initializing...");
   Serial.println("lcd initialized");
-}
+}*/
 
 //--------------wifi--------------------
 void wifiConnect(){
@@ -219,7 +218,7 @@ void initOTA(){
   // ArduinoOTA.setPort(8266);
 
   // Hostname defaults to esp8266-[ChipID]
-  ArduinoOTA.setHostname("board-8266");
+  ArduinoOTA.setHostname(hostName);
 
   // No authentication by default
   ArduinoOTA.setPassword((const char *)"kate_023");
@@ -325,14 +324,13 @@ void loop(){
 
   if(needCheckGround()){
     int humidity = getGroundHumidity();
+    saveGroundState(humidity);
     //Serial.println("--------------------");
-    bool needWater = needWatering();
-    //Serial.println("--------------------");
-    if(needWater){
+    if(needWatering()){
       watering();
       //Serial.println("--------------------");
     }
-    saveGroundState(humidity, needWatering);
+
     //Serial.println("--------------------");
   }
 
@@ -362,14 +360,15 @@ void loop(){
   if(needLightingOn()){
     lightingOn();
     //Serial.println("--------------------");
-    saveLightingState(true);
-    //Serial.println("--------------------");
+      saveLightingState(true);
+    // Serial.println("--------------------");
   } else if(needLightingOff()){
     lightingOff();
-    //Serial.println("--------------------");
-    saveLightingState(false);
    // Serial.println("--------------------");
+     saveLightingState(false);
+    // Serial.println("--------------------");
   }
+
   delay(2000);
 }
 
@@ -388,7 +387,7 @@ void handleChangeSettings() {
 }
 
 void handleGetState(){
-  Serial.println("getting state info request received. Handling...");
+  //Serial.println("getting state info request received. Handling...");
 
   //if (server.hasArg("plain") == false){
   //    server.send(400, "text/plain", "body is empty");
@@ -397,8 +396,8 @@ void handleGetState(){
   String state = serializeState();
   server.send(200, "application/json;charset=UTF-8", state);
 
-  Serial.println("request handled successfully");
-  Serial.println("--------------------");
+  //Serial.println("request handled successfully");
+  //Serial.println("--------------------");
 }
 
 //--------------CHECKERS-----------------
@@ -417,10 +416,12 @@ bool needCheckAir(){
 }
 //check required actions
 bool needWhistling(){
-  return settings.whistling.enabled &&
+  bool needWhistle =  settings.whistling.enabled &&
      greaterOrEqual(getDateTime().Hour(), getDateTime().Minute(), settings.whistling.startHour, settings.whistling.startMinute) &&
      greater(settings.whistling.stopHour, settings.whistling.stopMinute, getDateTime().Hour(), getDateTime().Minute()) &&
      !state.tanker.isFull;
+     //Serial.println("whistle = " + String(needWhistle));
+     return needWhistle;
 }
 bool needWatering(){
   /*
@@ -508,11 +509,10 @@ bool needVaporizeOff(){
 }
 
 //------------SAVING STATE--------------
-void saveGroundState(int humidity, bool needWatering){
+void saveGroundState(int humidity){
   state.ground.lastCheck = millis();
   state.ground.date = getDateTime();
   state.ground.humidity = humidity;
-  state.ground.needWater = needWatering;
 }
 void saveTankerState(bool isFull){
   state.tanker.lastCheck = millis();
@@ -526,13 +526,11 @@ void saveAirState(int humidity, int temperature){
   state.air.temperature = temperature;
 }
 void saveLightingState(bool lightingStatus){
-  //Serial.println("saving lighting state");
   state.lighting.turnedOn = lightingStatus;
   state.lighting.date = getDateTime();
-  //Serial.println("state.lighting.turnedOn=" + String(state.lighting.turnedOn));
 }
-void saveVaporizerState(bool vaporizerStatus){
-  state.vaporizer.turnedOn = vaporizerStatus;
+void saveVaporizerState(bool vaporizeStatus){
+  state.vaporizer.turnedOn = vaporizeStatus;
   state.vaporizer.date = getDateTime();
 }
 
@@ -604,26 +602,24 @@ String serializeState(){
 
   JsonObject air = doc.createNestedObject("air");
   air["humidity"] = state.air.humidity;
-  air["temp"] = state.air.temperature;
-  air["needWater"] = state.air.needWater;
-  air["date"] = prettyDateTime(state.air.date);
+  air["temperature"] = state.air.temperature;
+  air["lastCheck"] = prettyDateTime(state.air.date);
 
   JsonObject ground = doc.createNestedObject("ground");
   ground["humidity"] = state.ground.humidity;
-  ground["needWater"] = state.ground.needWater;
-  ground["date"] = prettyDateTime(state.ground.date);
+  ground["lastCheck"] = prettyDateTime(state.ground.date);
 
   JsonObject tanker = doc.createNestedObject("tanker");
   tanker["full"] = state.tanker.isFull;
-  tanker["date"] = prettyDateTime(state.tanker.date);
+  tanker["lastCheck"] = prettyDateTime(state.tanker.date);
 
   JsonObject light = doc.createNestedObject("light");
   light["status"] = state.lighting.turnedOn;
-  light["date"] = prettyDateTime(state.lighting.date);
+  light["lastCheck"] = prettyDateTime(state.lighting.date);
 
   JsonObject vaporizer = doc.createNestedObject("vaporizer");
   vaporizer["status"] = state.vaporizer.turnedOn;
-  vaporizer["date"] = prettyDateTime(state.vaporizer.date);
+  vaporizer["lastCheck"] = prettyDateTime(state.vaporizer.date);
 
   String output;
   serializeJson(doc, output);
@@ -731,8 +727,8 @@ RtcDateTime getDateTime(){
   return now;
 }
 
-void lcdPrint(String message){
+/*void lcdPrint(String message){
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print(message);
-}
+}*/

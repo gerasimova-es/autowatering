@@ -1,11 +1,11 @@
 package com.home.autowatering.api.converter
 
 import com.home.autowatering.api.dto.settings.VaporizeSettingsDto
-import com.home.autowatering.model.VaporizeSettings
+import com.home.autowatering.model.settings.Vaporizer
 
-object VaporizeSettingsConverter : RequestConverter<VaporizeSettingsDto, VaporizeSettings>(
+object VaporizeSettingsConverter : RequestConverter<VaporizeSettingsDto, Vaporizer>(
     {
-        VaporizeSettings(
+        Vaporizer(
             it.enabled,
             it.minHumidity,
             it.interval
@@ -15,7 +15,7 @@ object VaporizeSettingsConverter : RequestConverter<VaporizeSettingsDto, Vaporiz
         VaporizeSettingsDto(
             it.enabled,
             it.minHumidity,
-            it.interval
+            it.checkInterval
         )
     }
 )

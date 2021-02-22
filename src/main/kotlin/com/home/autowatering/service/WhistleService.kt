@@ -1,11 +1,11 @@
 package com.home.autowatering.service
 
-import com.home.autowatering.dao.WhistlingSettingsDao
-import com.home.autowatering.model.WhistlingSettings
+import com.home.autowatering.dao.WhistlingDao
+import com.home.autowatering.model.settings.Whistling
 import org.springframework.stereotype.Service
 
 @Service
-class WhistleService(private var whistlingSettingsDao: WhistlingSettingsDao) {
+class WhistleService(private var whistlingSettingsDao: WhistlingDao) {
 
-    fun getSettings(): WhistlingSettings = whistlingSettingsDao.get()
+    fun getSettings(): Whistling = whistlingSettingsDao.get()
 }

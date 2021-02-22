@@ -1,23 +1,24 @@
 package com.home.autowatering.api.converter
 
 import com.home.autowatering.api.dto.settings.DeviceSettingsDto
-import com.home.autowatering.model.LightingSettings
-import com.home.autowatering.model.VaporizeSettings
-import com.home.autowatering.model.WateringSettings
-import com.home.autowatering.model.WhistlingSettings
+import com.home.autowatering.model.settings.Lighting
+import com.home.autowatering.model.settings.Vaporizer
+import com.home.autowatering.model.settings.Watering
+import com.home.autowatering.model.settings.Whistling
 
 object SettingsConverter {
+
     fun convert(
-        lightingSettings: LightingSettings,
-        vaporizeSettings: VaporizeSettings,
-        whistlingSettings: WhistlingSettings,
-        wateringSettings: WateringSettings
+        lighting: Lighting,
+        vaporizer: Vaporizer,
+        whistling: Whistling,
+        watering: Watering
     ): DeviceSettingsDto {
         return DeviceSettingsDto(
-            WateringSettingsConverter.fromEntity(wateringSettings),
-            VaporizeSettingsConverter.fromEntity(vaporizeSettings),
-            LightingSettingsConverter.fromEntity(lightingSettings),
-            WhistlingSettingsConverter.fromEntity(whistlingSettings)
+            WateringSettingsConverter.fromEntity(watering),
+            VaporizeSettingsConverter.fromEntity(vaporizer),
+            LightingSettingsConverter.fromEntity(lighting),
+            WhistlingSettingsConverter.fromEntity(whistling)
         )
     }
 }

@@ -1,12 +1,12 @@
 package com.home.autowatering.api.converter
 
 import com.home.autowatering.api.dto.settings.WhistlingSettingsDto
-import com.home.autowatering.model.WhistlingSettings
+import com.home.autowatering.model.settings.Whistling
 import java.time.LocalTime
 
-object WhistlingSettingsConverter : RequestConverter<WhistlingSettingsDto, WhistlingSettings>(
+object WhistlingSettingsConverter : RequestConverter<WhistlingSettingsDto, Whistling>(
     {
-        WhistlingSettings(
+        Whistling(
             it.enabled,
             it.duration,
             LocalTime.of(it.startHour, it.startMinute),
