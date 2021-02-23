@@ -1,8 +1,5 @@
 package com.home.autowatering.api.dto.settings
 
-import com.fasterxml.jackson.annotation.JsonInclude
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
 class LightingDto(
     var enabled: Boolean = true,
     var startHour: Int,

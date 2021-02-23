@@ -6,6 +6,7 @@ import com.home.autowatering.model.settings.Lighting
 object JpaLightingConverter : JpaConverter<JpaLighting, Lighting>(
     {
         Lighting(
+            it.id,
             it.enabled!!,
             it.startTime!!,
             it.stopTime!!
@@ -13,6 +14,7 @@ object JpaLightingConverter : JpaConverter<JpaLighting, Lighting>(
     },
     {
         JpaLighting(
+            it.id,
             it.enabled,
             it.startTime,
             it.stopTime

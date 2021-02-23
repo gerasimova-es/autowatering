@@ -1,10 +1,11 @@
 package com.home.autowatering.service
 
 import com.home.autowatering.dao.WateringDao
-import com.home.autowatering.dao.jpa.converter.JpaWateringConverter
 import com.home.autowatering.invoker.DeviceInvoker
 import com.home.autowatering.model.settings.Watering
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
 
 @Service
 class WateringService(
@@ -12,8 +13,10 @@ class WateringService(
     private var deviceInvoker: DeviceInvoker
 ) {
 
+    @Transactional(readOnly = true)
     fun getSettings(): Watering = wateringDao.get()
 
+    @Transactional
     fun saveSettings(watering: Watering) {
         val saved = wateringDao.get()
 
@@ -25,5 +28,6 @@ class WateringService(
         wateringDao.save(saved)
     }
 
+    @Transactional
     fun watering() = deviceInvoker.watering()
 }

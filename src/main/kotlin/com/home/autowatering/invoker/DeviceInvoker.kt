@@ -7,7 +7,7 @@ interface DeviceInvoker {
 
     fun getState(): DeviceState
 
-    fun refreshSettings(deviceSettings: DeviceSettings)
+    fun refreshSettings(settings: DeviceSettings)
 
     fun watering()
 }

@@ -6,6 +6,7 @@ import com.home.autowatering.model.settings.Whistling
 object JpaWhistlingConverter : JpaConverter<JpaWhistling, Whistling>(
     {
         Whistling(
+            it.id,
             it.enabled!!,
             it.duration!!,
             it.startTime!!,
@@ -14,6 +15,7 @@ object JpaWhistlingConverter : JpaConverter<JpaWhistling, Whistling>(
     },
     {
         JpaWhistling(
+            it.id,
             it.enabled,
             it.duration,
             it.startTime,

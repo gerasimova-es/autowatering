@@ -17,6 +17,7 @@ object DeviceSettingsDtoConverter : RequestConverter<DeviceSettingsDto, DeviceSe
         DeviceSettings(
             lighting = it.lighting?.let { lighting ->
                 Lighting(
+                    null,
                     lighting.enabled,
                     LocalTime.of(lighting.startHour, lighting.startMinute),
                     LocalTime.of(lighting.stopHour, lighting.stopMinute)
@@ -32,6 +33,7 @@ object DeviceSettingsDtoConverter : RequestConverter<DeviceSettingsDto, DeviceSe
             },
             whistling = it.whistling?.let { whistling ->
                 Whistling(
+                    null,
                     whistling.enabled,
                     whistling.duration,
                     LocalTime.of(whistling.startHour, whistling.startMinute),
@@ -40,6 +42,7 @@ object DeviceSettingsDtoConverter : RequestConverter<DeviceSettingsDto, DeviceSe
             },
             vaporizer = it.vaporize?.let { vaporize ->
                 Vaporizer(
+                    null,
                     vaporize.enabled,
                     vaporize.minHumidity,
                     vaporize.interval

@@ -11,9 +11,8 @@ import org.springframework.stereotype.Repository
 class WhistlingDaoJpa(private var repository: WhistlingRepository) : WhistlingDao {
 
     override fun get(): Whistling {
-        val settings = repository.findAll().stream()
-            .findFirst()
-            .orElseThrow { SettingsNotFoundException("whistling settings not found") }
+        val settings = repository.findAll().singleOrNull()
+            ?: throw SettingsNotFoundException("whistling settings not found")
         return JpaWhistlingConverter.fromJpa(settings)
     }
 

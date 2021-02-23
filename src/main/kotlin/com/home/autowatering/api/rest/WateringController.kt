@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController
 class WateringController(private var wateringService: WateringService) : AbstractController() {
 
     @GetMapping("/force")
-    fun force(){
+    fun force(): String {
         LOGGER.info("request watering is received.")
         GlobalScope.launch {
             wateringService.watering()
             LOGGER.info("watering completed")
 
         }
-        LOGGER.info("request watering sent to device.")
+        return OK
     }
 }

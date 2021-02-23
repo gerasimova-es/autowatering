@@ -11,9 +11,8 @@ import org.springframework.stereotype.Repository
 class VaporizeDaoJpa(private var repository: VaporizeRepository) : VaporiseDao {
 
     override fun get(): Vaporizer {
-        val settings = repository.findAll().stream()
-            .findFirst()
-            .orElseThrow { SettingsNotFoundException("vaporizer settings not found") }
+        val settings = repository.findAll().singleOrNull()
+            ?: throw SettingsNotFoundException("vaporizer settings not found")
         return JpaVaporizeConverter.fromJpa(settings)
     }
 

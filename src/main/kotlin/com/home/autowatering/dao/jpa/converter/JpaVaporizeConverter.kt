@@ -6,6 +6,7 @@ import com.home.autowatering.model.settings.Vaporizer
 object JpaVaporizeConverter : JpaConverter<JpaVaporizer, Vaporizer>(
     {
         Vaporizer(
+            it.id,
             it.enabled!!,
             it.minHumidity!!,
             it.checkInterval!!
@@ -13,6 +14,7 @@ object JpaVaporizeConverter : JpaConverter<JpaVaporizer, Vaporizer>(
     },
     {
         JpaVaporizer(
+            it.id,
             it.enabled,
             it.minHumidity,
             it.checkInterval

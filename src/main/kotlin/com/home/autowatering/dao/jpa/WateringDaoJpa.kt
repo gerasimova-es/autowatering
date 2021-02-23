@@ -11,9 +11,8 @@ import org.springframework.stereotype.Repository
 class WateringDaoJpa(private var repository: WateringRepository) : WateringDao {
 
     override fun get(): Watering {
-        val settings = repository.findAll().stream()
-            .findFirst()
-            .orElseThrow { SettingsNotFoundException("watering settings not found") }
+        val settings = repository.findAll().singleOrNull()
+            ?: throw SettingsNotFoundException("watering settings not found")
         return JpaWateringConverter.fromJpa(settings)
     }
 

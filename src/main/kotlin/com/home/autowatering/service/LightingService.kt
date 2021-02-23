@@ -5,6 +5,7 @@ import com.home.autowatering.dao.LightingHistoryDao
 import com.home.autowatering.model.history.LightingHistory
 import com.home.autowatering.model.settings.Lighting
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class LightingService(
@@ -12,8 +13,10 @@ class LightingService(
     private var lightingHistoryDao: LightingHistoryDao
 ) {
 
+    @Transactional(readOnly = true)
     fun getSettings(): Lighting = lightingDao.get()
 
+    @Transactional
     fun saveSettings(lighting: Lighting){
         val saved = lightingDao.get()
 
@@ -24,6 +27,7 @@ class LightingService(
         lightingDao.save(saved)
     }
 
+    @Transactional
     fun saveHistory(history: LightingHistory) {
         lightingHistoryDao.save(history)
     }

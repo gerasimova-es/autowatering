@@ -5,6 +5,7 @@ import com.home.autowatering.dao.GroundConditionDao
 import com.home.autowatering.model.history.AirCondition
 import com.home.autowatering.model.history.GroundCondition
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ClimateService(
@@ -12,10 +13,12 @@ class ClimateService(
     private var groundConditionDao: GroundConditionDao
 ) {
 
+    @Transactional
     fun saveAirCondition(condition: AirCondition) {
         airConditionDao.save(condition)
     }
 
+    @Transactional
     fun saveGroundCondition(condition: GroundCondition) {
         groundConditionDao.save(condition)
     }

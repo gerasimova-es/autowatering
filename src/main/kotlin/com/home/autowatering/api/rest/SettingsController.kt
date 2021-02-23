@@ -2,7 +2,6 @@ package com.home.autowatering.api.rest;
 
 import com.home.autowatering.api.converter.DeviceSettingsDtoConverter
 import com.home.autowatering.api.dto.settings.DeviceSettingsDto
-import com.home.autowatering.invoker.rest.DeviceRest
 import com.home.autowatering.model.settings.DeviceSettings
 import com.home.autowatering.service.DeviceService
 import com.home.autowatering.service.LightingService
@@ -13,6 +12,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -38,7 +38,7 @@ class SettingsController(
     }
 
     @PostMapping("/update")
-    fun update(settingsDto: DeviceSettingsDto) {
+    fun update(@RequestBody settingsDto: DeviceSettingsDto): String {
         LOGGER.info("request for update settings is received.")
         val settings = DeviceSettingsDtoConverter.fromDto(settingsDto)
 
@@ -57,9 +57,12 @@ class SettingsController(
 
         LOGGER.info("sending request for update settings to device")
         GlobalScope.launch {
-            deviceService.refresh()
-            LOGGER.info("settings updated on device")
+            runCatching { deviceService.refresh() }
+                .onFailure { error -> LOGGER.error("error during update settings on device", error) }
+                .onSuccess { LOGGER.info("settings updated on device") }
         }
+
+        return OK
     }
 
 }
