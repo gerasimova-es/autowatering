@@ -16,4 +16,10 @@ class WhistlingDaoJpa(private var repository: WhistlingRepository) : WhistlingDa
             .orElseThrow { SettingsNotFoundException("whistling settings not found") }
         return JpaWhistlingConverter.fromJpa(settings)
     }
+
+    override fun save(whistling: Whistling) {
+        repository.save(JpaWhistlingConverter.fromEntity(whistling))
+    }
+
+
 }

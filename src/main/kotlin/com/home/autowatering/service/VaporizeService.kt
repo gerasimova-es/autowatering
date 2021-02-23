@@ -14,6 +14,14 @@ class VaporizeService(
 
     fun getSettings(): Vaporizer = vaporizeDao.get()
 
+    fun saveSettings(vaporizer: Vaporizer){
+        var saved = vaporizeDao.get()
+        saved.checkInterval = vaporizer.checkInterval
+        saved.minHumidity = vaporizer.minHumidity
+        saved.enabled = vaporizer.enabled
+        vaporizeDao.save(vaporizer)
+    }
+
     fun saveHistory(history: VaporizerHistory) {
         vaporizerHistoryDao.save(history)
     }

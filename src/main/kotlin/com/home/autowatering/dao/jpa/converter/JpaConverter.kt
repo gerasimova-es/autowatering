@@ -7,7 +7,6 @@ open class JpaConverter<J, E>(
     fun fromJpa(jpa: J): E =
         fromJpa.invoke(jpa)
 
-
     fun fromEntity(entity: E): J =
         fromEntity.invoke(entity)
 

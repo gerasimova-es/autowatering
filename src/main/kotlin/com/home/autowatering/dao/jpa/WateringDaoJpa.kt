@@ -16,4 +16,8 @@ class WateringDaoJpa(private var repository: WateringRepository) : WateringDao {
             .orElseThrow { SettingsNotFoundException("watering settings not found") }
         return JpaWateringConverter.fromJpa(settings)
     }
+
+    override fun save(watering: Watering) {
+        repository.save(JpaWateringConverter.fromEntity(watering))
+    }
 }

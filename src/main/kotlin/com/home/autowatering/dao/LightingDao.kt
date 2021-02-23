@@ -5,4 +5,6 @@ import com.home.autowatering.model.settings.Lighting
 interface LightingDao {
 
     fun get(): Lighting
+
+    fun save(lighting: Lighting)
 }

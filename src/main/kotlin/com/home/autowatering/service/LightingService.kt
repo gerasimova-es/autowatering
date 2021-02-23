@@ -14,6 +14,16 @@ class LightingService(
 
     fun getSettings(): Lighting = lightingDao.get()
 
+    fun saveSettings(lighting: Lighting){
+        val saved = lightingDao.get()
+
+        saved.enabled = lighting.enabled
+        saved.startTime = lighting.startTime
+        saved.stopTime = lighting.stopTime
+
+        lightingDao.save(saved)
+    }
+
     fun saveHistory(history: LightingHistory) {
         lightingHistoryDao.save(history)
     }

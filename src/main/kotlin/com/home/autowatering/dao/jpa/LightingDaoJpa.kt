@@ -18,4 +18,8 @@ class LightingDaoJpa(private var repository: LightingRepository) : LightingDao {
         return JpaLightingConverter.fromJpa(settings)
     }
 
+    override fun save(lighting: Lighting) {
+        repository.save(JpaLightingConverter.fromEntity(lighting))
+    }
+
 }

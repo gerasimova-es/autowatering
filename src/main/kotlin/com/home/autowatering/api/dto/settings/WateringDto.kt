@@ -1,9 +1,6 @@
 package com.home.autowatering.api.dto.settings
 
-import com.fasterxml.jackson.annotation.JsonInclude
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-class WateringSettingsDto(
+class WateringDto(
     var enabled: Boolean,
     var minHumidity: Int,
     var interval: Int,

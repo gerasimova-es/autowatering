@@ -16,4 +16,8 @@ class VaporizeDaoJpa(private var repository: VaporizeRepository) : VaporiseDao {
             .orElseThrow { SettingsNotFoundException("vaporizer settings not found") }
         return JpaVaporizeConverter.fromJpa(settings)
     }
+
+    override fun save(vaporizer: Vaporizer) {
+        repository.save(JpaVaporizeConverter.fromEntity(vaporizer))
+    }
 }

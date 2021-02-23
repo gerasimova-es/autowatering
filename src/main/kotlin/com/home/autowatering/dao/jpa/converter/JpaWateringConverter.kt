@@ -6,6 +6,7 @@ import com.home.autowatering.model.settings.Watering
 object JpaWateringConverter : JpaConverter<JpaWatering, Watering>(
     {
         Watering(
+            it.id,
             it.enabled!!,
             it.minHumidity!!,
             it.checkInterval!!,
@@ -14,6 +15,7 @@ object JpaWateringConverter : JpaConverter<JpaWatering, Watering>(
     },
     {
         JpaWatering(
+            it.id,
             it.enabled,
             it.minHumidity,
             it.checkInterval,

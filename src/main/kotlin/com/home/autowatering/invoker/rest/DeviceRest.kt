@@ -1,18 +1,11 @@
 package com.home.autowatering.invoker.rest
 
-import com.home.autowatering.api.converter.LightingSettingsConverter
-import com.home.autowatering.api.converter.VaporizeSettingsConverter
-import com.home.autowatering.api.converter.WateringSettingsConverter
-import com.home.autowatering.api.converter.WhistlingSettingsConverter
-import com.home.autowatering.api.dto.settings.DeviceSettingsDto
+import com.home.autowatering.api.converter.DeviceSettingsDtoConverter
 import com.home.autowatering.invoker.DeviceInvoker
-import com.home.autowatering.invoker.converter.DeviceStateConverter
+import com.home.autowatering.invoker.converter.DeviceStateDtoConverter
 import com.home.autowatering.invoker.dto.state.DeviceStateDto
 import com.home.autowatering.model.history.DeviceState
-import com.home.autowatering.model.settings.Lighting
-import com.home.autowatering.model.settings.Vaporizer
-import com.home.autowatering.model.settings.Watering
-import com.home.autowatering.model.settings.Whistling
+import com.home.autowatering.model.settings.DeviceSettings
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
@@ -48,25 +41,15 @@ class DeviceRest : DeviceInvoker {
             throw RuntimeException("body is empty" + response.statusCodeValue)
         }
 
-        return DeviceStateConverter.fromDto(response.body!!)
+        return DeviceStateDtoConverter.fromDto(response.body!!)
     }
 
-    override fun refreshSettings(
-        lighting: Lighting,
-        watering: Watering,
-        whistling: Whistling,
-        vaporizer: Vaporizer
-    ) {
+    override fun refreshSettings(settings: DeviceSettings) {
         val response = RestTemplate().exchange(
             url + REFRESH_SETTINGS,
             HttpMethod.POST,
             HttpEntity(
-                DeviceSettingsDto(
-                    WateringSettingsConverter.fromEntity(watering),
-                    VaporizeSettingsConverter.fromEntity(vaporizer),
-                    LightingSettingsConverter.fromEntity(lighting),
-                    WhistlingSettingsConverter.fromEntity(whistling)
-                )
+                DeviceSettingsDtoConverter.fromEntity(settings)
             ),
             object : ParameterizedTypeReference<String>() {}
         )

@@ -14,7 +14,7 @@ import com.home.autowatering.model.history.LightingHistory
 import com.home.autowatering.model.history.TankerHistory
 import com.home.autowatering.model.history.VaporizerHistory
 
-object DeviceStateConverter : RequestConverter<DeviceStateDto, DeviceState>(
+object DeviceStateDtoConverter : RequestConverter<DeviceStateDto, DeviceState>(
     {
         DeviceState(
             airCondition = AirCondition(

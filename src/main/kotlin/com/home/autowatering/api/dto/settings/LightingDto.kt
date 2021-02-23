@@ -3,9 +3,8 @@ package com.home.autowatering.api.dto.settings
 import com.fasterxml.jackson.annotation.JsonInclude
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class WhistlingSettingsDto(
-    var enabled: Boolean,
-    var duration: Int,
+class LightingDto(
+    var enabled: Boolean = true,
     var startHour: Int,
     var startMinute: Int,
     var stopHour: Int,

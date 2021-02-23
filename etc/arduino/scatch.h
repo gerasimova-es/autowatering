@@ -61,7 +61,7 @@ struct WateringSettings {
   int minHumidity;
   int interval;   //in milliseconds
   int duration; //in milliseconds
-  WateringSettings(): enabled(true),
+  WateringSettings(): enabled(false),
     minHumidity(200),
     interval(60*60000),
     duration(3*1000){}
@@ -96,7 +96,7 @@ struct WhistleSettings {
   int startMinute;
   int stopHour; //hour of day
   int stopMinute;
-  WhistleSettings(): enabled(true),
+  WhistleSettings(): enabled(false),
     duration(200),
     startHour(10),
     startMinute(0),
@@ -375,7 +375,7 @@ void loop(){
 
 //-----------------REQUEST HANDLERS--------------------
 void handleChangeSettings() {
-  //Serial.println("changing setting request received. Handling...");
+  Serial.println("changing setting request received. Handling...");
   if (server.hasArg("plain") == false){
      server.send(400, "text/plain", "body is empty");
      return;
@@ -383,8 +383,8 @@ void handleChangeSettings() {
   settings = deserializeSettings(server.arg("plain"));
   server.send(200, "text/plain", "ok");
 
-  //Serial.println("request handled successfully");
-  //Serial.println("--------------------");
+  Serial.println("request handled successfully");
+  Serial.println("--------------------");
 }
 
 void handleGetState(){
@@ -398,13 +398,13 @@ void handleGetState(){
 }
 
 void handleForceWatering(){
-  //Serial.println("watering request received. Handling...");
+  Serial.println("watering request received. Handling...");
 
   watering();
   server.send(200, "text/plain", "ok");
 
-  //Serial.println("request handled successfully");
-  //Serial.println("--------------------");
+  Serial.println("request handled successfully");
+  Serial.println("--------------------");
 }
 
 //--------------CHECKERS-----------------
