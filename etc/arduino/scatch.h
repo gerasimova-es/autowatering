@@ -71,7 +71,7 @@ struct VaporizeSettings {
   bool enabled;
   int minHumidity;
   int interval; //in milliseconds
-  VaporizeSettings(): enabled(true),
+  VaporizeSettings(): enabled(false),
     minHumidity(50),
     interval(5*60000) {}
 };
