@@ -48,11 +48,11 @@ unsigned long lastCheckTime;
 #define PUMP_RELAY_OPEN HIGH
 #define PUMP_RELAY_CLOSE LOW
 
-#define LIGHT_RELAY_OPEN LOW
-#define LIGHT_RELAY_CLOSE HIGH
+#define LIGHT_RELAY_OPEN HIGH
+#define LIGHT_RELAY_CLOSE LOW
 
-#define VAPORIZE_RELAY_OPEN LOW
-#define VAPORIZE_RELAY_CLOSE HIGH
+#define VAPORIZE_RELAY_OPEN HIGH
+#define VAPORIZE_RELAY_CLOSE LOW
 
 //----------------SETTINGS--------------
 //settings for watering process
@@ -71,9 +71,9 @@ struct VaporizeSettings {
   bool enabled;
   int minHumidity;
   int interval; //in milliseconds
-  VaporizeSettings(): enabled(false),
-    minHumidity(50),
-    interval(5*60000) {}
+  VaporizeSettings(): enabled(true),
+    minHumidity(60),
+    interval(10*60000) {}
 };
 //settings for lighting
 struct LightingSettings {
@@ -83,7 +83,7 @@ struct LightingSettings {
   int stopHour; //hour of day
   int stopMinute;
   LightingSettings(): enabled(true),
-    startHour(8),
+    startHour(7),
     startMinute(30),
     stopHour(23),
     stopMinute(30){}
@@ -285,7 +285,7 @@ void initDateTime(){
   Serial.println(prettyDateTime(compiled));
 
   if (!Rtc.IsDateTimeValid()){
-    Serial.println("SENSOR: RTC INIT: lost confidence in the DateTime!");
+    Serial.println("SENSOR: RTC INIT: lost confidence in DateTime!");
     Rtc.SetDateTime(compiled);
   }
 
@@ -454,7 +454,7 @@ bool needLightingOn(){
   Serial.println("settings.lighting.enabled=" + String(settings.lighting.enabled));
   Serial.println("state.lighting.turnedOn=" + String(state.lighting.turnedOn));
 
-  Serial.println("settings.lighting.startTime=" + String(settings.lighting.startTime) + ":" + String(settings.lighting.startMinute));
+  Serial.println("settings.lighting.startHour=" + String(settings.lighting.startHour) + ":" + String(settings.lighting.startMinute));
   Serial.println("settings.lighting.stopTime=" + String(settings.lighting.stopHour) + ":" + String(settings.lighting.stopMinute));
   Serial.println("getDateTime().Hour()=" + String(getDateTime().Hour()));
   Serial.println("getDateTime().Minute()=" + String(getDateTime().Minute()));
@@ -476,7 +476,7 @@ bool needLightingOff(){
   Serial.println("settings.lighting.enabled=" + String(settings.lighting.enabled));
   Serial.println("state.lighting.turnedOn=" + String(state.lighting.turnedOn));
 
-  Serial.println("settings.lighting.startTime=" + String(settings.lighting.startTime) + ":" + String(settings.lighting.startMinute));
+  Serial.println("settings.lighting.startHour=" + String(settings.lighting.startHour) + ":" + String(settings.lighting.startMinute));
   Serial.println("settings.lighting.stopTime=" + String(settings.lighting.stopHour) + ":" + String(settings.lighting.stopMinute));
   Serial.println("getDateTime().Hour()=" + String(getDateTime().Hour()));
   Serial.println("getDateTime().Minute()=" + String(getDateTime().Minute()));
@@ -496,9 +496,9 @@ bool needVaporizeOn(){
   /*Serial.println("need vaporize on calculation:");
   Serial.println("settings.vaporize.enabled=" + String(settings.vaporize.enabled));
   Serial.println("settings.vaporize.minHumidity:" + String(settings.vaporize.minHumidity));
-  Serial.println("state.air.humidity:" + String(state.air.humidity));
-  Serial.println("-----------------------");*/
-  bool vaporizeOn = !state.vaporizer.turnedOn && settings.vaporize.enabled && state.air.humidity < settings.vaporize.minHumidity;
+  Serial.println("state.air.humidity:" + String(state.air.humidity));*/
+
+  bool vaporizeOn = settings.vaporize.enabled && !state.vaporizer.turnedOn && state.air.humidity <= settings.vaporize.minHumidity;
   /*Serial.println("vaporize.turnOn = " + String(vaporizeOn));
   Serial.println("-----------------------");*/
   return vaporizeOn;
@@ -507,8 +507,8 @@ bool needVaporizeOff(){
   /*Serial.println("need vaporize on calculation:");
   Serial.println("settings.vaporize.enabled=" + String(settings.vaporize.enabled));
   Serial.println("settings.vaporize.minHumidity:" + String(settings.vaporize.minHumidity));
-  Serial.println("state.air.humidity:" + String(state.air.humidity));
-  Serial.println("-----------------------");*/
+  Serial.println("state.air.humidity:" + String(state.air.humidity));*/
+
   bool vaporizeOff = state.vaporizer.turnedOn && (!settings.vaporize.enabled || state.air.humidity > settings.vaporize.minHumidity);
   /*Serial.println("vaporize.turnOff = " + String(vaporizeOff));
   Serial.println("-----------------------");*/
@@ -584,9 +584,9 @@ struct Settings deserializeSettings(String settings){
   tmp.watering.duration = tmp.watering.duration * 1000;
 
   JsonObject vaporize = doc["vaporize"];
-  tmp.watering.enabled = vaporize["enabled"]; // false
-  tmp.watering.minHumidity = vaporize["minHumidity"]; // 50
-  tmp.watering.interval = vaporize["interval"]; // 30
+  tmp.vaporize.enabled = vaporize["enabled"]; // false
+  tmp.vaporize.minHumidity = vaporize["minHumidity"]; // 50
+  tmp.vaporize.interval = vaporize["interval"]; // 30
 
   tmp.lighting.enabled = doc["lighting"]["enabled"]; // false
   tmp.lighting.startHour = doc["lighting"]["startHour"]; //7
@@ -712,9 +712,9 @@ void lightingOff(){
 }
 
 void vaporizeOn(){
-  //Serial.println("turning vaporize on...");
+  Serial.println("turning vaporize on...");
   digitalWrite(VAPORIZER, VAPORIZE_RELAY_OPEN);
-  //Serial.println("vaporize is turned on");
+  Serial.println("vaporize is turned on");
 }
 
 void vaporizeOff(){
