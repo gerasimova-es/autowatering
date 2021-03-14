@@ -72,8 +72,8 @@ struct VaporizeSettings {
   int minHumidity;
   int interval; //in milliseconds
   VaporizeSettings(): enabled(true),
-    minHumidity(60),
-    interval(10*60000) {}
+    minHumidity(55),
+    interval(2*60000) {}
 };
 //settings for lighting
 struct LightingSettings {
@@ -712,9 +712,9 @@ void lightingOff(){
 }
 
 void vaporizeOn(){
-  Serial.println("turning vaporize on...");
+  //Serial.println("turning vaporize on...");
   digitalWrite(VAPORIZER, VAPORIZE_RELAY_OPEN);
-  Serial.println("vaporize is turned on");
+  //Serial.println("vaporize is turned on");
 }
 
 void vaporizeOff(){
